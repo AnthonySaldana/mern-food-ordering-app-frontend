@@ -63,3 +63,18 @@ export type RestaurantSearchResponse = {
     pages: number;
   };
 };
+
+export type SocialMediaHandle = {
+  platform: string;
+  handle: string;
+};
+
+export type Influencer = {
+  _id: string;
+  influencerName: string;
+  city: string;
+  country: string;
+  socialMediaHandles: SocialMediaHandle[];
+  imageUrl: string;
+  cuisines: string[];
+};

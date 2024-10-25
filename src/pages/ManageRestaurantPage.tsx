@@ -6,7 +6,8 @@ import {
 } from "@/api/MyRestaurantApi";
 import OrderItemCard from "@/components/OrderItemCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import ManageRestaurantForm from "@/forms/manage-restaurant-form/ManageRestaurantForm";
+// import ManageRestaurantForm from "@/forms/manage-restaurant-form/ManageRestaurantForm";
+import ManageInfluencerForm from "@/forms/manage-influencer-form/ManageInfluencerForm";
 
 const ManageRestaurantPage = () => {
   const { createRestaurant, isLoading: isCreateLoading } =
@@ -23,7 +24,7 @@ const ManageRestaurantPage = () => {
     <Tabs defaultValue="orders">
       <TabsList>
         <TabsTrigger value="orders">Orders</TabsTrigger>
-        <TabsTrigger value="manage-restaurant">Manage Restaurant</TabsTrigger>
+        <TabsTrigger value="manage-influencer">Manage Influencer</TabsTrigger>
       </TabsList>
       <TabsContent
         value="orders"
@@ -34,8 +35,8 @@ const ManageRestaurantPage = () => {
           <OrderItemCard order={order} />
         ))}
       </TabsContent>
-      <TabsContent value="manage-restaurant">
-        <ManageRestaurantForm
+      <TabsContent value="manage-influencer">
+        <ManageInfluencerForm
           restaurant={restaurant}
           onSave={isEditing ? updateRestaurant : createRestaurant}
           isLoading={isCreateLoading || isUpdateLoading}
