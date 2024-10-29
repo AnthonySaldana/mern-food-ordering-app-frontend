@@ -38,6 +38,13 @@ const formSchema = z
       z.object({
         name: z.string().min(1, "name is required"),
         price: z.coerce.number().min(1, "price is required"),
+        ingredients: z.string().optional(),
+        calories: z.coerce.number().optional(),
+        macros: z.object({
+          protein: z.coerce.number().optional(),
+          carbs: z.coerce.number().optional(),
+          fat: z.coerce.number().optional(),
+        }),
       })
     ),
     imageUrl: z.string().optional(),

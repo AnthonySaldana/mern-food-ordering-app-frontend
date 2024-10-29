@@ -71,10 +71,14 @@ export type SocialMediaHandle = {
 
 export type Influencer = {
   _id: string;
-  influencerName: string;
+  name: string;
+  bio: string;
+  deliveryPrice: number;
+  estimatedDeliveryTime: number;
   city: string;
   country: string;
   socialMediaHandles: SocialMediaHandle[];
   imageUrl: string;
   cuisines: string[];
+  menuItems: MenuItem[];
 };

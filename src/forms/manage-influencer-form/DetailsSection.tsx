@@ -8,20 +8,27 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useFormContext } from "react-hook-form";
+import { Button } from "@/components/ui/button";
 
 const DetailsSection = () => {
-  const { control } = useFormContext();
+  const { control, watch, setValue } = useFormContext();
+  const socialMediaHandles = watch("socialMediaHandles") || [];
+
+  const addSocialMediaHandle = () => {
+    setValue("socialMediaHandles", [...socialMediaHandles, { platform: "", handle: "" }]);
+  };
+
   return (
     <div className="space-y-2">
       <div>
         <h2 className="text-2xl font-bold">Details</h2>
         <FormDescription>
-          Enter the details about your restaurant
+          Enter the details about your influencer profile
         </FormDescription>
       </div>
       <FormField
         control={control}
-        name="restaurantName"
+        name="name"
         render={({ field }) => (
           <FormItem>
             <FormLabel>Name</FormLabel>
@@ -60,7 +67,19 @@ const DetailsSection = () => {
           )}
         />
       </div>
-
+      <FormField
+        control={control}
+        name="bio"
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Bio</FormLabel>
+            <FormControl>
+              <Input type="textarea" {...field} className="bg-white" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
       <FormField
         control={control}
         name="deliveryPrice"
@@ -87,6 +106,43 @@ const DetailsSection = () => {
           </FormItem>
         )}
       />
+
+      <div>
+        <h3 className="text-xl font-bold mt-4">Social Media Handles</h3>
+        {socialMediaHandles.map((handle, index) => (
+          <div key={index} className="flex gap-4 mt-2">
+            <FormField
+              control={control}
+              name={`socialMediaHandles.${index}.platform`}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Platform</FormLabel>
+                  <FormControl>
+                    <Input {...field} className="bg-white" placeholder="e.g. Instagram" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+            <FormField
+              control={control}
+              name={`socialMediaHandles.${index}.handle`}
+              render={({ field }) => (
+                <FormItem className="flex-1">
+                  <FormLabel>Handle</FormLabel>
+                  <FormControl>
+                    <Input {...field} className="bg-white" placeholder="@username" />
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+          </div>
+        ))}
+        <Button type="button" onClick={addSocialMediaHandle} className="mt-2">
+          Add Social Media Handle
+        </Button>
+      </div>
     </div>
   );
 };

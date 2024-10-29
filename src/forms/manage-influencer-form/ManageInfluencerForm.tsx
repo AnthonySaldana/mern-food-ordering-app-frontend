@@ -5,6 +5,7 @@ import { z } from "zod";
 import DetailsSection from "./DetailsSection";
 import { Separator } from "@/components/ui/separator";
 import CuisinesSection from "./CuisinesSection";
+import MenuSection from "./MenuSection";
 import ImageSection from "./ImageSection";
 import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
@@ -13,8 +14,11 @@ import { useEffect } from "react";
 
 const formSchema = z
   .object({
-    influencerName: z.string({
+    name: z.string({
       required_error: "Influencer name is required",
+    }),
+    bio: z.string({
+      required_error: "Bio is required",
     }),
     city: z.string({
       required_error: "City is required",
@@ -22,10 +26,34 @@ const formSchema = z
     country: z.string({
       required_error: "Country is required",
     }),
+    deliveryPrice: z.coerce.number({
+      required_error: "delivery price is required",
+      invalid_type_error: "must be a valid number",
+    }),
+    estimatedDeliveryTime: z.coerce.number({
+      required_error: "estimated delivery time is required",
+      invalid_type_error: "must be a valid number",
+    }),
     socialMediaHandles: z.array(
       z.object({
-        platform: z.string().min(1, "Platform is required"),
-        handle: z.string().min(1, "Handle is required"),
+        platform: z.string().min(1, "Platform is required").optional(),
+        handle: z.string().min(1, "Handle is required").optional(),
+      })
+    ).optional(),
+    cuisines: z.array(z.string()).nonempty({
+      message: "please select at least one item",
+    }),
+    menuItems: z.array(
+      z.object({
+        name: z.string().min(1, "name is required"),
+        price: z.coerce.number().min(1, "price is required"),
+        ingredients: z.string().optional(),
+        calories: z.coerce.number().optional(),
+        macros: z.object({
+          protein: z.coerce.number().optional(),
+          carbs: z.coerce.number().optional(),
+          fat: z.coerce.number().optional(),
+        }),
       })
     ),
     imageUrl: z.string().optional(),
@@ -48,7 +76,17 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
   const form = useForm<InfluencerFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
+      name: "",
+      bio: "",
+      city: "",
+      country: "",
+      deliveryPrice: 0,
+      estimatedDeliveryTime: 0,
       socialMediaHandles: [{ platform: "", handle: "" }],
+      cuisines: [],
+      menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 } }],
+      imageUrl: "",
+      imageFile: undefined,
     },
   });
 
@@ -57,30 +95,92 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
       return;
     }
 
-    const updatedInfluencer = {
-      ...influencer,
-    };
+    console.log(influencer, 'Influencer data in effect');
 
-    form.reset(updatedInfluencer);
+    try {
+      const deliveryPriceFormatted = parseInt(
+        (influencer.deliveryPrice / 100).toFixed(2)
+      );
+
+      const menuItemsFormatted = influencer.menuItems ? influencer.menuItems.map((item) => ({
+        ...item,
+        price: parseInt((item.price / 100).toFixed(2)),
+      })) : [];
+
+      const updatedInfluencer = {
+        ...influencer,
+        deliveryPrice: deliveryPriceFormatted,
+        menuItems: menuItemsFormatted,
+      };
+
+      form.reset(updatedInfluencer);
+    } catch (error) {
+      console.error("Error formatting influencer data:", error);
+      // You might want to show an error message to the user here
+    }
   }, [form, influencer]);
 
   const onSubmit = (formDataJson: InfluencerFormData) => {
-    const formData = new FormData();
+    try {
+      console.log(formDataJson);
+      console.log("Running submit on save");
+      const formData = new FormData();
 
-    formData.append("influencerName", formDataJson.influencerName);
-    formData.append("city", formDataJson.city);
-    formData.append("country", formDataJson.country);
+      formData.append("name", formDataJson.name);
+      formData.append("bio", formDataJson.bio);
+      formData.append("city", formDataJson.city);
+      formData.append("country", formDataJson.country);
+      formData.append("deliveryPrice", (formDataJson.deliveryPrice * 100).toString());
+      formData.append("estimatedDeliveryTime", formDataJson.estimatedDeliveryTime.toString());
 
-    formDataJson.socialMediaHandles.forEach((handle, index) => {
-      formData.append(`socialMediaHandles[${index}][platform]`, handle.platform);
-      formData.append(`socialMediaHandles[${index}][handle]`, handle.handle);
-    });
+      if (formDataJson.socialMediaHandles) {
+        formDataJson.socialMediaHandles.forEach((handle, index) => {
+          if (handle.platform) {
+            formData.append(`socialMediaHandles[${index}][platform]`, handle.platform);
+          }
+          if (handle.handle) {
+            formData.append(`socialMediaHandles[${index}][handle]`, handle.handle);
+          }
+        });
+      }
 
-    if (formDataJson.imageFile) {
-      formData.append(`imageFile`, formDataJson.imageFile);
+      formDataJson.cuisines.forEach((cuisine, index) => {
+        formData.append(`cuisines[${index}]`, cuisine);
+      });
+
+      formDataJson.menuItems.forEach((item, index) => {
+        formData.append(`menuItems[${index}][name]`, item.name);
+        formData.append(`menuItems[${index}][price]`, (item.price * 100).toString());
+        if (item.ingredients) {
+          formData.append(`menuItems[${index}][ingredients]`, item.ingredients);
+        }
+        if (item.calories) {
+          formData.append(`menuItems[${index}][calories]`, item.calories.toString());
+        }
+        if (item.macros?.protein) {
+          formData.append(`menuItems[${index}][macros][protein]`, item.macros.protein.toString());
+        }
+        if (item.macros?.carbs) {
+          formData.append(`menuItems[${index}][macros][carbs]`, item.macros.carbs.toString());
+        }
+        if (item.macros?.fat) {
+          formData.append(`menuItems[${index}][macros][fat]`, item.macros.fat.toString());
+        }
+      });
+
+      if (formDataJson.imageFile) {
+        formData.append(`imageFile`, formDataJson.imageFile);
+      }
+
+      console.log(formDataJson);
+      console.log("Running submit on save");
+      onSave(formData);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      // You might want to show an error message to the user here
+      // For example:
+      // form.setError("root", { type: "manual", message: "An error occurred while submitting the form. Please try again." });
     }
-
-    onSave(formData);
   };
 
   return (
@@ -91,7 +191,9 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
       >
         <DetailsSection />
         <Separator />
-        {/* <CuisinesSection /> */}
+        <CuisinesSection />
+        <Separator />
+        <MenuSection />
         <Separator />
         <ImageSection />
         {isLoading ? <LoadingButton /> : <Button type="submit">Submit</Button>}

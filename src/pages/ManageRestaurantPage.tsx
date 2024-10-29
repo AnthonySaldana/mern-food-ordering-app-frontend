@@ -4,21 +4,33 @@ import {
   useGetMyRestaurantOrders,
   useUpdateMyRestaurant,
 } from "@/api/MyRestaurantApi";
+import {
+  useGetMyInfluencer,
+  useUpdateMyInfluencer,
+  useCreateMyInfluencer
+} from "@/api/InfluencerApi";
 import OrderItemCard from "@/components/OrderItemCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import ManageRestaurantForm from "@/forms/manage-restaurant-form/ManageRestaurantForm";
 import ManageInfluencerForm from "@/forms/manage-influencer-form/ManageInfluencerForm";
 
 const ManageRestaurantPage = () => {
-  const { createRestaurant, isLoading: isCreateLoading } =
-    useCreateMyRestaurant();
-  const { restaurant } = useGetMyRestaurant();
-  const { updateRestaurant, isLoading: isUpdateLoading } =
-    useUpdateMyRestaurant();
+  // const { createRestaurant, isLoading: isCreateLoading } =
+  //   useCreateMyRestaurant();
+  // const { restaurant } = useGetMyRestaurant();
+  const { influencer } = useGetMyInfluencer();
+  // const { updateRestaurant, isLoading: isUpdateLoading } =
+  //   useUpdateMyRestaurant();
+  const { createInfluencer, isLoading: isCreateInfluencerLoading } =
+    useCreateMyInfluencer();
+  const { updateInfluencer, isLoading: isUpdateInfluencerLoading } =
+    useUpdateMyInfluencer();
 
   const { orders } = useGetMyRestaurantOrders();
 
-  const isEditing = !!restaurant;
+  const isEditing = !!influencer;
+
+  console.log(influencer, 'Influencer data');
 
   return (
     <Tabs defaultValue="orders">
@@ -37,9 +49,9 @@ const ManageRestaurantPage = () => {
       </TabsContent>
       <TabsContent value="manage-influencer">
         <ManageInfluencerForm
-          restaurant={restaurant}
-          onSave={isEditing ? updateRestaurant : createRestaurant}
-          isLoading={isCreateLoading || isUpdateLoading}
+          influencer={influencer}
+          onSave={isEditing ? updateInfluencer : createInfluencer}
+          isLoading={isCreateInfluencerLoading || isUpdateInfluencerLoading}
         />
       </TabsContent>
     </Tabs>

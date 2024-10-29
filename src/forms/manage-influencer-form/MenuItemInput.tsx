@@ -18,7 +18,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
   const { control } = useFormContext();
 
   return (
-    <div className="flex flex-row items-end gap-2">
+    <div className="flex flex-col gap-4 border p-4 rounded-lg">
       <FormField
         control={control}
         name={`menuItems.${index}.name`}
@@ -30,7 +30,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
             <FormControl>
               <Input
                 {...field}
-                placeholder="Cheese Pizza"
+                placeholder="Grilled Chicken Salad"
                 className="bg-white"
               />
             </FormControl>
@@ -43,18 +43,117 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
-              Price (£) <FormMessage />
+              Price <FormMessage />
             </FormLabel>
             <FormControl>
-              <Input {...field} placeholder="8.00" className="bg-white" />
+              <Input
+                {...field}
+                placeholder="Meal average price"
+                className="bg-white"
+              />
             </FormControl>
           </FormItem>
         )}
       />
+      <FormField
+        control={control}
+        name={`menuItems.${index}.ingredients`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-1">
+              Ingredients (comma-separated) <FormMessage />
+            </FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="Chicken breast, mixed greens, tomatoes, cucumber"
+                className="bg-white"
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name={`menuItems.${index}.instructions`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-1">
+              Instructions <FormMessage />
+            </FormLabel>
+            <FormControl>
+              <Input
+                type="textarea"
+                {...field}
+                placeholder="1. Grill chicken breast. 2. Chop vegetables. 3. Mix ingredients in a bowl."
+                className="bg-white"
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name={`menuItems.${index}.calories`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-1">
+              Calories <FormMessage />
+            </FormLabel>
+            <FormControl>
+              <Input {...field} type="number" placeholder="300" className="bg-white" />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <div className="flex gap-4">
+        <FormField
+          control={control}
+          name={`menuItems.${index}.macros.protein`}
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel className="flex items-center gap-1">
+                Protein (g) <FormMessage />
+              </FormLabel>
+              <FormControl>
+                <Input {...field} type="number" placeholder="25" className="bg-white" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name={`menuItems.${index}.macros.carbs`}
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel className="flex items-center gap-1">
+                Carbs (g) <FormMessage />
+              </FormLabel>
+              <FormControl>
+                <Input {...field} type="number" placeholder="10" className="bg-white" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={control}
+          name={`menuItems.${index}.macros.fat`}
+          render={({ field }) => (
+            <FormItem className="flex-1">
+              <FormLabel className="flex items-center gap-1">
+                Fat (g) <FormMessage />
+              </FormLabel>
+              <FormControl>
+                <Input {...field} type="number" placeholder="15" className="bg-white" />
+              </FormControl>
+            </FormItem>
+          )}
+        />
+      </div>
       <Button
         type="button"
         onClick={removeMenuItem}
-        className="bg-red-500 max-h-fit"
+        className="bg-red-500 max-h-fit self-end"
       >
         Remove
       </Button>
