@@ -8,6 +8,7 @@ import ManageRestaurantPage from "./pages/ManageRestaurantPage";
 import SearchPage from "./pages/SearchPage";
 import DetailPage from "./pages/DetailPage";
 import OrderStatusPage from "./pages/OrderStatusPage";
+import InfluencerDetailPage from "./pages/InfluencerDetailPage";
 
 const AppRoutes = () => {
   return (
@@ -34,6 +35,14 @@ const AppRoutes = () => {
         element={
           <Layout showHero={false}>
             <DetailPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/influencer/:influencerId"
+        element={
+          <Layout showHero={false}>
+            <InfluencerDetailPage />
           </Layout>
         }
       />

@@ -82,3 +82,9 @@ export type Influencer = {
   cuisines: string[];
   menuItems: MenuItem[];
 };
+
+export type MealPlan = {
+  _id: string;
+  name: string;
+  description: string;
+};

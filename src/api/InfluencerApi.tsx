@@ -1,9 +1,70 @@
+import { SearchState } from "@/pages/SearchPage";
 import { Influencer, MealPlan } from "@/types";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useMutation, useQuery } from "react-query";
 import { toast } from "sonner";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+export const useGetInfluencer = (influencerId?: string) => {
+  const getInfluencerByIdRequest = async (): Promise<Influencer> => {
+    const response = await fetch(
+      `${API_BASE_URL}/api/influencer/${influencerId}`
+    );
+
+    console.log(response, 'response from influencer api');
+
+    if (!response.ok) {
+      throw new Error("Failed to get influencer");
+    }
+
+    return response.json();
+  };
+
+  const { data: influencer, isLoading } = useQuery(
+    "fetchInfluencer",
+    getInfluencerByIdRequest,
+    {
+      enabled: !!influencerId,
+    }
+  );
+
+  return { influencer, isLoading };
+};
+
+export const useSearchInfluencers = (
+  searchState: SearchState,
+  city?: string
+) => {
+  const createSearchRequest = async () => {
+    const params = new URLSearchParams();
+    params.set("searchQuery", searchState.searchQuery);
+    params.set("page", searchState.page.toString());
+    params.set("selectedCuisines", searchState.selectedCuisines.join(","));
+    params.set("sortOption", searchState.sortOption);
+
+    const response = await fetch(
+      `${API_BASE_URL}/api/influencer/search/${city}?${params.toString()}`
+    );
+
+    if (!response.ok) {
+      throw new Error("Failed to get influencer");
+    }
+
+    return response.json();
+  };
+
+  const { data: results, isLoading } = useQuery(
+    ["searchInfluencers", searchState],
+    createSearchRequest,
+    { enabled: !!city }
+  );
+
+  return {
+    results,
+    isLoading,
+  };
+};
 
 export const useGetMyInfluencer = () => {
   const { getAccessTokenSilently } = useAuth0();
@@ -193,4 +254,3 @@ export const useUpdateMyInfluencerMealPlan = () => {
 
   return { updateMealPlan, isLoading };
 };
-
