@@ -109,17 +109,42 @@ const InfluencerDetailPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-10">
-      <AspectRatio ratio={16 / 5}>
+    <div className="flex flex-col gap-5">
+      <Card className="w-full h-[200px] relative">
+        <div className="absolute top-0 left-0 right-0 p-4">
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              <h2 className="bg-white/70 text-black px-5 py-1 rounded-md text-md font-bold">
+                {influencer.name}
+              </h2>
+              {influencer?.socialMediaHandles?.map((handle, index) => (
+                <span key={index} className="bg-pink-500/80 text-white px-3 py-1 rounded-full text-sm">
+                  @{handle.handle}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
         <img
           src={influencer.imageUrl}
           className="rounded-md object-cover h-full w-full"
         />
-      </AspectRatio>
+        <div className="absolute bottom-0 left-0 right-0 p-4 rounded-md bg-gradient-to-t from-black/60 to-transparent">
+          <div className="flex flex-col gap-2">
+            <div className="flex gap-2">
+              {influencer.cuisines.map((cuisine, index) => (
+                <span key={index} className="bg-pink-500/80 text-white px-3 py-1 rounded-full text-sm">
+                  {cuisine}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Card>
       <div className="grid md:grid-cols-[4fr_2fr] gap-5 md:px-32">
         <div className="flex flex-col gap-4">
-          <InfluencerInfo influencer={influencer} />
-          <span className="text-2xl font-bold tracking-tight">Menu</span>
+          {/* <InfluencerInfo influencer={influencer} /> */}
+          {/* <span className="text-2xl font-bold tracking-tight">Meal Plans</span> */}
           {influencer.menuItems.map((menuItem) => (
             <MenuItem
               menuItem={menuItem}
