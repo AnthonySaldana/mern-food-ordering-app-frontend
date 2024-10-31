@@ -109,7 +109,7 @@ const InfluencerDetailPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-5">
+    <div className="flex flex-col gap-5 bg-white p-3 rounded-md">
       <Card className="w-full h-[200px] relative">
         <div className="absolute top-0 left-0 right-0 p-4">
           <div className="flex flex-col gap-2">

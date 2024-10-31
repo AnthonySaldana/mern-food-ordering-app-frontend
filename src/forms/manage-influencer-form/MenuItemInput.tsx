@@ -1,4 +1,5 @@
 import { Button } from "@/components/ui/button";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import {
   FormControl,
   FormField,
@@ -15,7 +16,9 @@ type Props = {
 };
 
 const MenuItemInput = ({ index, removeMenuItem }: Props) => {
-  const { control } = useFormContext();
+  const { control, watch } = useFormContext();
+
+  const existingImageUrl = watch(`menuItems.${index}.imageUrl`);
 
   return (
     <div className="flex flex-col gap-4 border p-4 rounded-lg">
@@ -149,6 +152,40 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
             </FormItem>
           )}
         />
+      </div>
+      <div className="space-y-2">
+        <FormLabel>Meal Image</FormLabel>
+        <div className="flex flex-col gap-4">
+          {existingImageUrl && (
+            <AspectRatio ratio={16 / 9}>
+              <img
+                src={existingImageUrl}
+                className="rounded-md object-cover h-full w-full"
+              />
+            </AspectRatio>
+          )}
+          <FormField
+            control={control}
+            name="imageFile"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    className="bg-white"
+                    type="file"
+                    accept=".jpg, .jpeg, .png"
+                    onChange={(event) =>
+                      field.onChange(
+                        event.target.files ? event.target.files[0] : null
+                      )
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
       </div>
       <Button
         type="button"

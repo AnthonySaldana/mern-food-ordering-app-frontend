@@ -54,6 +54,8 @@ const formSchema = z
           carbs: z.coerce.number().optional(),
           fat: z.coerce.number().optional(),
         }),
+        imageUrl: z.string().optional(),
+        imageFile: z.instanceof(File, { message: "Image is required" }).optional(),
       })
     ),
     imageUrl: z.string().optional(),
@@ -84,7 +86,7 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
       estimatedDeliveryTime: 0,
       socialMediaHandles: [{ platform: "", handle: "" }],
       cuisines: [],
-      menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 } }],
+      menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined }],
       imageUrl: "",
       imageFile: undefined,
     },
@@ -189,6 +191,7 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
         onSubmit={form.handleSubmit(onSubmit)}
         className="space-y-8 bg-gray-50 p-10 rounded-lg"
       >
+        <a href={`/influencer/${influencer?._id}`} target="_blank" rel="noopener noreferrer">View Influencer Page</a>
         <DetailsSection />
         <Separator />
         <CuisinesSection />
