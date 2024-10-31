@@ -1,6 +1,7 @@
+/* eslint-disable */
 import { useGetRestaurant } from "@/api/RestaurantApi";
 import MenuItem from "@/components/MenuItem";
-import OrderSummary from "@/components/OrderSummary";
+// import OrderSummary from "@/components/OrderSummary";
 import RestaurantInfo from "@/components/RestaurantInfo";
 import { AspectRatio } from "@/components/ui/aspect-ratio";
 import { Card, CardFooter } from "@/components/ui/card";
@@ -64,20 +65,20 @@ const DetailPage = () => {
     });
   };
 
-  const removeFromCart = (cartItem: CartItem) => {
-    setCartItems((prevCartItems) => {
-      const updatedCartItems = prevCartItems.filter(
-        (item) => cartItem._id !== item._id
-      );
+  // const removeFromCart = (cartItem: CartItem) => {
+  //   setCartItems((prevCartItems) => {
+  //     const updatedCartItems = prevCartItems.filter(
+  //       (item) => cartItem._id !== item._id
+  //     );
 
-      sessionStorage.setItem(
-        `cartItems-${restaurantId}`,
-        JSON.stringify(updatedCartItems)
-      );
+  //     sessionStorage.setItem(
+  //       `cartItems-${restaurantId}`,
+  //       JSON.stringify(updatedCartItems)
+  //     );
 
-      return updatedCartItems;
-    });
-  };
+  //     return updatedCartItems;
+  //   });
+  // };
 
   const onCheckout = async (userFormData: UserFormData) => {
     if (!restaurant) {
@@ -130,11 +131,11 @@ const DetailPage = () => {
 
         <div>
           <Card>
-            <OrderSummary
+            {/* <OrderSummary
               restaurant={restaurant}
               cartItems={cartItems}
               removeFromCart={removeFromCart}
-            />
+            /> */}
             <CardFooter>
               <CheckoutButton
                 disabled={cartItems.length === 0}

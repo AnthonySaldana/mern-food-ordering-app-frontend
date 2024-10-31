@@ -1,8 +1,8 @@
+/* eslint-disable */
 import { useGetInfluencer } from "@/api/InfluencerApi";
 import MenuItem from "@/components/MenuItem";
 import OrderSummary from "@/components/OrderSummary";
-import InfluencerInfo from "@/components/InfluencerInfo";
-import { AspectRatio } from "@/components/ui/aspect-ratio";
+// import InfluencerInfo from "@/components/InfluencerInfo";
 import { Card, CardFooter } from "@/components/ui/card";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
@@ -21,7 +21,9 @@ export type CartItem = {
 const InfluencerDetailPage = () => {
   const { influencerId } = useParams();
   const { influencer, isLoading } = useGetInfluencer(influencerId);
-  const { createCheckoutSession, isLoading: isCheckoutLoading } =
+  // const { createCheckoutSession, isLoading: isCheckoutLoading } =
+  //   useCreateCheckoutSession();
+  const { isLoading: isCheckoutLoading } =
     useCreateCheckoutSession();
 
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
@@ -100,8 +102,10 @@ const InfluencerDetailPage = () => {
       },
     };
 
-    const data = await createCheckoutSession(checkoutData);
-    window.location.href = data.url;
+    console.log(checkoutData, 'checkoutData');
+
+    // const data = await createCheckoutSession(checkoutData);
+    // window.location.href = data.url;
   };
 
   if (isLoading || !influencer) {

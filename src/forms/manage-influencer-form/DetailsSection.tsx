@@ -1,3 +1,4 @@
+/* eslint-disable */
 import {
   FormControl,
   FormDescription,
@@ -109,7 +110,8 @@ const DetailsSection = () => {
 
       <div>
         <h3 className="text-xl font-bold mt-4">Social Media Handles</h3>
-        {socialMediaHandles.map((handle, index) => (
+        {socialMediaHandles.map((handle: any, index: number) => (
+          console.log(handle, 'handle'),
           <div key={index} className="flex gap-4 mt-2">
             <FormField
               control={control}

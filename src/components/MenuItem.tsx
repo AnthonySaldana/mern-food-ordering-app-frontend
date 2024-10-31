@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { type MenuItem } from "../types";
-import { Card, CardContent } from "./ui/card";
+import { CardContent } from "./ui/card";
 
 type Props = {
   menuItem: MenuItem;
