@@ -1,15 +1,16 @@
 /* eslint-disable */
 import { useGetInfluencer } from "@/api/InfluencerApi";
 import MenuItem from "@/components/MenuItem";
-import OrderSummary from "@/components/OrderSummary";
+// import OrderSummary from "@/components/OrderSummary";
 // import InfluencerInfo from "@/components/InfluencerInfo";
-import { Card, CardFooter } from "@/components/ui/card";
+// import { Card, CardFooter } from "@/components/ui/card";
+import { Card } from "@/components/ui/card";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import { MenuItem as MenuItemType } from "../types";
-import CheckoutButton from "@/components/CheckoutButton";
-import { UserFormData } from "@/forms/user-profile-form/UserProfileForm";
-import { useCreateCheckoutSession } from "@/api/OrderApi";
+// import CheckoutButton from "@/components/CheckoutButton";
+// import { UserFormData } from "@/forms/user-profile-form/UserProfileForm";
+// import { useCreateCheckoutSession } from "@/api/OrderApi";
 
 export type CartItem = {
   _id: string;
@@ -23,13 +24,15 @@ const InfluencerDetailPage = () => {
   const { influencer, isLoading } = useGetInfluencer(influencerId);
   // const { createCheckoutSession, isLoading: isCheckoutLoading } =
   //   useCreateCheckoutSession();
-  const { isLoading: isCheckoutLoading } =
-    useCreateCheckoutSession();
+  // const { isLoading: isCheckoutLoading } =
+  //   useCreateCheckoutSession();
 
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     const storedCartItems = sessionStorage.getItem(`cartItems-${influencerId}`);
     return storedCartItems ? JSON.parse(storedCartItems) : [];
   });
+
+  console.log(cartItems, 'cartItems');
 
   const addToCart = (menuItem: MenuItemType) => {
     setCartItems((prevCartItems) => {
@@ -66,47 +69,47 @@ const InfluencerDetailPage = () => {
     });
   };
 
-  const removeFromCart = (cartItem: CartItem) => {
-    setCartItems((prevCartItems) => {
-      const updatedCartItems = prevCartItems.filter(
-        (item) => cartItem._id !== item._id
-      );
+  // const removeFromCart = (cartItem: CartItem) => {
+  //   setCartItems((prevCartItems) => {
+  //     const updatedCartItems = prevCartItems.filter(
+  //       (item) => cartItem._id !== item._id
+  //     );
 
-      sessionStorage.setItem(
-        `cartItems-${influencerId}`,
-        JSON.stringify(updatedCartItems)
-      );
+  //     sessionStorage.setItem(
+  //       `cartItems-${influencerId}`,
+  //       JSON.stringify(updatedCartItems)
+  //     );
 
-      return updatedCartItems;
-    });
-  };
+  //     return updatedCartItems;
+  //   });
+  // };
 
-  const onCheckout = async (userFormData: UserFormData) => {
-    if (!influencer) {
-      return;
-    }
+  // const onCheckout = async (userFormData: UserFormData) => {
+  //   if (!influencer) {
+  //     return;
+  //   }
 
-    const checkoutData = {
-      cartItems: cartItems.map((cartItem) => ({
-        menuItemId: cartItem._id,
-        name: cartItem.name,
-        quantity: cartItem.quantity.toString(),
-      })),
-      influencerId: influencer._id,
-      deliveryDetails: {
-        name: userFormData.name,
-        addressLine1: userFormData.addressLine1,
-        city: userFormData.city,
-        country: userFormData.country,
-        email: userFormData.email as string,
-      },
-    };
+  //   const checkoutData = {
+  //     cartItems: cartItems.map((cartItem) => ({
+  //       menuItemId: cartItem._id,
+  //       name: cartItem.name,
+  //       quantity: cartItem.quantity.toString(),
+  //     })),
+  //     influencerId: influencer._id,
+  //     deliveryDetails: {
+  //       name: userFormData.name,
+  //       addressLine1: userFormData.addressLine1,
+  //       city: userFormData.city,
+  //       country: userFormData.country,
+  //       email: userFormData.email as string,
+  //     },
+  //   };
 
-    console.log(checkoutData, 'checkoutData');
+  //   console.log(checkoutData, 'checkoutData');
 
-    // const data = await createCheckoutSession(checkoutData);
-    // window.location.href = data.url;
-  };
+  //   // const data = await createCheckoutSession(checkoutData);
+  //   // window.location.href = data.url;
+  // };
 
   if (isLoading || !influencer) {
     return "Loading...";
