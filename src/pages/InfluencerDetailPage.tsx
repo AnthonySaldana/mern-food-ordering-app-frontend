@@ -120,12 +120,13 @@ const InfluencerDetailPage = () => {
             <div className="flex gap-2">
               <h2 className="bg-white/70 text-black px-5 py-1 rounded-md text-md font-bold">
                 {influencer.name}
+                <br/>
+                {influencer?.socialMediaHandles?.map((handle, index) => (
+                  <span key={index} className="text-black rounded-full text-sm font-normal">
+                    @{handle.handle}
+                  </span>
+                ))}
               </h2>
-              {influencer?.socialMediaHandles?.map((handle, index) => (
-                <span key={index} className="bg-pink-500/80 text-white px-3 py-1 rounded-full text-sm">
-                  @{handle.handle}
-                </span>
-              ))}
             </div>
           </div>
         </div>
@@ -157,7 +158,7 @@ const InfluencerDetailPage = () => {
           ))}
         </div>
 
-        <div>
+        {/* <div>
           <Card>
             <OrderSummary
               influencer={influencer}
@@ -172,7 +173,7 @@ const InfluencerDetailPage = () => {
               />
             </CardFooter>
           </Card>
-        </div>
+        </div> */}
       </div>
     </div>
   );

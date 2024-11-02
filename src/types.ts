@@ -12,6 +12,14 @@ export type MenuItem = {
   name: string;
   price: number;
   imageUrl: string;
+  calories: number;
+  ingredients: string;
+  instructions: string;
+  macros: {
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
 };
 
 export type Restaurant = {

@@ -46,7 +46,7 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
 
       {isAccordionOpen && (
         <div className="p-4 border-t border-gray-200">
-          <h2 className="text-xl font-bold">{menuItem.name}</h2>
+          {/* <h2 className="text-xl font-bold">{menuItem.name}</h2> */}
           {menuItem.imageUrl && (
             <img
               src={menuItem.imageUrl}
@@ -54,7 +54,22 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
               className="w-full h-auto object-cover rounded-lg my-4"
             />
           )}
-          <p className="text-lg">Price: ${(menuItem.price / 100).toFixed(2)}</p>
+          <div className="text-sm flex flex-row md:flex-row md:gap-4">
+            <p>Calories: {menuItem?.calories}</p>
+            <p>Protein: {menuItem?.macros?.protein}g</p>
+            <p>Carbs: {menuItem?.macros?.carbs}g</p>
+            <p>Fat: {menuItem?.macros?.fat}g</p>
+          </div>
+          <div className="flex flex-col mt-4">
+            <p className="font-semibold">Ingredients:</p>
+            <p className="mb-2">{menuItem?.ingredients}</p>
+            <p className="font-semibold">Instructions:</p>
+            <p className="text-sm">{menuItem?.instructions}</p>
+          </div>
+          {/* <p className="text-md">
+            <span className="font-semibold mr-2">Price:</span>
+            <span className="text-md">${(menuItem.price / 100).toFixed(2)}</span>
+          </p> */}
           <button
             className="mt-4 bg-orange-500 text-white px-4 py-2 rounded"
             onClick={() => {
@@ -62,7 +77,7 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
               handleToggleAccordion();
             }}
           >
-            Add to Cart
+            ${(menuItem.price / 100).toFixed(2)} - Add to Cart
           </button>
         </div>
       )}
