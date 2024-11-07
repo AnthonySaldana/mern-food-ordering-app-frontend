@@ -5,7 +5,7 @@ import { z } from "zod";
 import DetailsSection from "./DetailsSection";
 import { Separator } from "@/components/ui/separator";
 import CuisinesSection from "./CuisinesSection";
-import MenuSection from "./MenuSection";
+import MealPlansSection from "./MealPlansSection";
 import ImageSection from "./ImageSection";
 import LoadingButton from "@/components/LoadingButton";
 import { Button } from "@/components/ui/button";
@@ -43,19 +43,25 @@ const formSchema = z
     cuisines: z.array(z.string()).nonempty({
       message: "please select at least one item",
     }),
-    menuItems: z.array(
+    mealPlans: z.array(
       z.object({
         name: z.string().min(1, "name is required"),
-        price: z.coerce.number().min(1, "price is required"),
-        ingredients: z.string().optional(),
-        calories: z.coerce.number().optional(),
-        macros: z.object({
-          protein: z.coerce.number().optional(),
-          carbs: z.coerce.number().optional(),
-          fat: z.coerce.number().optional(),
-        }),
-        imageUrl: z.string().optional(),
-        imageFile: z.instanceof(File, { message: "Image is required" }).optional(),
+        totalCalories: z.coerce.number().optional(),
+        menuItems: z.array(
+          z.object({
+            name: z.string().min(1, "name is required"),
+            price: z.coerce.number().min(1, "price is required"),
+            ingredients: z.string().optional(),
+            calories: z.coerce.number().optional(),
+            macros: z.object({
+              protein: z.coerce.number().optional(),
+              carbs: z.coerce.number().optional(),
+              fat: z.coerce.number().optional(),
+            }),
+            imageUrl: z.string().optional(),
+            imageFile: z.instanceof(File, { message: "Image is required" }).optional(),
+          })
+        ),
       })
     ),
     imageUrl: z.string().optional(),
@@ -86,7 +92,7 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
       estimatedDeliveryTime: 0,
       socialMediaHandles: [{ platform: "", handle: "" }],
       cuisines: [],
-      menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined }],
+      mealPlans: [{ name: "", totalCalories: 0, menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined }] }],
       imageUrl: "",
       imageFile: undefined,
     },
@@ -104,15 +110,18 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
         (influencer.deliveryPrice / 100).toFixed(2)
       );
 
-      const menuItemsFormatted = influencer.menuItems ? influencer.menuItems.map((item) => ({
-        ...item,
-        price: parseInt((item.price / 100).toFixed(2)),
+      const mealPlansFormatted = influencer.mealPlans ? influencer.mealPlans.map((plan) => ({
+        ...plan,
+        menuItems: plan.menuItems.map((item) => ({
+          ...item,
+          price: parseInt((item.price / 100).toFixed(2)),
+        })),
       })) : [];
 
       const updatedInfluencer = {
         ...influencer,
         deliveryPrice: deliveryPriceFormatted,
-        menuItems: menuItemsFormatted,
+        mealPlans: mealPlansFormatted,
       };
 
       form.reset(updatedInfluencer);
@@ -150,24 +159,30 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
         formData.append(`cuisines[${index}]`, cuisine);
       });
 
-      formDataJson.menuItems.forEach((item, index) => {
-        formData.append(`menuItems[${index}][name]`, item.name);
-        formData.append(`menuItems[${index}][price]`, (item.price * 100).toString());
-        if (item.ingredients) {
-          formData.append(`menuItems[${index}][ingredients]`, item.ingredients);
+      formDataJson.mealPlans.forEach((plan, planIndex) => {
+        formData.append(`mealPlans[${planIndex}][name]`, plan.name);
+        if (plan.totalCalories) {
+          formData.append(`mealPlans[${planIndex}][totalCalories]`, plan.totalCalories.toString());
         }
-        if (item.calories) {
-          formData.append(`menuItems[${index}][calories]`, item.calories.toString());
-        }
-        if (item.macros?.protein) {
-          formData.append(`menuItems[${index}][macros][protein]`, item.macros.protein.toString());
-        }
-        if (item.macros?.carbs) {
-          formData.append(`menuItems[${index}][macros][carbs]`, item.macros.carbs.toString());
-        }
-        if (item.macros?.fat) {
-          formData.append(`menuItems[${index}][macros][fat]`, item.macros.fat.toString());
-        }
+        plan.menuItems.forEach((item, itemIndex) => {
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][name]`, item.name);
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][price]`, (item.price * 100).toString());
+          if (item.ingredients) {
+            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][ingredients]`, item.ingredients);
+          }
+          if (item.calories) {
+            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][calories]`, item.calories.toString());
+          }
+          if (item.macros?.protein) {
+            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][protein]`, item.macros.protein.toString());
+          }
+          if (item.macros?.carbs) {
+            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][carbs]`, item.macros.carbs.toString());
+          }
+          if (item.macros?.fat) {
+            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][fat]`, item.macros.fat.toString());
+          }
+        });
       });
 
       if (formDataJson.imageFile) {
@@ -196,7 +211,7 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
         <Separator />
         <CuisinesSection />
         <Separator />
-        <MenuSection />
+        <MealPlansSection />
         <Separator />
         <ImageSection />
         {isLoading ? <LoadingButton /> : <Button type="submit">Submit</Button>}

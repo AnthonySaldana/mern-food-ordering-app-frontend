@@ -102,7 +102,8 @@ const SearchPage = () => {
           />
         </div>
 
-        {results.data.map((influencer) => (
+        {/* @ts-expect-error transition to any */}
+        {results.data.map((influencer: any) => (
           <SearchResultCard restaurant={influencer} />
         ))}
         <PaginationSelector

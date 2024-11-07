@@ -9,6 +9,7 @@ import SearchPage from "./pages/SearchPage";
 import DetailPage from "./pages/DetailPage";
 import OrderStatusPage from "./pages/OrderStatusPage";
 import InfluencerDetailPage from "./pages/InfluencerDetailPage";
+import MealPlanDetailPage from "./pages/MealPlanDetailPage";
 
 const AppRoutes = () => {
   return (
@@ -43,6 +44,14 @@ const AppRoutes = () => {
         element={
           <Layout showHero={false}>
             <InfluencerDetailPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/mealplan/:id"
+        element={
+          <Layout showHero={false}>
+            <MealPlanDetailPage />
           </Layout>
         }
       />
