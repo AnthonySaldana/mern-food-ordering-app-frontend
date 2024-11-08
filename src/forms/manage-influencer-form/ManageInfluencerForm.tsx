@@ -203,7 +203,9 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
   return (
     <Form {...form}>
       <form
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, (errors) => {
+          console.error("Form submission errors:", errors);
+        })}
         className="space-y-8 bg-gray-50 p-10 rounded-lg"
       >
         <a href={`/influencer/${influencer?._id}`} target="_blank" rel="noopener noreferrer">View Influencer Page</a>

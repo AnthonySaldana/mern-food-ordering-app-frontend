@@ -87,7 +87,7 @@ export type Influencer = {
   city: string;
   country: string;
   socialMediaHandles: SocialMediaHandle[];
-  // mealPlans: MealPlan[];
+  mealPlans: MealPlan[];
   imageUrl: string;
   cuisines: string[];
   menuItems: MenuItem[];

@@ -24,7 +24,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
     <div className="flex flex-col gap-4 border p-4 rounded-lg">
       <FormField
         control={control}
-        name={`menuItems.${index}.name`}
+        name={`mealPlans.${index}.menuItems.${index}.name`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -42,7 +42,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       />
       <FormField
         control={control}
-        name={`menuItems.${index}.price`}
+        name={`mealPlans.${index}.menuItems.${index}.price`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -60,7 +60,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       />
       <FormField
         control={control}
-        name={`menuItems.${index}.ingredients`}
+        name={`mealPlans.${index}.menuItems.${index}.ingredients`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -78,7 +78,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       />
       <FormField
         control={control}
-        name={`menuItems.${index}.instructions`}
+        name={`mealPlans.${index}.menuItems.${index}.instructions`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -97,7 +97,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       />
       <FormField
         control={control}
-        name={`menuItems.${index}.calories`}
+        name={`mealPlans.${index}.menuItems.${index}.calories`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -112,7 +112,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       <div className="flex gap-4">
         <FormField
           control={control}
-          name={`menuItems.${index}.macros.protein`}
+          name={`mealPlans.${index}.menuItems.${index}.macros.protein`}
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormLabel className="flex items-center gap-1">
@@ -126,7 +126,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
         />
         <FormField
           control={control}
-          name={`menuItems.${index}.macros.carbs`}
+          name={`mealPlans.${index}.menuItems.${index}.macros.carbs`}
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormLabel className="flex items-center gap-1">
@@ -140,7 +140,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
         />
         <FormField
           control={control}
-          name={`menuItems.${index}.macros.fat`}
+          name={`mealPlans.${index}.menuItems.${index}.macros.fat`}
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormLabel className="flex items-center gap-1">
@@ -166,7 +166,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
           )}
           <FormField
             control={control}
-            name="imageFile"
+            name={`mealPlans.${index}.menuItems.${index}.imageFile`}
             render={({ field }) => (
               <FormItem>
                 <FormControl>
