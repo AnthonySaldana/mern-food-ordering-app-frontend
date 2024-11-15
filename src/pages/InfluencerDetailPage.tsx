@@ -3,7 +3,7 @@ import { useGetInfluencer } from "@/api/InfluencerApi";
 import MenuItem from "@/components/MenuItem";
 import { Card } from "@/components/ui/card";
 import { useState } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams } from "react-router-dom";
 import { MenuItem as MenuItemType } from "../types";
 // import OrderSummary from "@/components/OrderSummary";
 import InfluencerInfo from "@/components/InfluencerInfo";
@@ -22,8 +22,7 @@ export type CartItem = {
 const InfluencerDetailPage = () => {
   const { influencerId } = useParams();
   const { influencer, isLoading } = useGetInfluencer(influencerId);
-  const navigate = useNavigate();
-
+  // const navigate = useNavigate();
   const [cartItems, setCartItems] = useState<CartItem[]>(() => {
     const storedCartItems = sessionStorage.getItem(`cartItems-${influencerId}`);
     return storedCartItems ? JSON.parse(storedCartItems) : [];
@@ -66,9 +65,9 @@ const InfluencerDetailPage = () => {
     });
   };
 
-  const handleMenuItemClick = (menuItem: MenuItemType) => {
-    navigate(`/mealplan/${menuItem._id}`);
-  };
+  // const handleMenuItemClick = (menuItem: MenuItemType) => {
+  //   navigate(`/mealplan/${menuItem._id}`);
+  // };
 
   if (isLoading || !influencer) {
     return "Loading...";
