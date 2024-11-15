@@ -189,6 +189,14 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
         formData.append(`imageFile`, formDataJson.imageFile);
       }
 
+      formDataJson.mealPlans.forEach((plan, planIndex) => {
+        plan.menuItems.forEach((item, itemIndex) => {
+          if (item.imageFile) {
+            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][imageFile]`, item.imageFile);
+          }
+        });
+      });
+
       console.log(formDataJson);
       console.log("Running submit on save");
       onSave(formData);

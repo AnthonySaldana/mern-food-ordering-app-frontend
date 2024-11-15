@@ -73,6 +73,7 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
           <MenuItemInput
             key={menuItem.id}
             index={menuItemIndex}
+            mealPlanIndex={index}
             removeMenuItem={() => removeMenuItem(menuItemIndex)}
           />
         ))}

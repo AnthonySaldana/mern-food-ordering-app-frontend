@@ -13,9 +13,10 @@ import { useFormContext } from "react-hook-form";
 type Props = {
   index: number;
   removeMenuItem: () => void;
+  mealPlanIndex: number;
 };
 
-const MenuItemInput = ({ index, removeMenuItem }: Props) => {
+const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
   const { control, watch } = useFormContext();
 
   const existingImageUrl = watch(`menuItems.${index}.imageUrl`);
@@ -24,7 +25,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
     <div className="flex flex-col gap-4 border p-4 rounded-lg">
       <FormField
         control={control}
-        name={`mealPlans.${index}.menuItems.${index}.name`}
+        name={`mealPlans.${mealPlanIndex}.menuItems.${index}.name`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -42,7 +43,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       />
       <FormField
         control={control}
-        name={`mealPlans.${index}.menuItems.${index}.price`}
+        name={`mealPlans.${mealPlanIndex}.menuItems.${index}.price`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -60,7 +61,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       />
       <FormField
         control={control}
-        name={`mealPlans.${index}.menuItems.${index}.ingredients`}
+        name={`mealPlans.${mealPlanIndex}.menuItems.${index}.ingredients`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -78,7 +79,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       />
       <FormField
         control={control}
-        name={`mealPlans.${index}.menuItems.${index}.instructions`}
+        name={`mealPlans.${mealPlanIndex}.menuItems.${index}.instructions`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -97,7 +98,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       />
       <FormField
         control={control}
-        name={`mealPlans.${index}.menuItems.${index}.calories`}
+        name={`mealPlans.${mealPlanIndex}.menuItems.${index}.calories`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
@@ -112,7 +113,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
       <div className="flex gap-4">
         <FormField
           control={control}
-          name={`mealPlans.${index}.menuItems.${index}.macros.protein`}
+          name={`mealPlans.${mealPlanIndex}.menuItems.${index}.macros.protein`}
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormLabel className="flex items-center gap-1">
@@ -126,7 +127,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
         />
         <FormField
           control={control}
-          name={`mealPlans.${index}.menuItems.${index}.macros.carbs`}
+          name={`mealPlans.${mealPlanIndex}.menuItems.${index}.macros.carbs`}
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormLabel className="flex items-center gap-1">
@@ -140,7 +141,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
         />
         <FormField
           control={control}
-          name={`mealPlans.${index}.menuItems.${index}.macros.fat`}
+          name={`mealPlans.${mealPlanIndex}.menuItems.${index}.macros.fat`}
           render={({ field }) => (
             <FormItem className="flex-1">
               <FormLabel className="flex items-center gap-1">
@@ -166,7 +167,7 @@ const MenuItemInput = ({ index, removeMenuItem }: Props) => {
           )}
           <FormField
             control={control}
-            name={`mealPlans.${index}.menuItems.${index}.imageFile`}
+            name={`mealPlans.${mealPlanIndex}.menuItems.${index}.imageFile`}
             render={({ field }) => (
               <FormItem>
                 <FormControl>

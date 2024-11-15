@@ -6,7 +6,7 @@ import { useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { MenuItem as MenuItemType } from "../types";
 // import OrderSummary from "@/components/OrderSummary";
-// import InfluencerInfo from "@/components/InfluencerInfo";
+import InfluencerInfo from "@/components/InfluencerInfo";
 // import { Card, CardFooter } from "@/components/ui/card";
 // import CheckoutButton from "@/components/CheckoutButton";
 // import { UserFormData } from "@/forms/user-profile-form/UserProfileForm";
@@ -110,10 +110,10 @@ const InfluencerDetailPage = () => {
       </Card>
       <div className="grid md:grid-cols-[4fr_2fr] gap-5 md:px-32">
         <div className="flex flex-col gap-4">
-          {/* <InfluencerInfo influencer={influencer} /> */}
-          {/* <span className="text-2xl font-bold tracking-tight">Meal Plans</span> */}
+          <InfluencerInfo influencer={influencer} />
+          <span className="text-2xl font-bold tracking-tight">Meal Plans</span>
           {influencer.menuItems.map((menuItem) => (
-            <div key={menuItem._id} onClick={() => handleMenuItemClick(menuItem)}>
+            <div key={menuItem._id}>
               <MenuItem
                 menuItem={menuItem}
                 addToCart={() => addToCart(menuItem)}
