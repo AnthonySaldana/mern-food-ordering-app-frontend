@@ -102,7 +102,6 @@ const SearchPage = () => {
           />
         </div>
 
-        {/* @ts-expect-error transition to any */}
         {results.data.map((influencer: any) => (
           <SearchResultCard restaurant={influencer} />
         ))}
