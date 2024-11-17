@@ -17,9 +17,9 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
   return (
     <>
       <div className="cursor-pointer hover:bg-yellow-50" onClick={handleToggleAccordion}>
-        <CardContent className="flex flex-col items-center p-4">
+        <CardContent className="flex flex-col items-start p-1">
           {menuItem.imageUrl && (
-            <div className="relative w-24 h-24 mb-2">
+            <div className="relative mb-2" style={{ width: "6rem", height: "6rem" }}>
               <img
                 src={menuItem.imageUrl}
                 alt={menuItem.name}
@@ -27,8 +27,8 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
               />
             </div>
           )}
-          <h3 className="font-bold text-lg text-center">{menuItem.name}</h3>
-          <p className="text-md text-center mt-1">${(menuItem.price / 100).toFixed(2)}</p>
+          <h3 className="text-sm text-left truncate max-w-[95px]">{menuItem.name}</h3>
+          <p className="text-sm text-left mt-1">${(menuItem.price / 100).toFixed(2)}</p>
         </CardContent>
       </div>
 

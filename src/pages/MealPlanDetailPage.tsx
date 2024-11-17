@@ -52,7 +52,7 @@ const MealPlanDetailPage = () => {
 
   return (
     <div className="flex flex-col gap-5 bg-white p-3 rounded-md">
-      <Card className="w-full h-[200px] relative">
+      <Card className="w-full h-[320px] relative">
         <div className="absolute top-0 left-0 right-0 p-4">
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
@@ -85,7 +85,7 @@ const MealPlanDetailPage = () => {
         </div>
       </Card>
 
-      <div className="px-4 md:px-32">
+      <div className="px-2 md:px-32">
         {influencer.mealPlans.map((plan, planIndex) => (
           <div key={planIndex} className="mb-12">
             <div 
@@ -105,13 +105,13 @@ const MealPlanDetailPage = () => {
                 </span>
               </h2>
               <p className="text-gray-600 mt-2">
-                {plan.totalCalories} calories per week • {plan.menuItems.length} meals
+                {plan.totalCalories} calories per week • {plan.menuItems.length} items
               </p>
             </div>
             
             {expandedPlanIndex === planIndex && (
               <>
-                <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-6 mb-6">
+                <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4 mb-6">
                   {plan.menuItems.map((menuItem) => (
                     <MenuItem
                       key={menuItem._id}
@@ -121,7 +121,7 @@ const MealPlanDetailPage = () => {
                   ))}
                 </div>
 
-                <div className="bg-gray-50 rounded-lg p-6">
+                {/* <div className="bg-gray-50 rounded-lg p-6">
                   <h3 className="text-lg font-semibold mb-3">Plan Details</h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
@@ -133,7 +133,7 @@ const MealPlanDetailPage = () => {
                       <p className="font-medium">{plan.menuItems.length} meals</p>
                     </div>
                   </div>
-                </div>
+                </div> */}
 
                 <div className="bg-gray-50 rounded-lg p-6 mt-4">
                   <h3 className="text-lg font-semibold mb-3">Delivery Preference</h3>
