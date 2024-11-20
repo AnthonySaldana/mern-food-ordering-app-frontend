@@ -64,39 +64,27 @@ const MealPlanDetailPage = () => {
   // };
 
   return (
-    <div className="flex flex-col gap-4 bg-white p-3 rounded-md mt-[40px]" style={{ borderRadius: '24px 24px 0 0' }}>
-      {/* <div 
-        className="border-b pb-4 mb-6 cursor-pointer hover:bg-gray-50 transition-colors p-4 rounded-t-lg"
-        // onClick={() => togglePlan(planIndex)}
-      >
-        <h2 className="text-2xl font-bold flex items-center justify-between">
-          {plan.name}
-          <span className="text-lg">
-            {true ? <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="0.5" y="0.5" width="35" height="35" rx="17.5" stroke="black"/>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M13.2381 12.7618C12.8436 12.7618 12.5239 12.442 12.5239 12.0475C12.5239 11.653 12.8436 11.3333 13.2381 11.3333H23.9524C24.3469 11.3333 24.6667 11.653 24.6667 12.0475V22.7618C24.6667 23.1563 24.3469 23.4761 23.9524 23.4761C23.5579 23.4761 23.2381 23.1563 23.2381 22.7618V13.772L12.5527 24.4574C12.2738 24.7363 11.8215 24.7363 11.5426 24.4574C11.2636 24.1784 11.2636 23.7262 11.5426 23.4472L22.228 12.7618H13.2381Z" fill="black"/>
-            </svg> : <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <rect x="0.5" y="0.5" width="35" height="35" rx="17.5" stroke="black"/>
-              <path fill-rule="evenodd" clip-rule="evenodd" d="M13.2381 12.7618C12.8436 12.7618 12.5239 12.442 12.5239 12.0475C12.5239 11.653 12.8436 11.3333 13.2381 11.3333H23.9524C24.3469 11.3333 24.6667 11.653 24.6667 12.0475V22.7618C24.6667 23.1563 24.3469 23.4761 23.9524 23.4761C23.5579 23.4761 23.2381 23.1563 23.2381 22.7618V13.772L12.5527 24.4574C12.2738 24.7363 11.8215 24.7363 11.5426 24.4574C11.2636 24.1784 11.2636 23.7262 11.5426 23.4472L22.228 12.7618H13.2381Z" fill="black"/>
-            </svg>}
-          </span>
-        </h2>
-        <p className="text-gray-600 mt-2">
-          {plan.totalCalories} calories per week • {plan.menuItems.length} items
-        </p>
-      </div> */}
-      <div className="flex flex-col gap-4 p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
-        <div className="flex flex-row items-center gap-4 pb-2 cursor-pointer transition-colors p-4 rounded-t-lg">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={() => navigate(`/influencer/${influencerId}/mealplans`)} className="cursor-pointer">
-            <path d="M18 18L6 6M6 6H18M6 6V18" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-          </svg>
-          <div className="flex flex-col gap-2">
-            <h2 className="text-2xl font-bold">{plan.name}</h2>
-            <div className="flex items-center gap-2">
-              <span className="bg-orange-500 text-black px-3 py-1 rounded-full text-sm font-bold">
-                {plan.totalCalories} cal/day
-              </span>
-              <span className="text-gray-600">{plan.totalCalories * 7} cal/week</span>
+    <div className="flex flex-col gap-4 bg-white p-3 rounded-md mt-[40px]" style={{ borderRadius: '24px 24px 0 0', boxShadow: '0px 0px 10px 0px #5c5c5c' }}>
+      <div className="relative">
+        <div className="flex justify-center">
+          <div className="w-12 h-1 bg-gray-300 rounded-full"/>
+        </div>
+        <div className="flex flex-col gap-4 p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
+          <div className="flex flex-row items-center gap-4 pb-2 cursor-pointer transition-colors p-4 rounded-t-lg">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"
+            onClick={() => navigate(`/influencer/${influencerId}/mealplans`)}
+            className="cursor-pointer"
+            style={{position: 'absolute'}}>
+              <path d="M18 18L6 6M6 6H18M6 6V18" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+            <div className="flex flex-col gap-2 items-center" style={{width: '100%'}}>
+              <h2 className="text-2xl font-bold">{plan.name}</h2>
+              <div className="flex items-center gap-2">
+                <span className="bg-orange-500 text-black px-3 py-1 rounded-full text-sm font-bold">
+                  {plan.totalCalories} cal/day
+                </span>
+                <span className="text-gray-600">{plan.totalCalories * 7} cal/week</span>
+              </div>
             </div>
           </div>
         </div>
@@ -136,7 +124,7 @@ const MealPlanDetailPage = () => {
 
       <div className="px-2 md:px-32">
         <div key={planIndex} className="mb-12">
-          <p className="text-2xl font-bold mb-4">Plan Items</p>
+          <p className="text-2xl font-bold mb-4">Plan Items <span className="text-gray-500 font-normal text-xl">({plan.menuItems.length})</span></p>
           <>
             <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4 mb-6">
               {plan.menuItems.map((menuItem) => (
