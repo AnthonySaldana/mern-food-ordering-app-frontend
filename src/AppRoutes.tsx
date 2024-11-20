@@ -6,7 +6,7 @@ import UserProfilePage from "./pages/UserProfilePage";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import ManageRestaurantPage from "./pages/ManageRestaurantPage";
 import SearchPage from "./pages/SearchPage";
-import DetailPage from "./pages/DetailPage";
+// import DetailPage from "./pages/DetailPage";
 import OrderStatusPage from "./pages/OrderStatusPage";
 import InfluencerDetailPage from "./pages/InfluencerDetailPage";
 import MealPlanDetailPage from "./pages/MealPlanDetailPage";
@@ -32,14 +32,14 @@ const AppRoutes = () => {
           </Layout>
         }
       />
-      <Route
+      {/* <Route
         path="/detail/:restaurantId"
         element={
           <Layout showHero={false}>
             <DetailPage />
           </Layout>
         }
-      />
+      /> */}
       <Route
         path="/influencer/:influencerId"
         element={
