@@ -1,11 +1,12 @@
 /* eslint-disable */
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
-import { Influencer, MenuItem as MenuItemType } from "@/types";
+// import { Influencer, MenuItem as MenuItemType } from "@/types";
+import { Influencer } from "@/types";
 import { Card } from "@/components/ui/card";
 import MenuItem from "@/components/MenuItem";
 import { useState } from "react";
-
+import { useNavigate } from "react-router-dom";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchInfluencerById = async (id: string): Promise<Influencer> => {
@@ -21,6 +22,7 @@ const MealPlanDetailPage = () => {
   // const [expandedPlanIndex, setExpandedPlanIndex] = useState<number | null>(0);
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string | null>(null);
   const [selectedStartDay, setSelectedStartDay] = useState<string | null>("Mon");
+  const navigate = useNavigate();
 
   const { data: influencer, isLoading, error } = useQuery(
     ["fetchInfluencer", influencerId],
@@ -52,10 +54,10 @@ const MealPlanDetailPage = () => {
     return <div>No meal plans found</div>;
   }
 
-  const addToCart = (menuItem: MenuItemType) => {
-    // TODO: Implement cart functionality
-    console.log("Add to cart:", menuItem);
-  };
+  // const addToCart = (menuItem: MenuItemType) => {
+  //   // TODO: Implement cart functionality
+  //   console.log("Add to cart:", menuItem);
+  // };
 
   // const togglePlan = (index: number) => {
   //   setExpandedPlanIndex(expandedPlanIndex === index ? null : index);
@@ -84,13 +86,18 @@ const MealPlanDetailPage = () => {
         </p>
       </div> */}
       <div className="flex flex-col gap-4 p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
-        <div className="flex flex-col gap-4 items-center justify-between pb-2 cursor-pointer transition-colors p-4 rounded-t-lg">
-          <h2 className="text-2xl font-bold">{plan.name}</h2>
-          <div className="flex items-center gap-2">
-            <span className="bg-orange-500 text-black px-3 py-1 rounded-full text-sm font-bold">
-              {plan.totalCalories} cal/day
-            </span>
-            <span className="text-gray-600">{plan.totalCalories * 7} cal/week</span>
+        <div className="flex flex-row items-center gap-4 pb-2 cursor-pointer transition-colors p-4 rounded-t-lg">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg" onClick={() => navigate(`/influencer/${influencerId}/mealplans`)} className="cursor-pointer">
+            <path d="M18 18L6 6M6 6H18M6 6V18" stroke="black" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+          </svg>
+          <div className="flex flex-col gap-2">
+            <h2 className="text-2xl font-bold">{plan.name}</h2>
+            <div className="flex items-center gap-2">
+              <span className="bg-orange-500 text-black px-3 py-1 rounded-full text-sm font-bold">
+                {plan.totalCalories} cal/day
+              </span>
+              <span className="text-gray-600">{plan.totalCalories * 7} cal/week</span>
+            </div>
           </div>
         </div>
       </div>
@@ -116,10 +123,10 @@ const MealPlanDetailPage = () => {
         <div className="absolute bottom-0 left-0 right-0 p-4 rounded-md bg-gradient-to-t from-black/60 to-transparent">
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
-              <span className="bg-pink-500/80 text-white px-3 py-1 rounded-full text-sm">
+              <span className="bg-orange-500/80 text-white px-3 py-1 rounded-full text-sm">
                 ${(influencer.deliveryPrice ? influencer.deliveryPrice / 100 : 0).toFixed(2)} delivery
               </span>
-              <span className="bg-pink-500/80 text-white px-3 py-1 rounded-full text-sm">
+              <span className="bg-orange-500/80 text-white px-3 py-1 rounded-full text-sm">
                 {influencer.estimatedDeliveryTime} min
               </span>
             </div>
@@ -136,7 +143,7 @@ const MealPlanDetailPage = () => {
                 <MenuItem
                   key={menuItem._id}
                   menuItem={menuItem}
-                  addToCart={() => addToCart(menuItem)}
+                  // addToCart={() => addToCart(menuItem)}
                 />
               ))}
             </div>
@@ -212,7 +219,7 @@ const MealPlanDetailPage = () => {
                   {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                     <button
                       key={day}
-                      className={`px-4 py-2 rounded-lg ${selectedStartDay === day ? "bg-[#ff6d3f] text-white" : "bg-transparent border border-gray-200"}`}
+                      className={`px-4 py-2 rounded-lg ${selectedStartDay === day ? "bg-orange-500 text-white" : "bg-transparent border border-gray-200"}`}
                       onClick={() => setSelectedStartDay(day)}
                     >
                       {day}
@@ -235,7 +242,7 @@ const MealPlanDetailPage = () => {
                 </div>
               </div>
 
-              <button className="mt-4 bg-[#ff6d3f] text-white px-4 py-3 rounded-xl w-full font-medium">
+              <button className="mt-4 bg-orange-500 text-white px-4 py-3 rounded-xl w-full font-medium">
                 Confirm and pay - $74.95
               </button>
             </div>

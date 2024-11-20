@@ -77,10 +77,10 @@ const MealPlanDetailPage = () => {
         <div className="absolute bottom-0 left-0 right-0 p-4 rounded-md bg-gradient-to-t from-black/60 to-transparent">
           <div className="flex flex-col gap-2">
             <div className="flex gap-2">
-              <span className="bg-pink-500/80 text-white px-3 py-1 rounded-full text-sm">
+              <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm">
                 ${(influencer.deliveryPrice ? influencer.deliveryPrice / 100 : 0).toFixed(2)} delivery
               </span>
-              <span className="bg-pink-500/80 text-white px-3 py-1 rounded-full text-sm">
+              <span className="bg-orange-500/80 text-white px-3 py-1 rounded-full text-sm">
                 {influencer.estimatedDeliveryTime} min
               </span>
             </div>
@@ -108,7 +108,7 @@ const MealPlanDetailPage = () => {
                 </span>
               </h2>
               <p className="text-gray-600 mt-2">
-                {plan.totalCalories} calories per week • {plan.menuItems.length} items
+                {plan.totalCalories * 7} calories per week • {plan.menuItems.length} items
               </p>
             </div>
             
