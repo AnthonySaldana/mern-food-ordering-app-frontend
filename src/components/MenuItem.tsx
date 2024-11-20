@@ -16,10 +16,11 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
 
   return (
     <>
-      <div className="cursor-pointer hover:bg-yellow-50" onClick={handleToggleAccordion}>
+      {/* <div className="cursor-pointer hover:bg-yellow-50" onClick={handleToggleAccordion}> */}
+      <div className="cursor-pointer hover:bg-yellow-50">
         <CardContent className="flex flex-col items-start p-1">
           {menuItem.imageUrl && (
-            <div className="relative mb-2" style={{ width: "6rem", height: "6rem" }}>
+            <div className="relative mb-2" style={{ width: "100%", height: "5rem" }}>
               <img
                 src={menuItem.imageUrl}
                 alt={menuItem.name}
@@ -57,7 +58,7 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
             className="mt-4 bg-orange-500 text-white px-4 py-2 rounded"
             onClick={() => {
               addToCart();
-              handleToggleAccordion();
+              // handleToggleAccordion();
             }}
           >
             ${(menuItem.price / 100).toFixed(2)} - Add to Cart

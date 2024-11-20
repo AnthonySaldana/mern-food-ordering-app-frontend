@@ -10,6 +10,7 @@ import DetailPage from "./pages/DetailPage";
 import OrderStatusPage from "./pages/OrderStatusPage";
 import InfluencerDetailPage from "./pages/InfluencerDetailPage";
 import MealPlanDetailPage from "./pages/MealPlanDetailPage";
+import MealPlansPage from "./pages/MealPlansPage";
 
 const AppRoutes = () => {
   return (
@@ -48,7 +49,15 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/mealplan/:id"
+        path="/influencer/:id/mealplans"
+        element={
+          <Layout showHero={false}>
+            <MealPlansPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/influencer/:influencerId/mealplans/:planIndex"
         element={
           <Layout showHero={false}>
             <MealPlanDetailPage />
