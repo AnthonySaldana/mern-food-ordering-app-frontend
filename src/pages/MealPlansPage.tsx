@@ -50,7 +50,7 @@ const MealPlanDetailPage = () => {
 
   const togglePlan = (index: number) => {
     navigate(`/influencer/${id}/mealplans/${index}`);
-    // setExpandedPlanIndex(expandedPlanIndex === index ? null : index);
+    setExpandedPlanIndex(expandedPlanIndex === index ? null : index);
   };
 
   return (

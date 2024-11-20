@@ -4,7 +4,8 @@ import { CardContent } from "./ui/card";
 
 type Props = {
   menuItem: MenuItem;
-  // addToCart: () => void;
+  addToCart?: () => void;
+  onClick?: () => void;
 };
 
 const MenuItem = ({ menuItem }: Props) => {
