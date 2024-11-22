@@ -19,7 +19,7 @@ type Props = {
 const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
   const { control, watch } = useFormContext();
 
-  const existingImageUrl = watch(`menuItems.${index}.imageUrl`);
+  const existingImageUrl = watch(`mealPlans.${mealPlanIndex}.menuItems.${index}.imageUrl`);
 
   return (
     <div className="flex flex-col gap-4 border p-4 rounded-lg">

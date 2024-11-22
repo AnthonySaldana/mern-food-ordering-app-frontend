@@ -2,6 +2,7 @@ import { useFieldArray, useFormContext } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
+import { AspectRatio } from "@/components/ui/aspect-ratio";
 import MenuItemInput from "./MenuItemInput";
 import { Control } from "react-hook-form";
 
@@ -25,7 +26,7 @@ const MealPlansSection = () => {
           />
         );
       })}
-      <Button type="button" onClick={() => append({ name: "", totalCalories: 0, menuItems: [] })}>
+      <Button type="button" onClick={() => append({ name: "", totalCalories: 0, menuItems: [], imageUrl: "", imageFile: undefined })}>
         Add Meal Plan
       </Button>
     </div>
@@ -34,10 +35,13 @@ const MealPlansSection = () => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any>; index: number; removeMealPlan: () => void }) => {
+  const { watch } = useFormContext();
   const { fields: menuItems, append: appendMenuItem, remove: removeMenuItem } = useFieldArray({
     control,
     name: `mealPlans.${index}.menuItems`,
   });
+
+  const existingImageUrl = watch(`mealPlans.${index}.imageUrl`);
 
   return (
     <div className="border p-4 rounded-lg mb-4">
@@ -67,7 +71,43 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
           </FormItem>
         )}
       />
-      <div>
+
+      <div className="space-y-2 mt-4">
+        <FormLabel>Meal Plan Image</FormLabel>
+        <div className="flex flex-col gap-4">
+          {existingImageUrl && (
+            <AspectRatio ratio={16 / 9}>
+              <img
+                src={existingImageUrl}
+                className="rounded-md object-cover h-full w-full"
+              />
+            </AspectRatio>
+          )}
+          <FormField
+            control={control}
+            name={`mealPlans.${index}.imageFile`}
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <Input
+                    className="bg-white"
+                    type="file"
+                    accept=".jpg, .jpeg, .png"
+                    onChange={(event) =>
+                      field.onChange(
+                        event.target.files ? event.target.files[0] : null
+                      )
+                    }
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+        </div>
+      </div>
+
+      <div className="mt-4">
         <h3 className="text-md font-medium">Menu Items</h3>
         {menuItems.map((menuItem, menuItemIndex) => (
           <MenuItemInput
@@ -81,7 +121,7 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
           Add Menu Item
         </Button>
       </div>
-      <Button type="button" onClick={removeMealPlan}>
+      <Button type="button" onClick={removeMealPlan} className="mt-4">
         Remove Meal Plan
       </Button>
     </div>
