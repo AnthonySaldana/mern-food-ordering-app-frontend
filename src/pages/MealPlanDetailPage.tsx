@@ -24,6 +24,7 @@ const MealPlanDetailPage = () => {
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isOrderPage, setIsOrderPage] = useState(false);
+  const [isMenuExpanded, setIsMenuExpanded] = useState(false);
   const navigate = useNavigate();
   const randValue = () => Math.random() - 0.5;
 
@@ -74,6 +75,40 @@ const MealPlanDetailPage = () => {
               <span className="text-gray-600">{plan.totalCalories * 7} cal/week</span>
             </div>
           </div>
+        </div>
+
+        <div className="bg-white rounded-xl">
+          <div 
+            className="flex justify-between items-center cursor-pointer p-4" 
+            onClick={() => setIsMenuExpanded(!isMenuExpanded)}
+          >
+            <p className="text-md font-bold">Plan Items ({plan.menuItems.length})</p>
+            <svg 
+              width="24" 
+              height="24" 
+              viewBox="0 0 24 24"
+              className={`transition-transform ${isMenuExpanded ? 'rotate-180' : ''}`}
+            >
+              <path 
+                d="M19 9l-7 7-7-7" 
+                stroke="currentColor" 
+                strokeWidth="2" 
+                strokeLinecap="round" 
+                strokeLinejoin="round"
+                fill="none"
+              />
+            </svg>
+          </div>
+          {isMenuExpanded && (
+            <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4 p-4">
+              {plan.menuItems.map((menuItem) => (
+                <MenuItem
+                  key={menuItem._id}
+                  menuItem={menuItem}
+                />
+              ))}
+            </div>
+          )}
         </div>
 
         <div className="px-2 md:px-32">
