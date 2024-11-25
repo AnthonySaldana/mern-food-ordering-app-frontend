@@ -1,10 +1,6 @@
 import { useSearchInfluencers } from "@/api/InfluencerApi";
-import CuisineFilter from "@/components/CuisineFilter";
 import PaginationSelector from "@/components/PaginationSelector";
 import SearchBar, { SearchForm } from "@/components/SearchBar";
-import SearchResultCard from "@/components/SearchResultCard";
-import SearchResultInfo from "@/components/SearchResultInfo";
-import SortOptionDropdown from "@/components/SortOptionDropdown";
 import { useState } from "react";
 import { useParams } from "react-router-dom";
 import SearchInfluencerCard from "@/components/SearchInfluencerCard";
@@ -25,25 +21,25 @@ const SearchPage = () => {
     sortOption: "bestMatch",
   });
 
-  const [isExpanded, setIsExpanded] = useState<boolean>(false);
+  // const [isExpanded, setIsExpanded] = useState<boolean>(false);
 
   const { results, isLoading } = useSearchInfluencers(searchState, city);
 
-  const setSortOption = (sortOption: string) => {
-    setSearchState((prevState) => ({
-      ...prevState,
-      sortOption,
-      page: 1,
-    }));
-  };
+  // const setSortOption = (sortOption: string) => {
+  //   setSearchState((prevState) => ({
+  //     ...prevState,
+  //     sortOption,
+  //     page: 1,
+  //   }));
+  // };
 
-  const setSelectedCuisines = (selectedCuisines: string[]) => {
-    setSearchState((prevState) => ({
-      ...prevState,
-      selectedCuisines,
-      page: 1,
-    }));
-  };
+  // const setSelectedCuisines = (selectedCuisines: string[]) => {
+  //   setSearchState((prevState) => ({
+  //     ...prevState,
+  //     selectedCuisines,
+  //     page: 1,
+  //   }));
+  // };
 
   const setPage = (page: number) => {
     setSearchState((prevState) => ({

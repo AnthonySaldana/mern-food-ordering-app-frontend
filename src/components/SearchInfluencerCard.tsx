@@ -1,7 +1,6 @@
 import { Influencer } from "@/types";
 import { Link } from "react-router-dom";
 import { AspectRatio } from "./ui/aspect-ratio";
-import { Banknote, Clock } from "lucide-react";
 
 type Props = {
   influencer: Influencer;
