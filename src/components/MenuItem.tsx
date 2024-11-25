@@ -1,25 +1,27 @@
-import { useState } from "react";
+// import { useState } from "react";
 import { type MenuItem } from "../types";
 import { CardContent } from "./ui/card";
 
 type Props = {
   menuItem: MenuItem;
-  addToCart: () => void;
+  addToCart?: () => void;
+  onClick?: () => void;
 };
 
-const MenuItem = ({ menuItem, addToCart }: Props) => {
-  const [isAccordionOpen, setIsAccordionOpen] = useState(false);
+const MenuItem = ({ menuItem }: Props) => {
+  // const [isAccordionOpen, setIsAccordionOpen] = useState(false);
 
-  const handleToggleAccordion = () => {
-    setIsAccordionOpen(!isAccordionOpen);
-  };
+  // const handleToggleAccordion = () => {
+  //   setIsAccordionOpen(!isAccordionOpen);
+  // };
 
   return (
     <>
-      <div className="cursor-pointer hover:bg-yellow-50" onClick={handleToggleAccordion}>
+      {/* <div className="cursor-pointer hover:bg-yellow-50" onClick={handleToggleAccordion}> */}
+      <div className="cursor-pointer hover:bg-yellow-50">
         <CardContent className="flex flex-col items-start p-1">
           {menuItem.imageUrl && (
-            <div className="relative mb-2" style={{ width: "6rem", height: "6rem" }}>
+            <div className="relative mb-2" style={{ width: "100%", height: "5rem" }}>
               <img
                 src={menuItem.imageUrl}
                 alt={menuItem.name}
@@ -28,11 +30,11 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
             </div>
           )}
           <h3 className="text-sm text-left truncate max-w-[95px]">{menuItem.name}</h3>
-          <p className="text-sm text-left mt-1">${(menuItem.price / 100).toFixed(2)}</p>
+          {/* <p className="text-sm text-left mt-1">${(menuItem.price / 100).toFixed(2)}</p> */}
         </CardContent>
       </div>
 
-      {isAccordionOpen && (
+      {/* {isAccordionOpen && (
         <div className="p-4 border-t border-gray-200">
           {menuItem.imageUrl && (
             <img
@@ -54,16 +56,16 @@ const MenuItem = ({ menuItem, addToCart }: Props) => {
             <p className="text-sm">{menuItem?.instructions}</p>
           </div>
           <button
-            className="mt-4 bg-orange-500 text-white px-4 py-2 rounded"
+            className="mt-4 bg-[#50ad40] text-white px-4 py-2 rounded"
             onClick={() => {
               addToCart();
-              handleToggleAccordion();
+              // handleToggleAccordion();
             }}
           >
             ${(menuItem.price / 100).toFixed(2)} - Add to Cart
           </button>
         </div>
-      )}
+      )} */}
     </>
   );
 };

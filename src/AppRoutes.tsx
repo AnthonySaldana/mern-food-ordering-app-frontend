@@ -6,10 +6,11 @@ import UserProfilePage from "./pages/UserProfilePage";
 import ProtectedRoute from "./auth/ProtectedRoute";
 import ManageRestaurantPage from "./pages/ManageRestaurantPage";
 import SearchPage from "./pages/SearchPage";
-import DetailPage from "./pages/DetailPage";
+// import DetailPage from "./pages/DetailPage";
 import OrderStatusPage from "./pages/OrderStatusPage";
 import InfluencerDetailPage from "./pages/InfluencerDetailPage";
 import MealPlanDetailPage from "./pages/MealPlanDetailPage";
+import MealPlansPage from "./pages/MealPlansPage";
 
 const AppRoutes = () => {
   return (
@@ -17,7 +18,7 @@ const AppRoutes = () => {
       <Route
         path="/"
         element={
-          <Layout showHero>
+          <Layout showHero={false}>
             <HomePage />
           </Layout>
         }
@@ -31,14 +32,14 @@ const AppRoutes = () => {
           </Layout>
         }
       />
-      <Route
+      {/* <Route
         path="/detail/:restaurantId"
         element={
           <Layout showHero={false}>
             <DetailPage />
           </Layout>
         }
-      />
+      /> */}
       <Route
         path="/influencer/:influencerId"
         element={
@@ -48,7 +49,15 @@ const AppRoutes = () => {
         }
       />
       <Route
-        path="/mealplan/:id"
+        path="/influencer/:id/mealplans"
+        element={
+          <Layout showHero={false}>
+            <MealPlansPage />
+          </Layout>
+        }
+      />
+      <Route
+        path="/influencer/:influencerId/mealplans/:planIndex"
         element={
           <Layout showHero={false}>
             <MealPlanDetailPage />

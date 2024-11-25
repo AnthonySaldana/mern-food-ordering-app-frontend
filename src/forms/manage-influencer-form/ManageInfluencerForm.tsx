@@ -47,6 +47,8 @@ const formSchema = z
       z.object({
         name: z.string().min(1, "name is required"),
         totalCalories: z.coerce.number().optional(),
+        imageUrl: z.string().optional(),
+        imageFile: z.instanceof(File, { message: "Image is required" }).optional(),
         menuItems: z.array(
           z.object({
             name: z.string().min(1, "name is required"),
@@ -92,7 +94,7 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
       estimatedDeliveryTime: 0,
       socialMediaHandles: [{ platform: "", handle: "" }],
       cuisines: [],
-      mealPlans: [{ name: "", totalCalories: 0, menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined }] }],
+      mealPlans: [{ name: "", totalCalories: 0, imageUrl: "", imageFile: undefined, menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined }] }],
       imageUrl: "",
       imageFile: undefined,
     },
@@ -190,6 +192,9 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
       }
 
       formDataJson.mealPlans.forEach((plan, planIndex) => {
+        if (plan.imageFile) {
+          formData.append(`mealPlans[${planIndex}][imageFile]`, plan.imageFile);
+        }
         plan.menuItems.forEach((item, itemIndex) => {
           if (item.imageFile) {
             formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][imageFile]`, item.imageFile);

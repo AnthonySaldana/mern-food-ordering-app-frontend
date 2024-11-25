@@ -95,6 +95,7 @@ export type Influencer = {
 export type MealPlan = {
   _id: string;
   name: string;
+  imageUrl: string;
   totalCalories: number;
   menuItems: MenuItem[];
   influencer: string;
