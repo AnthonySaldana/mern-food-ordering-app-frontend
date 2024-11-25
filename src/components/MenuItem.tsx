@@ -56,7 +56,7 @@ const MenuItem = ({ menuItem }: Props) => {
             <p className="text-sm">{menuItem?.instructions}</p>
           </div>
           <button
-            className="mt-4 bg-orange-500 text-white px-4 py-2 rounded"
+            className="mt-4 bg-[#50ad40] text-white px-4 py-2 rounded"
             onClick={() => {
               addToCart();
               // handleToggleAccordion();

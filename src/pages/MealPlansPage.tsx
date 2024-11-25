@@ -54,7 +54,7 @@ const MealPlanDetailPage = () => {
   };
 
   return (
-    <div className="flex flex-col gap-5 bg-white p-3 rounded-md mt-[40px]" style={{ borderRadius: '16px' }}>
+    <div className="flex flex-col gap-5 bg-white p-3 rounded-md mt-[40px] max-w-[500px] shadow-xl" style={{ borderRadius: '16px', margin: '0 auto' }}>
       <Card className="w-full h-[320px] relative">
         <div className="absolute top-0 left-0 right-0 p-4">
           <div className="flex flex-col gap-2">
@@ -80,11 +80,11 @@ const MealPlanDetailPage = () => {
             <div className="flex gap-2">
               <div className="flex gap-2">
                 {influencer.cuisines?.map((cuisine, index) => (
-                  <span key={index} className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm">
+                  <span key={index} className="bg-[#50ad40] text-white px-3 py-1 rounded-full text-sm">
                     {cuisine}
                   </span>
                 )) || (
-                  <span className="bg-orange-500 text-white px-3 py-1 rounded-full text-sm">
+                  <span className="bg-[#50ad40] text-white px-3 py-1 rounded-full text-sm">
                     Healthy
                   </span>
                 )}
@@ -94,7 +94,7 @@ const MealPlanDetailPage = () => {
         </div>
       </Card>
 
-      <div className="px-2 md:px-32">
+      <div className="px-2">
         {influencer.mealPlans.map((plan, planIndex) => (
           <div key={planIndex}>
             <div 
@@ -103,7 +103,7 @@ const MealPlanDetailPage = () => {
               onClick={() => togglePlan(planIndex)}
             >
               <img src={plan.imageUrl} alt={plan.name} className="w-[100px] h-[80px] object-cover rounded-md" />
-              <div>
+              <div className="w-[100%]">
                 <h2 className="text-xl font-bold flex items-center justify-between" style={{ minWidth: '240px' }}>
                     {plan.name}
                     <span className="text-lg">
@@ -195,7 +195,7 @@ const MealPlanDetailPage = () => {
                         {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                           <button
                             key={day}
-                            className={`px-3 py-1 rounded ${selectedStartDay === day ? "bg-orange-500 text-white" : "bg-gray-200"}`}
+                            className={`px-3 py-1 rounded ${selectedStartDay === day ? "bg-[#50ad40] text-white" : "bg-gray-200"}`}
                             onClick={() => setSelectedStartDay(day)}
                           >
                             {day}
@@ -216,7 +216,7 @@ const MealPlanDetailPage = () => {
                         </label>
                       </div>
                     </div>
-                    <button className="mt-4 bg-orange-500 text-white px-4 py-2 rounded w-full">
+                    <button className="mt-4 bg-[#50ad40] text-white px-4 py-2 rounded w-full">
                       Confirm and pay - $74.95
                     </button>
                   </div>

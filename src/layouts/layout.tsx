@@ -10,7 +10,7 @@ type Props = {
 const Layout = ({ children, showHero = false }: Props) => {
   return (
     // <div className="flex flex-col min-h-screen bg-[#F7F4E5]">
-    <div className="flex flex-col min-h-screen bg-[#d8d4bf]">
+    <div className="flex flex-col min-h-screen bg-white">
       <Header />
       {showHero && <Hero />}
       <div className="container mx-auto flex-1 py-5 px-5"

@@ -18,7 +18,7 @@ const SearchResultCard = ({ restaurant }: Props) => {
           src={restaurant.imageUrl}
           className="rounded-md w-full h-full object-cover"
         />
-      </AspectRatio>
+      </AspectRatio>s
       <div>
         <h3 className="text-2xl font-bold tracking-tight mb-2 group-hover:underline">
           {restaurant.restaurantName}
