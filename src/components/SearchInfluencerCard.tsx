@@ -9,7 +9,7 @@ type Props = {
 const SearchInfluencerCard = ({ influencer }: Props) => {
   return (
     <Link
-      to={`/influencer/${influencer._id}/mealplans`}
+      to={`/influencer/${influencer._id}/mealplans/0`}
       className="flex flex-col group bg-[#c3f47d] p-0 rounded-lg shadow-md transition-transform transform hover:scale-105"
     >
       <AspectRatio ratio={16 / 9}>
