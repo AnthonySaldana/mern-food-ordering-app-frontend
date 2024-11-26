@@ -79,7 +79,7 @@ const MealPlanDetailPage = () => {
 
         <div className="bg-white rounded-xl">
           <div 
-            className="flex justify-between items-center cursor-pointer p-4" 
+            className="flex justify-between items-center cursor-pointer p-4 md:px-32" 
             onClick={() => setIsMenuExpanded(!isMenuExpanded)}
           >
             <p className="text-md font-bold">Plan Items ({plan.menuItems.length})</p>
@@ -100,7 +100,7 @@ const MealPlanDetailPage = () => {
             </svg>
           </div>
           {isMenuExpanded && (
-            <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4 p-4">
+            <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4 p-4 md:px-32">
               {plan.menuItems.map((menuItem) => (
                 <MenuItem
                   key={menuItem._id}
