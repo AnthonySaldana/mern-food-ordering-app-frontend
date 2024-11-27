@@ -327,7 +327,7 @@ const MealPlanDetailPage = () => {
           </div>
           {isPlanExpanded && (
             <p className="text-gray-700 mt-4">
-              {influencer.bio}
+              {influencer.mealPlans[Number(planIndex)].description}
             </p>
           )}
         </div>
