@@ -26,7 +26,7 @@ const MealPlansSection = () => {
           />
         );
       })}
-      <Button type="button" onClick={() => append({ name: "", totalCalories: 0, menuItems: [], imageUrl: "", imageFile: undefined })}>
+      <Button type="button" onClick={() => append({ name: "", description: "", totalCalories: 0, menuItems: [], imageUrl: "", imageFile: undefined })}>
         Add Meal Plan
       </Button>
     </div>
@@ -53,6 +53,19 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
             <FormLabel>Name</FormLabel>
             <FormControl>
               <Input {...field} placeholder="Meal Plan Name" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name={`mealPlans.${index}.description`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Description</FormLabel>
+            <FormControl>
+              <Input {...field} placeholder="Meal Plan Description" />
             </FormControl>
             <FormMessage />
           </FormItem>
