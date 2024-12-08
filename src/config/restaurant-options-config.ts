@@ -25,5 +25,7 @@ export const cuisineList = [
   "Macro Focused",
   "Plant Based",
   "Sports Nutrition",
-  "Meal Prep"
+  "Meal Prep",
+  "Family Friendly",
+  "Quick & Easy",
 ];
