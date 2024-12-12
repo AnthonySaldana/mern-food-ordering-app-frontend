@@ -60,13 +60,16 @@ const MealPlanDetailPage = () => {
 
   if (isOrderPage) {
     return (
-      <div className="flex flex-row mt-[40px]">
-        <div className="flex w-2/3 flex-col gap-4 bg-white p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
-          {/* <div className="flex justify-center">
-            <div className="w-12 h-1 bg-gray-300 rounded-full"/>
-          </div> */}
-
-          <div className="bg-white rounded-xl">
+      <div className="flex flex-col lg:flex-row mt-[40px]">
+        <div className="flex lg:w-3/4 flex-col gap-4 bg-white p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
+          <div className="flex flex-row items-center gap-2 md:px-32 cursor-pointer" onClick={() => setIsOrderPage(false)}>
+            <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8936 3.5173C16.3818 3.5173 16.7776 3.12151 16.7776 2.63328C16.7776 2.14506 16.3818 1.74927 15.8936 1.74927H2.63334C2.14511 1.74927 1.74933 2.14506 1.74933 2.63328V15.8935C1.74933 16.3818 2.14511 16.7776 2.63334 16.7776C3.12157 16.7776 3.51736 16.3818 3.51736 15.8935V4.76749L16.7419 17.992C17.0871 18.3372 17.6468 18.3372 17.9921 17.992C18.3373 17.6468 18.3373 17.087 17.9921 16.7418L4.76755 3.5173H15.8936Z" fill="black"/>
+              <path fill-rule="evenodd" clip-rule="evenodd" d="M16.8596 2.63327C16.8596 2.09948 16.4269 1.66675 15.8931 1.66675H2.63286C2.09907 1.66675 1.66634 2.09948 1.66634 2.63327V15.8935C1.66634 16.4273 2.09907 16.8601 2.63286 16.8601C3.16666 16.8601 3.59939 16.4273 3.59939 15.8935V4.96667L16.683 18.0503C17.0605 18.4278 17.6725 18.4278 18.0499 18.0503C18.4274 17.6729 18.4274 17.0609 18.0499 16.6835L4.96626 3.5998H15.8931C16.4269 3.5998 16.8596 3.16707 16.8596 2.63327ZM15.8931 1.83176C16.3358 1.83176 16.6946 2.19061 16.6946 2.63327C16.6946 3.07593 16.3358 3.43478 15.8931 3.43478H4.76707C4.7337 3.43478 4.70361 3.45488 4.69084 3.48572C4.67807 3.51655 4.68513 3.55204 4.70873 3.57563L17.9332 16.8001C18.2462 17.1131 18.2462 17.6206 17.9332 17.9336C17.6202 18.2467 17.1127 18.2467 16.7997 17.9336L3.57522 4.70914C3.55163 4.68554 3.51614 4.67848 3.48531 4.69125C3.45448 4.70402 3.43437 4.73411 3.43437 4.76748V15.8935C3.43437 16.3362 3.07553 16.695 2.63286 16.695C2.1902 16.695 1.83136 16.3362 1.83136 15.8935V2.63327C1.83136 2.19061 2.1902 1.83176 2.63286 1.83176H15.8931Z" fill="black"/>
+            </svg>
+            <p>Back</p>
+          </div>
+          <div className="bg-white rounded-xl relative">
             <div 
               className="flex justify-between items-center cursor-pointer p-4 md:px-32" 
               onClick={() => setIsMenuExpanded(!isMenuExpanded)}
@@ -149,6 +152,34 @@ const MealPlanDetailPage = () => {
                     />
                   </label>
                 </div>
+
+                <div className="mt-6">
+                  <p className="text-gray-600 mb-4">Saved addresses</p>
+                  <div className="flex flex-col divide-y">
+                    <label className="flex items-center justify-between py-4">
+                      <div>
+                        <span className="font-medium">68 5 89th st</span>
+                      </div>
+                      <input 
+                        type="radio" 
+                        name="deliveryAddress"
+                        value="68 5 89th st"
+                        className="h-5 w-5 text-[#ff6d3f]"
+                      />
+                    </label>
+                    <label className="flex items-center justify-between py-4">
+                      <div className="flex items-center">
+                        <span className="font-medium">New address</span>
+                      </div>
+                      <input
+                        type="radio"
+                        name="deliveryAddress" 
+                        value="new"
+                        className="h-5 w-5 text-[#ff6d3f]"
+                      />
+                    </label>
+                  </div>
+                </div>
               </div>
 
               <div className="bg-[#F2F6FB] rounded-xl p-6">
@@ -191,7 +222,7 @@ const MealPlanDetailPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 bg-white p-4 rounded-md w-1/3">
+        <div className="flex flex-col gap-4 bg-white p-4 rounded-md lg:w-1/4 lg:px-2 px-32">
           <div className="mb-6 -bottom-[61px] left-0 right-0">
             <div className="flex flex-col items-start gap-2 flex justify-start">
               <h2 className="text-lg font-bold">{plan.name}</h2>
@@ -231,7 +262,7 @@ const MealPlanDetailPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-white p-3 rounded-md mt-[40px] lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8">
+    <div className="flex flex-col gap-4 bg-white p-3 rounded-md mt-[80px] lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8">
       <div className="block lg:hidden">
         <Card className="w-full h-[320px] relative" style={{boxShadow: 'none'}}>
           <img
