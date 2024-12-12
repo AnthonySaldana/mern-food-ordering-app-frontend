@@ -65,18 +65,6 @@ const MealPlanDetailPage = () => {
           {/* <div className="flex justify-center">
             <div className="w-12 h-1 bg-gray-300 rounded-full"/>
           </div> */}
-          
-          <div className="px-2 md:px-32 mb-6 max-w-[400px] mx-auto -bottom-[61px] left-0 right-0">
-            <div className="flex flex-col items-center gap-2">
-              <h2 className="text-xl font-bold">{plan.name}</h2>
-              <div className="flex items-center gap-2">
-                <span className="bg-[#4DE54A] text-black px-3 py-1 rounded-full text-sm font-bold">
-                  {plan.totalCalories} cal/day
-                </span>
-                <span className="text-gray-600">{plan.totalCalories * 7} cal/week</span>
-              </div>
-            </div>
-          </div>
 
           <div className="bg-white rounded-xl">
             <div 
@@ -114,7 +102,7 @@ const MealPlanDetailPage = () => {
 
           <div className="px-2 md:px-32">
             <div className="space-y-4">
-              <div className="bg-[#fbfbf6] rounded-xl p-6">
+              <div className="bg-[#F2F6FB] rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-3">Delivery</h3>
                 <p className="text-gray-600 mb-4">Choose delivery date</p>
                 <div className="flex flex-col divide-y">
@@ -163,14 +151,14 @@ const MealPlanDetailPage = () => {
                 </div>
               </div>
 
-              <div className="bg-[#fbfbf6] rounded-xl p-6">
+              <div className="bg-[#F2F6FB] rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-3">Plan start</h3>
                 <p className="text-gray-600 mb-2">Which day of the week will you start your plan?</p>
                 <div className="flex flex-wrap gap-2">
                   {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
                     <button
                       key={day}
-                      className={`px-4 py-2 rounded-lg ${selectedStartDay === day ? "bg-[#50ad40] text-white" : "bg-transparent border border-gray-200"}`}
+                      className={`px-4 py-2 rounded-lg ${selectedStartDay === day ? "bg-[#09C274] text-white" : "bg-transparent border border-gray-200"}`}
                       onClick={() => setSelectedStartDay(day)}
                     >
                       {day}
@@ -179,7 +167,7 @@ const MealPlanDetailPage = () => {
                 </div>
               </div>
 
-              <div className="bg-[#fbfbf6] rounded-xl p-6">
+              <div className="bg-[#F2F6FB] rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-3">Payment</h3>
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center">
@@ -195,7 +183,7 @@ const MealPlanDetailPage = () => {
 
               <button 
                 onClick={() => setIsOrderPage(false)}
-                className="mt-4 bg-white border-2 border-[#50ad40] text-[#50ad40] px-4 py-3 rounded-xl w-full font-medium"
+                className="mt-4 bg-white border-2 border-[#09C274] text-[#09C274] px-4 py-3 rounded-xl w-full font-medium"
               >
                 Back
               </button>
@@ -204,6 +192,17 @@ const MealPlanDetailPage = () => {
         </div>
 
         <div className="flex flex-col gap-4 bg-white p-4 rounded-md w-1/3">
+          <div className="mb-6 -bottom-[61px] left-0 right-0">
+            <div className="flex flex-col items-start gap-2 flex justify-start">
+              <h2 className="text-lg font-bold">{plan.name}</h2>
+              <div className="flex items-center gap-2">
+                <span className="bg-[#D9D6FF] text-black px-4 py-2 rounded-full text-sm font-bold text-center min-w-[2xs00px]">
+                  {plan.totalCalories} cal/day
+                </span>
+                <span className="text-gray-500 text-sm text-center min-w-[150px]">{plan.totalCalories * 7} cal/week</span>
+              </div>
+            </div>
+          </div>
           <div className="flex flex-col gap-2">
             <div className="flex justify-between text-sm">
               <span>Subtotal</span>
@@ -223,7 +222,7 @@ const MealPlanDetailPage = () => {
               <span>$74.95</span>
             </div>
           </div>
-          <button className="mt-4 bg-[#50ad40] text-white px-4 py-3 rounded-xl w-full font-medium">
+          <button className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium">
             Order plan - $74.95
           </button>
         </div>
@@ -246,7 +245,7 @@ const MealPlanDetailPage = () => {
                 <div className="flex flex-col gap-2 items-center" style={{width: '100%'}}>
                   <h2 className="text-xl font-bold">{plan.name}</h2>
                   <div className="flex items-center gap-2">
-                    <span className="bg-[#4DE54A] text-black px-3 py-1 rounded-full text-sm font-bold">
+                    <span className="bg-[#D9D6FF] text-black px-3 py-1 rounded-full text-sm font-bold">
                       {plan.totalCalories} cal/day
                     </span>
                     <span className="text-gray-600">{plan.totalCalories * 7} cal/week</span>
@@ -270,7 +269,7 @@ const MealPlanDetailPage = () => {
             <div className="absolute bottom-[-60px] left-6 right-6 bg-white p-6 rounded-2xl max-w-[400px] mx-auto -bottom-[61px] left-0 right-0">
               <h2 className="text-xl font-bold mb-2">{plan.name}</h2>
               <div className="flex items-center gap-2">
-                <span className="bg-[#4DE54A] text-black px-3 py-1 rounded-full text-sm font-bold">
+                <span className="bg-[#D9D6FF] text-black px-3 py-1 rounded-full text-sm font-bold">
                   {plan.totalCalories} cal/day
                 </span>
                 <span className="text-gray-600">{plan.totalCalories * 7} cal/week</span>
@@ -305,7 +304,7 @@ const MealPlanDetailPage = () => {
             </div>
             <button 
               onClick={() => navigate(`/influencer/${influencerId}/mealplans`)}
-              className="flex items-center gap-2 border-2 border-[#50ad40] text-[#50ad40] px-4 py-2 rounded-full font-semibold hover:bg-[#50ad40] hover:text-white transition-colors"
+              className="flex items-center gap-2 border-2 border-[#09C274] text-[#09C274] px-4 py-2 rounded-full font-semibold hover:bg-[#09C274] hover:text-white transition-colors"
             >
               More Plans
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
