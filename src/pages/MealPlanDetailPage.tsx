@@ -5,8 +5,9 @@ import { useQuery } from "react-query";
 import { Influencer } from "@/types";
 import { Card } from "@/components/ui/card";
 import MenuItem from "@/components/MenuItem";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSearchGroceryStores, useStoreInventory } from "@/api/GroceryApi";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchInfluencerById = async (id: string): Promise<Influencer> => {
@@ -25,6 +26,10 @@ const MealPlanDetailPage = () => {
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isOrderPage, setIsOrderPage] = useState(false);
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
+  const [isStoresExpanded, setIsStoresExpanded] = useState(false);
+  const [selectedStore, setSelectedStore] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
   const navigate = useNavigate();
   const randValue = () => Math.random() - 0.5;
 
@@ -35,6 +40,51 @@ const MealPlanDetailPage = () => {
       enabled: !!influencerId,
     }
   );
+
+  const { data: storeMatches } = useSearchGroceryStores({
+    latitude: location?.latitude || 0,
+    longitude: location?.longitude || 0,
+  });
+
+  const { data: inventory, isLoading: inventoryLoading } = useStoreInventory({
+    store_id: selectedStore?._id,
+    ...(selectedCategory?.subcategory_id && { subcategory_id: selectedCategory.subcategory_id }),
+    latitude: location?.latitude || 0,
+    longitude: location?.longitude || 0
+  });
+
+  const handleStoreSelection = (store: any) => {
+    setSelectedStore(store);
+    setSelectedCategory(null); // Reset category selection when switching stores
+  };
+
+  console.log(inventory, 'inventory found here');
+  console.log(inventoryLoading, 'inventoryLoading found here');
+
+  // const { data: storeMatches } = useFindStoresForShoppingList({
+  //   menuItems: plan?.menuItems || [],
+  //   latitude: location?.latitude || 0,
+  //   longitude: location?.longitude || 0,
+  // });
+
+  console.log(storeMatches, 'storeMatches found here');
+
+  useEffect(() => {
+    // Get user's location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        }
+      );
+    }
+  }, []);
 
   const plan = influencer?.mealPlans[Number(planIndex) || 0];
   console.log(" --------- ");
@@ -99,6 +149,128 @@ const MealPlanDetailPage = () => {
                     menuItem={menuItem}
                   />
                 ))}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-xl relative">
+            <div 
+              className="flex justify-between items-center cursor-pointer p-4 md:px-32" 
+              onClick={() => setIsStoresExpanded(!isStoresExpanded)}
+            >
+              <p className="text-md font-bold">Available at Stores Nearby</p>
+              <svg 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24"
+                className={`transition-transform ${isStoresExpanded ? 'rotate-180' : ''}`}
+              >
+                <path 
+                  d="M19 9l-7 7-7-7" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+            {isStoresExpanded && (
+              <div className="p-4 md:px-32">
+                {!location ? (
+                  <p className="text-gray-600">Please enable location access to see store availability</p>
+                ) : !storeMatches?.stores?.length ? (
+                  <p className="text-gray-600">No stores found nearby</p>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      {storeMatches.stores.map((store: any) => (
+                        <div 
+                          key={store?._id || 'unknown'} 
+                          className={`flex justify-between items-center p-4 rounded-lg cursor-pointer ${
+                            selectedStore?.id === store.id ? 'bg-[#09C274] text-white' : 'bg-[#F2F6FB]'
+                          }`}
+                          onClick={() => handleStoreSelection(store)}
+                        >
+                          <div>
+                            <h4 className="font-medium">{store?.name || 'Unknown Store'}</h4>
+                            <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
+                              {store?.matchPercentage ?? 0}% of items available
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">
+                              ${(store?.totalPrice ?? 0).toFixed(2)}
+                            </p>
+                            <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
+                              {store?.matchedItems?.length ?? 0} items found
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedStore && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-4">Categories</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          {inventory?.categories?.map((category: any) => (
+                            <button
+                              key={category.id}
+                              className={`p-4 rounded-lg text-left ${
+                                selectedCategory?.id === category.id 
+                                  ? 'bg-[#09C274] text-white' 
+                                  : 'bg-[#F2F6FB]'
+                              }`}
+                              onClick={() => setSelectedCategory(category)}
+                            >
+                              <p className="font-medium">{category.name}</p>
+                              {/* <p className={`text-sm ${
+                                selectedCategory?.id === category.id 
+                                  ? 'text-white' 
+                                  : 'text-gray-600'
+                              }`}>
+                                {category.itemCount || 0} items
+                              </p> */}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedCategory && !inventoryLoading && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-4">Available Items</h3>
+                        <div className="grid grid-cols-3 gap-4">
+                          {inventory?.categories?.map((category: any) => 
+                            category.items?.map((item: any) => (
+                              <div key={item.id} className="bg-white rounded-lg p-4 shadow-sm">
+                                    {(item.imageUrl || item.image) && (
+                                      <img 
+                                        src={item.imageUrl || item.image}
+                                        alt={item.name}
+                                        className="w-full h-32 object-cover rounded-lg mb-2"
+                                      />
+                                    )}
+                                <h4 className="font-medium">{item.name}</h4>
+                                <p className="text-sm text-gray-600">${item.price?.toFixed(2)}</p>
+                                {item.is_available ? (
+                                  <span className="text-[#09C274] text-sm">In Stock</span>
+                                ) : (
+                                  <span className="text-red-500 text-sm">Out of Stock</span>
+                                )}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {inventoryLoading && (
+                      <div className="mt-6 text-center">
+                        <p>Loading inventory...</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
