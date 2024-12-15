@@ -8,6 +8,8 @@ import MenuItem from "@/components/MenuItem";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchGroceryStores, useStoreInventory } from "@/api/GroceryApi";
+import { ShoppingListItemType } from '../types/grocery';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchInfluencerById = async (id: string): Promise<Influencer> => {
@@ -17,6 +19,19 @@ const fetchInfluencerById = async (id: string): Promise<Influencer> => {
   }
   return response.json();
 };
+
+interface ShoppingListItem {
+  product_id: string;
+  name: string;
+  quantity: number;
+  product_marked_price: number;
+  selected_options?: Array<{
+    option_id: string;
+    quantity: number;
+    marked_price?: number;
+    notes?: string;
+  }>;
+}
 
 const MealPlanDetailPage = () => {
   const { influencerId, planIndex } = useParams();
@@ -32,6 +47,7 @@ const MealPlanDetailPage = () => {
   const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
   const navigate = useNavigate();
   const randValue = () => Math.random() - 0.5;
+  const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
 
   const { data: influencer, isLoading, error } = useQuery(
     ["fetchInfluencer", influencerId],
@@ -107,6 +123,34 @@ const MealPlanDetailPage = () => {
   if (!influencer?.mealPlans?.length) {
     return <div>No meal plans found</div>;
   }
+
+  const addToShoppingList = (item: any) => {
+    setShoppingList(prevList => {
+      const existingItem = prevList.find(listItem => listItem.product_id === item.id);
+      
+      if (existingItem) {
+        return prevList.map(listItem => 
+          listItem.product_id === item.id 
+            ? { ...listItem, quantity: listItem.quantity + 1 }
+            : listItem
+        );
+      }
+
+      const newItem: ShoppingListItem = {
+        product_id: item.id,
+        name: item.name,
+        quantity: 1,
+        product_marked_price: Math.round(item.price * 100), // Convert to cents
+        selected_options: [] // Add options if available from the API
+      };
+
+      return [...prevList, newItem];
+    });
+  };
+
+  const removeFromShoppingList = (productId: string) => {
+    setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
+  };
 
   if (isOrderPage) {
     return (
@@ -242,14 +286,17 @@ const MealPlanDetailPage = () => {
                         <div className="grid grid-cols-3 gap-4">
                           {inventory?.categories?.map((category: any) => 
                             category.items?.map((item: any) => (
-                              <div key={item.id} className="bg-white rounded-lg p-4 shadow-sm">
-                                    {(item.imageUrl || item.image) && (
-                                      <img 
-                                        src={item.imageUrl || item.image}
-                                        alt={item.name}
-                                        className="w-full h-32 object-cover rounded-lg mb-2"
-                                      />
-                                    )}
+                              <div key={item.id} 
+                                className="bg-white rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                                onClick={() => addToShoppingList(item)}
+                              >
+                                {(item.imageUrl || item.image) && (
+                                  <img 
+                                    src={item.imageUrl || item.image}
+                                    alt={item.name}
+                                    className="w-full h-32 object-cover rounded-lg mb-2"
+                                  />
+                                )}
                                 <h4 className="font-medium">{item.name}</h4>
                                 <p className="text-sm text-gray-600">${item.price?.toFixed(2)}</p>
                                 {item.is_available ? (
@@ -407,6 +454,32 @@ const MealPlanDetailPage = () => {
             </div>
           </div>
           <div className="flex flex-col gap-2">
+          {shoppingList.length > 0 && (
+            <div className="mb-6">
+              <h3 className="font-medium mb-3">Shopping List</h3>
+              <div className="space-y-2">
+                {shoppingList.map((item) => (
+                  <div key={item.product_id} className="flex justify-between items-center">
+                    <div className="flex items-center gap-2">
+                      <span className="bg-gray-100 px-2 py-1 rounded">{item.quantity}</span>
+                      <span>{item.name}</span>
+                    </div>
+                    <div className="flex items-center gap-4">
+                      <span>${(item.product_marked_price / 100).toFixed(2)}</span>
+                      <button 
+                        onClick={() => removeFromShoppingList(item.product_id)}
+                        className="text-red-500 hover:text-red-700"
+                      >
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                          <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
             <div className="flex justify-between text-sm">
               <span>Subtotal</span>
               <span>$64.95</span>
