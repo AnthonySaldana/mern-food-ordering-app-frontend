@@ -1,6 +1,6 @@
 import { useLocation, useNavigate } from 'react-router-dom';
 import { useState, useEffect } from 'react';
-import { useQuery } from 'react-query';
+// import { useQuery } from 'react-query';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 

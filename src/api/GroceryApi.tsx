@@ -2,18 +2,18 @@ import { useQuery } from "react-query";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-type StoreMatch = {
-  store_id: string;
-  store_name: string;
-  matchedItems: Array<{
-    requestedItem: any;
-    foundProduct: any;
-    price: number;
-  }>;
-  missingItems: any[];
-  totalPrice: number;
-  matchPercentage: number;
-};
+// type StoreMatch = {
+//   store_id: string;
+//   store_name: string;
+//   matchedItems: Array<{
+//     requestedItem: any;
+//     foundProduct: any;
+//     price: number;
+//   }>;
+//   missingItems: any[];
+//   totalPrice: number;
+//   matchPercentage: number;
+// };
 
 export const useSearchGroceryStores = (params: {
   latitude: number;
