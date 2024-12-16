@@ -152,6 +152,31 @@ const MealPlanDetailPage = () => {
     setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
   };
 
+  const calculateSubtotal = () => {
+    return shoppingList.reduce((total, item) => {
+      const itemTotal = (item.product_marked_price * item.quantity);
+      return total + itemTotal;
+    }, 0);
+  };
+
+  const calculateTax = (subtotal: number) => {
+    const TAX_RATE = 0.08; // 8% tax rate - adjust as needed
+    return Math.round(subtotal * TAX_RATE);
+  };
+
+  const calculateShipping = () => {
+    // You can implement dynamic shipping logic here
+    const BASE_SHIPPING = 500; // $5.00 in cents
+    return BASE_SHIPPING;
+  };
+
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const tax = calculateTax(subtotal);
+    const shipping = calculateShipping();
+    return subtotal + tax + shipping;
+  };
+
   if (isOrderPage) {
     return (
       <div className="flex flex-col lg:flex-row mt-[40px]">
@@ -446,60 +471,72 @@ const MealPlanDetailPage = () => {
             <div className="flex flex-col items-start gap-2 flex justify-start">
               <h2 className="text-lg font-bold">{plan.name}</h2>
               <div className="flex items-center gap-2">
-                <span className="bg-[#D9D6FF] text-black px-4 py-2 rounded-full text-sm font-bold text-center min-w-[2xs00px]">
+                <span className="bg-[#D9D6FF] text-black px-4 py-2 rounded-full text-sm font-bold text-center min-w-[200px]">
                   {plan.totalCalories} cal/day
                 </span>
-                <span className="text-gray-500 text-sm text-center min-w-[150px]">{plan.totalCalories * 7} cal/week</span>
+                <span className="text-gray-500 text-sm text-center min-w-[150px]">
+                  {plan.totalCalories * 7} cal/week
+                </span>
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-2">
-          {shoppingList.length > 0 && (
-            <div className="mb-6">
-              <h3 className="font-medium mb-3">Shopping List</h3>
-              <div className="space-y-2">
-                {shoppingList.map((item) => (
-                  <div key={item.product_id} className="flex justify-between items-center">
-                    <div className="flex items-center gap-2">
-                      <span className="bg-gray-100 px-2 py-1 rounded">{item.quantity}</span>
-                      <span>{item.name}</span>
+            {shoppingList.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-medium mb-3">Shopping List</h3>
+                <div className="space-y-2">
+                  {shoppingList.map((item) => (
+                    <div key={item.product_id} className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-gray-100 px-2 py-1 rounded">{item.quantity}</span>
+                        <span>{item.name}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span>${((item.product_marked_price * item.quantity) / 100).toFixed(2)}</span>
+                        <button 
+                          onClick={() => removeFromShoppingList(item.product_id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                        </button>
+                      </div>
                     </div>
-                    <div className="flex items-center gap-4">
-                      <span>${(item.product_marked_price / 100).toFixed(2)}</span>
-                      <button 
-                        onClick={() => removeFromShoppingList(item.product_id)}
-                        className="text-red-500 hover:text-red-700"
-                      >
-                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
+            )}
             <div className="flex justify-between text-sm">
               <span>Subtotal</span>
-              <span>$64.95</span>
+              <span>${(calculateSubtotal() / 100).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Taxes</span>
-              <span>$5.00</span>
+              <span>${(calculateTax(calculateSubtotal()) / 100).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Shipping</span>
-              <span>$5.00</span>
+              <span>${(calculateShipping() / 100).toFixed(2)}</span>
             </div>
             <div className="h-[1px] bg-gray-200 my-2"></div>
             <div className="flex justify-between font-medium">
               <span>Total</span>
-              <span>$74.95</span>
+              <span>${(calculateTotal() / 100).toFixed(2)}</span>
             </div>
           </div>
-          <button className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium">
-            Order plan - $74.95
+          <button 
+            className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
+              shoppingList.length > 0 
+                ? 'bg-[#09C274] text-white hover:bg-[#07b369] transition-colors' 
+                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+            }`}
+            disabled={shoppingList.length === 0}
+          >
+            {shoppingList.length > 0 
+              ? `Order plan - $${(calculateTotal() / 100).toFixed(2)}`
+              : 'Add items to cart'
+            }
           </button>
         </div>
       </div>
