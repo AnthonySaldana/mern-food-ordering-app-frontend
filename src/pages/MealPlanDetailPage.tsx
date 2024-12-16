@@ -8,7 +8,8 @@ import MenuItem from "@/components/MenuItem";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchGroceryStores, useStoreInventory } from "@/api/GroceryApi";
-import { ShoppingListItemType } from '../types/grocery';
+import PaymentMethodSection from "@/components/PaymentMethodSection";
+// import { ShoppingListItemType } from '../types/grocery';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -48,6 +49,7 @@ const MealPlanDetailPage = () => {
   const navigate = useNavigate();
   const randValue = () => Math.random() - 0.5;
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
 
   const { data: influencer, isLoading, error } = useQuery(
     ["fetchInfluencer", influencerId],
@@ -442,6 +444,33 @@ const MealPlanDetailPage = () => {
                 </div>
               </div>
 
+              <>
+                <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4 mb-6">
+                  {plan.menuItems.sort(randValue).slice(0, 3).map((menuItem) => (
+                    <MenuItem
+                      key={menuItem._id}
+                      menuItem={menuItem}
+                    />
+                  ))}
+                </div>
+
+                <PaymentMethodSection 
+                  onPaymentMethodSelect={(paymentMethodId) => setSelectedPaymentMethod(paymentMethodId)} 
+                />
+
+                <button 
+                  onClick={() => setIsOrderPage(true)}
+                  disabled={!selectedPaymentMethod}
+                  className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
+                    selectedPaymentMethod 
+                      ? 'bg-[#09C274] text-white' 
+                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {selectedPaymentMethod ? 'Order this plan - $74.95' : 'Select a payment method to continue'}
+                </button>
+              </>
+
               <div className="bg-[#F2F6FB] rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-3">Payment</h3>
                 <div className="flex flex-col gap-2">
@@ -532,9 +561,19 @@ const MealPlanDetailPage = () => {
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
             }`}
             disabled={shoppingList.length === 0}
+            onClick={() => navigate('/order-review', {
+              state: {
+                shoppingList,
+                storeId: selectedStore._id,
+                deliveryDetails: {
+                  address: "68 5 89th st", // You'll want to get this from the form
+                  instructions: ""
+                }
+              }
+            })}
           >
             {shoppingList.length > 0 
-              ? `Order plan - $${(calculateTotal() / 100).toFixed(2)}`
+              ? `Review Order - $${(calculateTotal() / 100).toFixed(2)}`
               : 'Add items to cart'
             }
           </button>
