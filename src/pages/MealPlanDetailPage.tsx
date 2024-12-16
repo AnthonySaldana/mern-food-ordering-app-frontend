@@ -5,8 +5,12 @@ import { useQuery } from "react-query";
 import { Influencer } from "@/types";
 import { Card } from "@/components/ui/card";
 import MenuItem from "@/components/MenuItem";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import { useSearchGroceryStores, useStoreInventory } from "@/api/GroceryApi";
+import PaymentMethodSection from "@/components/PaymentMethodSection";
+// import { ShoppingListItemType } from '../types/grocery';
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchInfluencerById = async (id: string): Promise<Influencer> => {
@@ -17,6 +21,19 @@ const fetchInfluencerById = async (id: string): Promise<Influencer> => {
   return response.json();
 };
 
+interface ShoppingListItem {
+  product_id: string;
+  name: string;
+  quantity: number;
+  product_marked_price: number;
+  selected_options?: Array<{
+    option_id: string;
+    quantity: number;
+    marked_price?: number;
+    notes?: string;
+  }>;
+}
+
 const MealPlanDetailPage = () => {
   const { influencerId, planIndex } = useParams();
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string | null>(null);
@@ -25,8 +42,14 @@ const MealPlanDetailPage = () => {
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isOrderPage, setIsOrderPage] = useState(false);
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
+  const [isStoresExpanded, setIsStoresExpanded] = useState(false);
+  const [selectedStore, setSelectedStore] = useState<any>(null);
+  const [selectedCategory, setSelectedCategory] = useState<any>(null);
+  const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
   const navigate = useNavigate();
   const randValue = () => Math.random() - 0.5;
+  const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
+  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
 
   const { data: influencer, isLoading, error } = useQuery(
     ["fetchInfluencer", influencerId],
@@ -35,6 +58,51 @@ const MealPlanDetailPage = () => {
       enabled: !!influencerId,
     }
   );
+
+  const { data: storeMatches } = useSearchGroceryStores({
+    latitude: location?.latitude || 0,
+    longitude: location?.longitude || 0,
+  });
+
+  const { data: inventory, isLoading: inventoryLoading } = useStoreInventory({
+    store_id: selectedStore?._id,
+    ...(selectedCategory?.subcategory_id && { subcategory_id: selectedCategory.subcategory_id }),
+    latitude: location?.latitude || 0,
+    longitude: location?.longitude || 0
+  });
+
+  const handleStoreSelection = (store: any) => {
+    setSelectedStore(store);
+    setSelectedCategory(null); // Reset category selection when switching stores
+  };
+
+  console.log(inventory, 'inventory found here');
+  console.log(inventoryLoading, 'inventoryLoading found here');
+
+  // const { data: storeMatches } = useFindStoresForShoppingList({
+  //   menuItems: plan?.menuItems || [],
+  //   latitude: location?.latitude || 0,
+  //   longitude: location?.longitude || 0,
+  // });
+
+  console.log(storeMatches, 'storeMatches found here');
+
+  useEffect(() => {
+    // Get user's location
+    if (navigator.geolocation) {
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          setLocation({
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude
+          });
+        },
+        (error) => {
+          console.error("Error getting location:", error);
+        }
+      );
+    }
+  }, []);
 
   const plan = influencer?.mealPlans[Number(planIndex) || 0];
   console.log(" --------- ");
@@ -57,6 +125,59 @@ const MealPlanDetailPage = () => {
   if (!influencer?.mealPlans?.length) {
     return <div>No meal plans found</div>;
   }
+
+  const addToShoppingList = (item: any) => {
+    setShoppingList(prevList => {
+      const existingItem = prevList.find(listItem => listItem.product_id === item.id);
+      
+      if (existingItem) {
+        return prevList.map(listItem => 
+          listItem.product_id === item.id 
+            ? { ...listItem, quantity: listItem.quantity + 1 }
+            : listItem
+        );
+      }
+
+      const newItem: ShoppingListItem = {
+        product_id: item.id,
+        name: item.name,
+        quantity: 1,
+        product_marked_price: Math.round(item.price * 100), // Convert to cents
+        selected_options: [] // Add options if available from the API
+      };
+
+      return [...prevList, newItem];
+    });
+  };
+
+  const removeFromShoppingList = (productId: string) => {
+    setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
+  };
+
+  const calculateSubtotal = () => {
+    return shoppingList.reduce((total, item) => {
+      const itemTotal = (item.product_marked_price * item.quantity);
+      return total + itemTotal;
+    }, 0);
+  };
+
+  const calculateTax = (subtotal: number) => {
+    const TAX_RATE = 0.08; // 8% tax rate - adjust as needed
+    return Math.round(subtotal * TAX_RATE);
+  };
+
+  const calculateShipping = () => {
+    // You can implement dynamic shipping logic here
+    const BASE_SHIPPING = 500; // $5.00 in cents
+    return BASE_SHIPPING;
+  };
+
+  const calculateTotal = () => {
+    const subtotal = calculateSubtotal();
+    const tax = calculateTax(subtotal);
+    const shipping = calculateShipping();
+    return subtotal + tax + shipping;
+  };
 
   if (isOrderPage) {
     return (
@@ -99,6 +220,131 @@ const MealPlanDetailPage = () => {
                     menuItem={menuItem}
                   />
                 ))}
+              </div>
+            )}
+          </div>
+
+          <div className="bg-white rounded-xl relative">
+            <div 
+              className="flex justify-between items-center cursor-pointer p-4 md:px-32" 
+              onClick={() => setIsStoresExpanded(!isStoresExpanded)}
+            >
+              <p className="text-md font-bold">Available at Stores Nearby</p>
+              <svg 
+                width="24" 
+                height="24" 
+                viewBox="0 0 24 24"
+                className={`transition-transform ${isStoresExpanded ? 'rotate-180' : ''}`}
+              >
+                <path 
+                  d="M19 9l-7 7-7-7" 
+                  stroke="currentColor" 
+                  strokeWidth="2" 
+                  strokeLinecap="round" 
+                  strokeLinejoin="round"
+                  fill="none"
+                />
+              </svg>
+            </div>
+            {isStoresExpanded && (
+              <div className="p-4 md:px-32">
+                {!location ? (
+                  <p className="text-gray-600">Please enable location access to see store availability</p>
+                ) : !storeMatches?.stores?.length ? (
+                  <p className="text-gray-600">No stores found nearby</p>
+                ) : (
+                  <div className="space-y-6">
+                    <div className="space-y-4">
+                      {storeMatches.stores.map((store: any) => (
+                        <div 
+                          key={store?._id || 'unknown'} 
+                          className={`flex justify-between items-center p-4 rounded-lg cursor-pointer ${
+                            selectedStore?.id === store.id ? 'bg-[#09C274] text-white' : 'bg-[#F2F6FB]'
+                          }`}
+                          onClick={() => handleStoreSelection(store)}
+                        >
+                          <div>
+                            <h4 className="font-medium">{store?.name || 'Unknown Store'}</h4>
+                            <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
+                              {store?.matchPercentage ?? 0}% of items available
+                            </p>
+                          </div>
+                          <div className="text-right">
+                            <p className="font-medium">
+                              ${(store?.totalPrice ?? 0).toFixed(2)}
+                            </p>
+                            <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
+                              {store?.matchedItems?.length ?? 0} items found
+                            </p>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                    {selectedStore && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-4">Categories</h3>
+                        <div className="grid grid-cols-2 gap-4">
+                          {inventory?.categories?.map((category: any) => (
+                            <button
+                              key={category.id}
+                              className={`p-4 rounded-lg text-left ${
+                                selectedCategory?.id === category.id 
+                                  ? 'bg-[#09C274] text-white' 
+                                  : 'bg-[#F2F6FB]'
+                              }`}
+                              onClick={() => setSelectedCategory(category)}
+                            >
+                              <p className="font-medium">{category.name}</p>
+                              {/* <p className={`text-sm ${
+                                selectedCategory?.id === category.id 
+                                  ? 'text-white' 
+                                  : 'text-gray-600'
+                              }`}>
+                                {category.itemCount || 0} items
+                              </p> */}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {selectedCategory && !inventoryLoading && (
+                      <div className="mt-6">
+                        <h3 className="text-lg font-semibold mb-4">Available Items</h3>
+                        <div className="grid grid-cols-3 gap-4">
+                          {inventory?.categories?.map((category: any) => 
+                            category.items?.map((item: any) => (
+                              <div key={item.id} 
+                                className="bg-white rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                                onClick={() => addToShoppingList(item)}
+                              >
+                                {(item.imageUrl || item.image) && (
+                                  <img 
+                                    src={item.imageUrl || item.image}
+                                    alt={item.name}
+                                    className="w-full h-32 object-cover rounded-lg mb-2"
+                                  />
+                                )}
+                                <h4 className="font-medium">{item.name}</h4>
+                                <p className="text-sm text-gray-600">${item.price?.toFixed(2)}</p>
+                                {item.is_available ? (
+                                  <span className="text-[#09C274] text-sm">In Stock</span>
+                                ) : (
+                                  <span className="text-red-500 text-sm">Out of Stock</span>
+                                )}
+                              </div>
+                            ))
+                          )}
+                        </div>
+                      </div>
+                    )}
+
+                    {inventoryLoading && (
+                      <div className="mt-6 text-center">
+                        <p>Loading inventory...</p>
+                      </div>
+                    )}
+                  </div>
+                )}
               </div>
             )}
           </div>
@@ -198,6 +444,33 @@ const MealPlanDetailPage = () => {
                 </div>
               </div>
 
+              <>
+                <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4 mb-6">
+                  {plan.menuItems.sort(randValue).slice(0, 3).map((menuItem) => (
+                    <MenuItem
+                      key={menuItem._id}
+                      menuItem={menuItem}
+                    />
+                  ))}
+                </div>
+
+                <PaymentMethodSection 
+                  onPaymentMethodSelect={(paymentMethodId) => setSelectedPaymentMethod(paymentMethodId)} 
+                />
+
+                <button 
+                  onClick={() => setIsOrderPage(true)}
+                  disabled={!selectedPaymentMethod}
+                  className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
+                    selectedPaymentMethod 
+                      ? 'bg-[#09C274] text-white' 
+                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+                  }`}
+                >
+                  {selectedPaymentMethod ? 'Order this plan - $74.95' : 'Select a payment method to continue'}
+                </button>
+              </>
+
               <div className="bg-[#F2F6FB] rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-3">Payment</h3>
                 <div className="flex flex-col gap-2">
@@ -227,34 +500,82 @@ const MealPlanDetailPage = () => {
             <div className="flex flex-col items-start gap-2 flex justify-start">
               <h2 className="text-lg font-bold">{plan.name}</h2>
               <div className="flex items-center gap-2">
-                <span className="bg-[#D9D6FF] text-black px-4 py-2 rounded-full text-sm font-bold text-center min-w-[2xs00px]">
+                <span className="bg-[#D9D6FF] text-black px-4 py-2 rounded-full text-sm font-bold text-center min-w-[200px]">
                   {plan.totalCalories} cal/day
                 </span>
-                <span className="text-gray-500 text-sm text-center min-w-[150px]">{plan.totalCalories * 7} cal/week</span>
+                <span className="text-gray-500 text-sm text-center min-w-[150px]">
+                  {plan.totalCalories * 7} cal/week
+                </span>
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-2">
+            {shoppingList.length > 0 && (
+              <div className="mb-6">
+                <h3 className="font-medium mb-3">Shopping List</h3>
+                <div className="space-y-2">
+                  {shoppingList.map((item) => (
+                    <div key={item.product_id} className="flex justify-between items-center">
+                      <div className="flex items-center gap-2">
+                        <span className="bg-gray-100 px-2 py-1 rounded">{item.quantity}</span>
+                        <span>{item.name}</span>
+                      </div>
+                      <div className="flex items-center gap-4">
+                        <span>${((item.product_marked_price * item.quantity) / 100).toFixed(2)}</span>
+                        <button 
+                          onClick={() => removeFromShoppingList(item.product_id)}
+                          className="text-red-500 hover:text-red-700"
+                        >
+                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
             <div className="flex justify-between text-sm">
               <span>Subtotal</span>
-              <span>$64.95</span>
+              <span>${(calculateSubtotal() / 100).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Taxes</span>
-              <span>$5.00</span>
+              <span>${(calculateTax(calculateSubtotal()) / 100).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
               <span>Shipping</span>
-              <span>$5.00</span>
+              <span>${(calculateShipping() / 100).toFixed(2)}</span>
             </div>
             <div className="h-[1px] bg-gray-200 my-2"></div>
             <div className="flex justify-between font-medium">
               <span>Total</span>
-              <span>$74.95</span>
+              <span>${(calculateTotal() / 100).toFixed(2)}</span>
             </div>
           </div>
-          <button className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium">
-            Order plan - $74.95
+          <button 
+            className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
+              shoppingList.length > 0 
+                ? 'bg-[#09C274] text-white hover:bg-[#07b369] transition-colors' 
+                : 'bg-gray-200 text-gray-500 cursor-not-allowed'
+            }`}
+            disabled={shoppingList.length === 0}
+            onClick={() => navigate('/order-review', {
+              state: {
+                shoppingList,
+                storeId: selectedStore._id,
+                deliveryDetails: {
+                  address: "68 5 89th st", // You'll want to get this from the form
+                  instructions: ""
+                }
+              }
+            })}
+          >
+            {shoppingList.length > 0 
+              ? `Review Order - $${(calculateTotal() / 100).toFixed(2)}`
+              : 'Add items to cart'
+            }
           </button>
         </div>
       </div>
