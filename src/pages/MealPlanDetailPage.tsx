@@ -10,6 +10,8 @@ import { useNavigate } from "react-router-dom";
 import { useSearchGroceryStores, useStoreInventory } from "@/api/GroceryApi";
 import PaymentMethodSection from "@/components/PaymentMethodSection";
 // import { ShoppingListItemType } from '../types/grocery';
+import { Toaster } from "@/components/ui/sonner";
+import { toast } from "sonner";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -58,6 +60,12 @@ const MealPlanDetailPage = () => {
   const [country, setCountry] = useState<string>("");
   const [tipAmount, setTipAmount] = useState<number>(0);
   const [specialInstructions, setSpecialInstructions] = useState<string>("");
+  const [open, setOpen] = useState(false);
+  const [pickup, setPickup] = useState(false);
+  const [sort, setSort] = useState('relevance');
+  const [searchFocus, setSearchFocus] = useState('store');
+  const [query, setQuery] = useState('');
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const { data: influencer, isLoading, error } = useQuery(
     ["fetchInfluencer", influencerId],
@@ -67,10 +75,20 @@ const MealPlanDetailPage = () => {
     }
   );
 
-  const { data: storeMatches } = useSearchGroceryStores({
+  const { data: storeMatches, refetch } = useSearchGroceryStores({
     latitude: location?.latitude || 0,
     longitude: location?.longitude || 0,
+    open,
+    pickup,
+    sort,
+    search_focus: searchFocus,
+    query
   });
+
+  useEffect(() => {
+    // Re-call the search stores endpoint when options change
+    refetch();
+  }, [open, pickup, sort, searchFocus, query, refetch]);
 
   const { data: inventory, isLoading: inventoryLoading } = useStoreInventory({
     store_id: selectedStore?._id,
@@ -111,6 +129,10 @@ const MealPlanDetailPage = () => {
       );
     }
   }, []);
+
+  useEffect(() => {
+    // Re-call the search stores endpoint when options change
+  }, [open, pickup, sort, searchFocus, query]);
 
   const plan = influencer?.mealPlans[Number(planIndex) || 0];
   console.log(" --------- ");
@@ -194,7 +216,7 @@ const MealPlanDetailPage = () => {
     }
 
     const deliveryDetails = {
-      address: `${streetNum} ${streetName}`,
+      address: `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`,
       latitude: location.latitude,
       longitude: location.longitude,
       street_num: streetNum,
@@ -233,13 +255,18 @@ const MealPlanDetailPage = () => {
       });
 
       if (!response.ok) {
-        throw new Error("Failed to create order");
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Failed to create order");
+        toast.error(errorData.message || "Failed to create order");
+        return;
       }
 
       const data = await response.json();
       console.log("Order created successfully:", data);
     } catch (error) {
       console.error("Error creating order:", error);
+      setErrorMessage("Error creating order");
+      toast.error("Error creating order");
     }
   };
 
@@ -312,6 +339,68 @@ const MealPlanDetailPage = () => {
             </div>
             {isStoresExpanded && (
               <div className="p-4 md:px-32">
+                <div className="space-y-4">
+                  <p className="text-lg font-semibold mb-3">Search Options</p>
+                  <div className="flex flex-col gap-4">
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={open} 
+                        onChange={(e) => setOpen(e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-300 focus:ring-[#ff6d3f]"
+                      />
+                      <span className="text-gray-600">Open Now</span>
+                    </label>
+                    
+                    <label className="flex items-center gap-2">
+                      <input 
+                        type="checkbox" 
+                        checked={pickup} 
+                        onChange={(e) => setPickup(e.target.checked)}
+                        className="w-4 h-4 rounded border-gray-300 focus:ring-[#ff6d3f]"
+                      />
+                      <span className="text-gray-600">Pickup Available</span>
+                    </label>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-gray-600">Sort By</label>
+                      <select 
+                        value={sort} 
+                        onChange={(e) => setSort(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                      >
+                        <option value="relevance">Relevance</option>
+                        <option value="cheapest">Cheapest</option>
+                        <option value="fastest">Fastest</option>
+                        <option value="rating">Rating</option>
+                        <option value="distance">Distance</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-gray-600">Search Focus</label>
+                      <select 
+                        value={searchFocus} 
+                        onChange={(e) => setSearchFocus(e.target.value)}
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                      >
+                        <option value="store">Store</option>
+                        <option value="item">Item</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-gray-600">Search</label>
+                      <input 
+                        type="text" 
+                        value={query} 
+                        onChange={(e) => setQuery(e.target.value)}
+                        placeholder="Search stores or items..."
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                      />
+                    </div>
+                  </div>
+                </div>
                 {!location ? (
                   <p className="text-gray-600">Please enable location access to see store availability</p>
                 ) : !storeMatches?.stores?.length ? (
@@ -330,16 +419,19 @@ const MealPlanDetailPage = () => {
                           <div>
                             <h4 className="font-medium">{store?.name || 'Unknown Store'}</h4>
                             <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
-                              {store?.matchPercentage ?? 0}% of items available
+                              {store?.address?.street_addr}, {store?.address?.city}
                             </p>
                           </div>
                           <div className="text-right">
                             <p className="font-medium">
-                              ${(store?.totalPrice ?? 0).toFixed(2)}
+                              {(store?.distance ?? 0).toFixed(1)} mi
                             </p>
-                            <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
-                              {store?.matchedItems?.length ?? 0} items found
-                            </p>
+                            <div className="flex items-center justify-end gap-1">
+                              <div className={`w-2 h-2 rounded-full ${store?.is_open ? 'bg-[#21ff00]' : 'bg-gray-500'}`}></div>
+                              <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
+                                {store?.is_open ? 'Open' : 'Closed'}
+                              </p>
+                            </div>
                           </div>
                         </div>
                       ))}
@@ -926,6 +1018,7 @@ const MealPlanDetailPage = () => {
           </>
         </div>
       </div>
+      <Toaster position="top-right" />
     </div>
   );
 };

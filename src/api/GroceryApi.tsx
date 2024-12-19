@@ -20,14 +20,18 @@ export const useSearchGroceryStores = (params: {
   longitude: number;
   query?: string;
   maximumMiles?: number;
+  open?: boolean;
+  pickup?: boolean;
+  sort?: string;
+  search_focus?: string;
 }) => {
-  const { latitude, longitude, query = "", maximumMiles = 3 } = params;
+  const { latitude, longitude, query = "", maximumMiles = 3, open, pickup, sort, search_focus } = params;
 
   return useQuery(
     ["groceryStores", { latitude, longitude, query, maximumMiles }],
     async () => {
       const response = await fetch(
-        `${API_BASE_URL}/api/grocery/search/stores?latitude=${latitude}&longitude=${longitude}&query=${query}&maximumMiles=${maximumMiles}`
+        `${API_BASE_URL}/api/grocery/search/stores?latitude=${latitude}&longitude=${longitude}&query=${query}&maximumMiles=${maximumMiles}&open=${open}&pickup=${pickup}&sort=${sort}&search_focus=${search_focus}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch grocery stores");
