@@ -67,6 +67,8 @@ const MealPlanDetailPage = () => {
   const [query, setQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  console.log(errorMessage, 'errorMessage found here');
+
   const { data: influencer, isLoading, error } = useQuery(
     ["fetchInfluencer", influencerId],
     () => fetchInfluencerById(influencerId as string),
