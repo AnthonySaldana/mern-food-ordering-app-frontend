@@ -66,6 +66,22 @@ const AppRoutes = () => {
           </Layout>
         }
       />
+      <Route
+          path="/order-review/:orderId"
+          element={
+            <Layout>
+              <OrderReviewPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/order-confirmation"
+          element={
+            <Layout>
+              <OrderReviewPage />
+            </Layout>
+          }
+        />
       <Route element={<ProtectedRoute />}>
         <Route
           path="/order-status"
@@ -91,22 +107,6 @@ const AppRoutes = () => {
             </Layout>
           }
         />
-        <Route
-          path="/order-review"
-          element={
-            <Layout>
-              <OrderReviewPage />
-            </Layout>
-          }
-        />
-        {/* <Route
-          path="/order-confirmation"
-          element={
-            <Layout>
-              <OrderConfirmationPage />
-            </Layout>
-          }
-        /> */}
       </Route>
 
       <Route path="*" element={<Navigate to="/" />} />

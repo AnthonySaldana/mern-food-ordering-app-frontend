@@ -14,9 +14,12 @@ interface PaymentMethod {
 
 interface PaymentMethodSectionProps {
   onPaymentMethodSelect: (paymentMethodId: string) => void;
+  onUserCreated?: (userData: { id: string; email: string; role: string }) => void;
 }
 
-const PaymentMethodSection = ({ onPaymentMethodSelect }: PaymentMethodSectionProps) => {
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated }: PaymentMethodSectionProps) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [cardNumber, setCardNumber] = useState('');
   const [expiryMonth, setExpiryMonth] = useState('');
@@ -24,11 +27,12 @@ const PaymentMethodSection = ({ onPaymentMethodSelect }: PaymentMethodSectionPro
   const [cvc, setCvc] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [email, setEmail] = useState('');
 
   const { data: paymentMethods, isLoading, refetch } = useQuery(
     'paymentMethods',
     async () => {
-      const response = await fetch('/api/payment-methods');
+      const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods`);
       return response.json();
     }
   );
@@ -36,12 +40,13 @@ const PaymentMethodSection = ({ onPaymentMethodSelect }: PaymentMethodSectionPro
   const handleAddPaymentMethod = async (e: React.FormEvent) => {
     e.preventDefault();
     try {
-      const response = await fetch('/api/payment-methods', {
+      const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          email,
           card_number: cardNumber,
           exp_month: parseInt(expiryMonth),
           exp_year: parseInt(expiryYear),
@@ -50,8 +55,12 @@ const PaymentMethodSection = ({ onPaymentMethodSelect }: PaymentMethodSectionPro
       });
 
       if (response.ok) {
+        const data = await response.json();
+        if (onUserCreated) {
+          onUserCreated(data.user);
+        }
         setIsAddingNew(false);
-        refetch(); // Refresh payment methods list
+        refetch();
         // Reset form
         setCardNumber('');
         setExpiryMonth('');
@@ -123,6 +132,17 @@ const PaymentMethodSection = ({ onPaymentMethodSelect }: PaymentMethodSectionPro
 
                   {isAddingNew ? (
                     <form onSubmit={handleAddPaymentMethod} className="space-y-4">
+                      <div className="mb-4">
+                        <Label htmlFor="email">Email</Label>
+                        <Input
+                          id="email"
+                          type="email"
+                          value={email}
+                          onChange={(e) => setEmail(e.target.value)}
+                          placeholder="your@email.com"
+                          required
+                        />
+                      </div>
                       <div>
                         <Label htmlFor="cardNumber">Card Number</Label>
                         <Input

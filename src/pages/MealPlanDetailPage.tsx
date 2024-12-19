@@ -50,6 +50,14 @@ const MealPlanDetailPage = () => {
   const randValue = () => Math.random() - 0.5;
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [streetNum, setStreetNum] = useState<string>("");
+  const [streetName, setStreetName] = useState<string>("");
+  const [city, setCity] = useState<string>("");
+  const [state, setState] = useState<string>("");
+  const [zipcode, setZipcode] = useState<string>("");
+  const [country, setCountry] = useState<string>("");
+  const [tipAmount, setTipAmount] = useState<number>(0);
+  const [specialInstructions, setSpecialInstructions] = useState<string>("");
 
   const { data: influencer, isLoading, error } = useQuery(
     ["fetchInfluencer", influencerId],
@@ -179,6 +187,62 @@ const MealPlanDetailPage = () => {
     return subtotal + tax + shipping;
   };
 
+  const handleCreateOrder = async () => {
+    if (!selectedStore || !location) {
+      console.error("Store or location not selected");
+      return;
+    }
+
+    const deliveryDetails = {
+      address: `${streetNum} ${streetName}`,
+      latitude: location.latitude,
+      longitude: location.longitude,
+      street_num: streetNum,
+      street_name: streetName,
+      city: city,
+      state: state,
+      zipcode: zipcode,
+      country: country,
+      instructions: specialInstructions,
+      tip_amount: tipAmount
+    };
+
+    const orderData = {
+      store_id: selectedStore._id,
+      items: shoppingList.map(item => ({
+        product_id: item.product_id,
+        quantity: item.quantity,
+        instructions: "" // Add any special instructions if needed
+      })),
+      delivery_details: deliveryDetails,
+      payment_details: {
+        payment_method_id: selectedPaymentMethod,
+        payment_amount: calculateTotal()
+      },
+      place_order: true,
+      final_quote: false // Adjust as needed
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/grocery/create-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to create order");
+      }
+
+      const data = await response.json();
+      console.log("Order created successfully:", data);
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
+  };
+
   if (isOrderPage) {
     return (
       <div className="flex flex-col lg:flex-row mt-[40px]">
@@ -201,7 +265,7 @@ const MealPlanDetailPage = () => {
                 height="24" 
                 viewBox="0 0 24 24"
                 className={`transition-transform ${isMenuExpanded ? 'rotate-180' : ''}`}
-              >
+              >fd
                 <path 
                   d="M19 9l-7 7-7-7" 
                   stroke="currentColor" 
@@ -353,46 +417,18 @@ const MealPlanDetailPage = () => {
             <div className="space-y-4">
               <div className="bg-[#F2F6FB] rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-3">Delivery</h3>
-                <p className="text-gray-600 mb-4">Choose delivery date</p>
+                <p className="text-gray-600 mb-4">Choose delivery time</p>
                 <div className="flex flex-col divide-y">
                   <label className="flex items-center justify-between py-4">
                     <div>
-                      <span className="font-medium">Tomorrow</span>
-                      <span className="text-gray-500 ml-2">Sat, 11 October</span>
+                      <span className="font-medium">ASAP</span>
+                      <span className="text-gray-500 ml-2">As soon as possible</span>
                     </div>
                     <input 
                       type="radio" 
                       name="deliveryDate"
-                      value="Tomorrow, Sat, 11 October"
-                      checked={selectedDeliveryDate === "Tomorrow, Sat, 11 October"}
-                      onChange={(e) => setSelectedDeliveryDate(e.target.value)}
-                      className="h-5 w-5 text-[#ff6d3f]"
-                    />
-                  </label>
-                  <label className="flex items-center justify-between py-4">
-                    <div>
-                      <span className="font-medium">In 3 days</span>
-                      <span className="text-gray-500 ml-2">Mon, 14 October</span>
-                    </div>
-                    <input 
-                      type="radio" 
-                      name="deliveryDate"
-                      value="In 3 days, Mon, 14 October"
-                      checked={selectedDeliveryDate === "In 3 days, Mon, 14 October"}
-                      onChange={(e) => setSelectedDeliveryDate(e.target.value)}
-                      className="h-5 w-5 text-[#ff6d3f]"
-                    />
-                  </label>
-                  <label className="flex items-center justify-between py-4">
-                    <div>
-                      <span className="font-medium">In 4 days</span>
-                      <span className="text-gray-500 ml-2">Tue, 15 October</span>
-                    </div>
-                    <input 
-                      type="radio" 
-                      name="deliveryDate"
-                      value="In 4 days, Tue, 15 October" 
-                      checked={selectedDeliveryDate === "In 4 days, Tue, 15 October"}
+                      value="ASAP"
+                      checked={selectedDeliveryDate === "ASAP"}
                       onChange={(e) => setSelectedDeliveryDate(e.target.value)}
                       className="h-5 w-5 text-[#ff6d3f]"
                     />
@@ -400,7 +436,7 @@ const MealPlanDetailPage = () => {
                 </div>
 
                 <div className="mt-6">
-                  <p className="text-gray-600 mb-4">Saved addresses</p>
+                  {/* <p className="text-gray-600 mb-4">Saved addresses</p>
                   <div className="flex flex-col divide-y">
                     <label className="flex items-center justify-between py-4">
                       <div>
@@ -424,7 +460,65 @@ const MealPlanDetailPage = () => {
                         className="h-5 w-5 text-[#ff6d3f]"
                       />
                     </label>
-                  </div>
+                  </div> */}
+
+                  <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
+                  <input
+                    type="text"
+                    placeholder="Street Number"
+                    value={streetNum}
+                    onChange={(e) => setStreetNum(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Street Name"
+                    value={streetName}
+                    onChange={(e) => setStreetName(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                  />
+                  <input
+                    type="text"
+                    placeholder="City"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                  />
+                  <input
+                    type="text"
+                    placeholder="State"
+                    value={state}
+                    onChange={(e) => setState(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Zipcode"
+                    value={zipcode}
+                    onChange={(e) => setZipcode(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                  />
+                  <input
+                    type="text"
+                    placeholder="Country"
+                    value={country}
+                    onChange={(e) => setCountry(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                  />
+                  <p className="text-gray-600 mb-4">Tip Amount</p>
+                  <input
+                    type="number"
+                    placeholder="Tip Amount"
+                    value={tipAmount}
+                    onChange={(e) => setTipAmount(Number(e.target.value))}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                  />
+                  <textarea
+                    placeholder="Special Instructions"
+                    value={specialInstructions}
+                    onChange={(e) => setSpecialInstructions(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f] min-h-[100px] resize-y"
+                  />
                 </div>
               </div>
 
@@ -458,8 +552,8 @@ const MealPlanDetailPage = () => {
                   onPaymentMethodSelect={(paymentMethodId) => setSelectedPaymentMethod(paymentMethodId)} 
                 />
 
-                <button 
-                  onClick={() => setIsOrderPage(true)}
+                {/* <button 
+                  onClick={handleCreateOrder}
                   disabled={!selectedPaymentMethod}
                   className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
                     selectedPaymentMethod 
@@ -468,10 +562,10 @@ const MealPlanDetailPage = () => {
                   }`}
                 >
                   {selectedPaymentMethod ? 'Order this plan - $74.95' : 'Select a payment method to continue'}
-                </button>
+                </button> */}
               </>
 
-              <div className="bg-[#F2F6FB] rounded-xl p-6">
+              {/* <div className="bg-[#F2F6FB] rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-3">Payment</h3>
                 <div className="flex flex-col gap-2">
                   <label className="flex items-center">
@@ -483,7 +577,7 @@ const MealPlanDetailPage = () => {
                     Visa ending in 2828
                   </label>
                 </div>
-              </div>
+              </div> */}
 
               <button 
                 onClick={() => setIsOrderPage(false)}
@@ -561,16 +655,7 @@ const MealPlanDetailPage = () => {
                 : 'bg-gray-200 text-gray-500 cursor-not-allowed'
             }`}
             disabled={shoppingList.length === 0}
-            onClick={() => navigate('/order-review', {
-              state: {
-                shoppingList,
-                storeId: selectedStore._id,
-                deliveryDetails: {
-                  address: "68 5 89th st", // You'll want to get this from the form
-                  instructions: ""
-                }
-              }
-            })}
+            onClick={handleCreateOrder}
           >
             {shoppingList.length > 0 
               ? `Review Order - $${(calculateTotal() / 100).toFixed(2)}`
@@ -832,6 +917,7 @@ const MealPlanDetailPage = () => {
             </div>
 
             <button 
+              // onClick={handleCreateOrder}
               onClick={() => setIsOrderPage(true)}
               className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium"
             >
