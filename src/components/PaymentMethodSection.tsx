@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useQuery } from 'react-query';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -13,13 +13,14 @@ interface PaymentMethod {
 }
 
 interface PaymentMethodSectionProps {
+  email: string; // Add email prop
   onPaymentMethodSelect: (paymentMethodId: string) => void;
   onUserCreated?: (userData: { id: string; email: string; role: string }) => void;
 }
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated }: PaymentMethodSectionProps) => {
+const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: PaymentMethodSectionProps) => {
   const [isAddingNew, setIsAddingNew] = useState(false);
   const [cardNumber, setCardNumber] = useState('');
   const [expiryMonth, setExpiryMonth] = useState('');
@@ -27,15 +28,21 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated }: PaymentM
   const [cvc, setCvc] = useState('');
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
-  const [email, setEmail] = useState('');
+  // const [email, setEmail] = useState('');
 
   const { data: paymentMethods, isLoading, refetch } = useQuery(
     'paymentMethods',
     async () => {
-      const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods`);
+      const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods?user_email=${email}`);
       return response.json();
     }
   );
+
+  useEffect(() => {
+    if (email) {
+      refetch();
+    }
+  }, [email, refetch]);
 
   const handleAddPaymentMethod = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -132,7 +139,7 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated }: PaymentM
 
                   {isAddingNew ? (
                     <form onSubmit={handleAddPaymentMethod} className="space-y-4">
-                      <div className="mb-4">
+                      {/* <div className="mb-4">
                         <Label htmlFor="email">Email</Label>
                         <Input
                           id="email"
@@ -142,7 +149,7 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated }: PaymentM
                           placeholder="your@email.com"
                           required
                         />
-                      </div>
+                      </div> */}
                       <div>
                         <Label htmlFor="cardNumber">Card Number</Label>
                         <Input

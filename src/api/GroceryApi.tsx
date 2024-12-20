@@ -23,15 +23,21 @@ export const useSearchGroceryStores = (params: {
   open?: boolean;
   pickup?: boolean;
   sort?: string;
-  search_focus?: string;
+  search_focus?: string;  
+  user_street_num?: string;
+  user_street_name?: string;
+  user_city?: string;
+  user_state?: string;
+  user_zipcode?: string;
+  user_country?: string;
 }) => {
-  const { latitude, longitude, query = "", maximumMiles = 3, open, pickup, sort, search_focus } = params;
+  const { latitude, longitude, query = "", maximumMiles = 3, open, pickup, sort, search_focus, user_street_num, user_street_name, user_city, user_state, user_zipcode, user_country } = params;
 
   return useQuery(
-    ["groceryStores", { latitude, longitude, query, maximumMiles }],
+    ["groceryStores", { latitude, longitude, query, maximumMiles, open, pickup, sort, search_focus, user_street_num, user_street_name, user_city, user_state, user_zipcode, user_country }],
     async () => {
       const response = await fetch(
-        `${API_BASE_URL}/api/grocery/search/stores?latitude=${latitude}&longitude=${longitude}&query=${query}&maximumMiles=${maximumMiles}&open=${open}&pickup=${pickup}&sort=${sort}&search_focus=${search_focus}`
+        `${API_BASE_URL}/api/grocery/search/stores?latitude=${latitude}&longitude=${longitude}&query=${query}&maximumMiles=${maximumMiles}&open=${open}&pickup=${pickup}&sort=${sort}&search_focus=${search_focus}&user_street_num=${user_street_num}&user_street_name=${user_street_name}&user_city=${user_city}&user_state=${user_state}&user_zipcode=${user_zipcode}&user_country=${user_country}`
       );
       if (!response.ok) {
         throw new Error("Failed to fetch grocery stores");
@@ -112,17 +118,29 @@ export const useStoreInventory = (params: {
   subcategory_id?: string;
   latitude: number;
   longitude: number;
+  user_street_num?: string;
+  user_street_name?: string;
+  user_city?: string;
+  user_state?: string;
+  user_zipcode?: string;
+  user_country?: string;
 }) => {
-  const { store_id, subcategory_id, latitude, longitude } = params;
+  const { store_id, subcategory_id, latitude, longitude, user_street_num, user_street_name, user_city, user_state, user_zipcode, user_country } = params;
 
   return useQuery(
-    ['storeInventory', { store_id, subcategory_id, latitude, longitude }],
+    ['storeInventory', { store_id, subcategory_id, latitude, longitude, user_street_num, user_street_name, user_city, user_state, user_zipcode, user_country }],
     async () => {
       const queryParams = new URLSearchParams({
         store_id,
         ...(subcategory_id && { subcategory_id }),
         latitude: latitude.toString(),
-        longitude: longitude.toString()
+        longitude: longitude.toString(),
+        user_street_num: user_street_num || '',
+        user_street_name: user_street_name || '',
+        user_city: user_city || '',
+        user_state: user_state || '',
+        user_zipcode: user_zipcode || '',
+        user_country: user_country || ''
       });
 
       const response = await fetch(

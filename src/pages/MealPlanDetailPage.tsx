@@ -12,8 +12,9 @@ import PaymentMethodSection from "@/components/PaymentMethodSection";
 // import { ShoppingListItemType } from '../types/grocery';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
-
+import QuoteDetails from "@/components/QuoteMealMe";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+const MEALME_API_KEY = import.meta.env.VITE_MEALME_API_KEY;
 
 const fetchInfluencerById = async (id: string): Promise<Influencer> => {
   const response = await fetch(`${API_BASE_URL}/api/influencer/${id}`);
@@ -66,6 +67,8 @@ const MealPlanDetailPage = () => {
   const [searchFocus, setSearchFocus] = useState('store');
   const [query, setQuery] = useState('');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [email, setEmail] = useState<string>("");
+  const [quote, setQuote] = useState<any>(null);
 
   console.log(errorMessage, 'errorMessage found here');
 
@@ -83,6 +86,12 @@ const MealPlanDetailPage = () => {
     open,
     pickup,
     sort,
+    user_street_num: streetNum,
+    user_street_name: streetName,
+    user_city: city,
+    user_state: state,
+    user_zipcode: zipcode,
+    user_country: country,
     search_focus: searchFocus,
     query
   });
@@ -90,14 +99,26 @@ const MealPlanDetailPage = () => {
   useEffect(() => {
     // Re-call the search stores endpoint when options change
     refetch();
-  }, [open, pickup, sort, searchFocus, query, refetch]);
+  }, [open, pickup, sort, searchFocus, query, location, refetch]);
 
   const { data: inventory, isLoading: inventoryLoading } = useStoreInventory({
     store_id: selectedStore?._id,
     ...(selectedCategory?.subcategory_id && { subcategory_id: selectedCategory.subcategory_id }),
     latitude: location?.latitude || 0,
-    longitude: location?.longitude || 0
+    longitude: location?.longitude || 0,
+    user_street_num: streetNum,
+    user_street_name: streetName,
+    user_city: city,
+    user_state: state,
+    user_zipcode: zipcode,
+    user_country: country
   });
+
+  useEffect(() => {
+    if (inventory && !selectedCategory) {
+      setQuote(inventory.quote);
+    }
+  }, [inventory, selectedCategory]);
 
   const handleStoreSelection = (store: any) => {
     setSelectedStore(store);
@@ -115,26 +136,43 @@ const MealPlanDetailPage = () => {
 
   console.log(storeMatches, 'storeMatches found here');
 
-  useEffect(() => {
-    // Get user's location
-    if (navigator.geolocation) {
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          setLocation({
-            latitude: position.coords.latitude,
-            longitude: position.coords.longitude
-          });
+  const fetchCoordinates = async (address: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/grocery/geocode-address`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
         },
-        (error) => {
-          console.error("Error getting location:", error);
-        }
-      );
+        body: JSON.stringify({ address })
+      });
+  
+      if (!response.ok) {
+        throw new Error('Failed to fetch coordinates');
+      }
+  
+      const data = await response.json();
+      return data; // Assuming the backend returns the coordinates directly
+    } catch (error) {
+      console.error('Error fetching coordinates:', error);
+      return null;
     }
-  }, []);
-
+  };
   useEffect(() => {
-    // Re-call the search stores endpoint when options change
-  }, [open, pickup, sort, searchFocus, query]);
+    const updateLocation = async () => {
+      if (areDeliveryDetailsComplete()) {
+        const address = `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`;
+        const coordinates = await fetchCoordinates(address);
+        if (coordinates) {
+          setLocation({
+            latitude: coordinates.lat,
+            longitude: coordinates.lng
+          });
+        }
+      }
+    };
+
+    updateLocation();
+  }, [streetNum, streetName, city, state, zipcode, country]);
 
   const plan = influencer?.mealPlans[Number(planIndex) || 0];
   console.log(" --------- ");
@@ -272,6 +310,10 @@ const MealPlanDetailPage = () => {
     }
   };
 
+  const areDeliveryDetailsComplete = () => {
+    return streetNum && streetName && city && state && zipcode && country && email;
+  };
+
   if (isOrderPage) {
     return (
       <div className="flex flex-col lg:flex-row mt-[40px]">
@@ -403,8 +445,8 @@ const MealPlanDetailPage = () => {
                     </div>
                   </div>
                 </div>
-                {!location ? (
-                  <p className="text-gray-600">Please enable location access to see store availability</p>
+                {!areDeliveryDetailsComplete() ? (
+                  <p className="text-gray-600">Please complete delivery details to see available stores</p>
                 ) : !storeMatches?.stores?.length ? (
                   <p className="text-gray-600">No stores found nearby</p>
                 ) : (
@@ -440,6 +482,9 @@ const MealPlanDetailPage = () => {
                     </div>
                     {selectedStore && (
                       <div className="mt-6">
+                      {inventory?.quote && (
+                        <QuoteDetails quote={quote} />
+                      )}
                         <h3 className="text-lg font-semibold mb-4">Categories</h3>
                         <div className="grid grid-cols-2 gap-4">
                           {inventory?.categories?.map((category: any) => (
@@ -557,6 +602,15 @@ const MealPlanDetailPage = () => {
                   </div> */}
 
                   <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
+                  <p className="text-gray-600 mb-4">Email</p>
+                  <input
+                    type="email"
+                    placeholder="your@email.com"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                    required
+                  />
                   <input
                     type="text"
                     placeholder="Street Number"
@@ -643,6 +697,7 @@ const MealPlanDetailPage = () => {
                 </div>
 
                 <PaymentMethodSection 
+                  email={email}
                   onPaymentMethodSelect={(paymentMethodId) => setSelectedPaymentMethod(paymentMethodId)} 
                 />
 
