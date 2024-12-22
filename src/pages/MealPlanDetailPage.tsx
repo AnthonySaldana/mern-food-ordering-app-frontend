@@ -302,6 +302,14 @@ const MealPlanDetailPage = () => {
       }
 
       const data = await response.json();
+
+      if (data.order_placed && data.tracking_link) {
+        // Open the tracking link in a new tab
+        window.open(data.tracking_link, '_blank');
+      } else {
+        // Handle the case where the order was not placed successfully
+        toast.error("Order could not be placed. Please try again.");
+      }
       console.log("Order created successfully:", data);
     } catch (error) {
       console.error("Error creating order:", error);
