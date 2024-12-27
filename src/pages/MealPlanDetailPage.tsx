@@ -5,9 +5,9 @@ import { useQuery } from "react-query";
 import { Influencer } from "@/types";
 import { Card } from "@/components/ui/card";
 import MenuItem from "@/components/MenuItem";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSearchGroceryStores, useStoreInventory } from "@/api/GroceryApi";
+import { useSearchGroceryStores, useStoreInventory, useSearchProducts } from "@/api/GroceryApi";
 import PaymentMethodSection from "@/components/PaymentMethodSection";
 // import { ShoppingListItemType } from '../types/grocery';
 import { Toaster } from "@/components/ui/sonner";
@@ -77,7 +77,8 @@ const MealPlanDetailPage = () => {
     () => fetchInfluencerById(influencerId as string),
     {
       enabled: !!influencerId,
-    }
+      retry: 0,
+    },
   );
 
   const { data: storeMatches, refetch } = useSearchGroceryStores({
@@ -93,13 +94,8 @@ const MealPlanDetailPage = () => {
     user_zipcode: zipcode,
     user_country: country,
     search_focus: searchFocus,
-    query
+    query,
   });
-
-  useEffect(() => {
-    // Re-call the search stores endpoint when options change
-    refetch();
-  }, [open, pickup, sort, searchFocus, query, location, refetch]);
 
   const { data: inventory, isLoading: inventoryLoading } = useStoreInventory({
     store_id: selectedStore?._id,
@@ -157,28 +153,79 @@ const MealPlanDetailPage = () => {
       return null;
     }
   };
-  useEffect(() => {
-    const updateLocation = async () => {
-      if (areDeliveryDetailsComplete()) {
-        const address = `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`;
-        const coordinates = await fetchCoordinates(address);
-        if (coordinates) {
-          setLocation({
-            latitude: coordinates.lat,
-            longitude: coordinates.lng
-          });
-        }
-      }
-    };
-
-    updateLocation();
-  }, [streetNum, streetName, city, state, zipcode, country]);
 
   const plan = influencer?.mealPlans[Number(planIndex) || 0];
   console.log(" --------- ");
   console.log(plan);
   console.log(planIndex);
   console.log(influencer);
+
+  const menuItems = plan?.menuItems[0]?.name || '';
+
+  const { data: searchedProducts, isLoading: isProductsLoading, refetch: refetchProducts } = useSearchProducts({
+    query: menuItems,
+    latitude: location?.latitude || 0,
+    longitude: location?.longitude || 0,
+    user_street_num: streetNum,
+    user_street_name: streetName,
+    user_city: city,
+    user_state: state,
+    user_zipcode: zipcode,
+    user_country: country,
+  });
+
+
+  const handleSaveLocation = async () => {
+    if (areDeliveryDetailsComplete()) {
+      const address = `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`;
+      const coordinates = await fetchCoordinates(address);
+      if (coordinates) {
+        setLocation({
+          latitude: coordinates.lat,
+          longitude: coordinates.lng
+        });
+        toast.success("Location saved successfully!");
+        refetchProducts();
+      } else {
+        toast.error("Failed to save location. Please check the address.");
+      }
+    } else {
+      toast.error("Please fill in all location details");
+    }
+  };
+
+  let isDebouncing = false;
+
+  // useEffect(() => {
+
+  //   if (!isDebouncing) {
+  //     isDebouncing = true;
+  //     const debounceTimeout = setTimeout(() => {
+  //       refetch();
+  //       isDebouncing = false;
+  //     }, 1000);
+
+  //     return () => {
+  //       clearTimeout(debounceTimeout);
+  //       isDebouncing = false;
+  //     };
+  //   }
+  // }, [open, pickup, sort, searchFocus, query, location]);
+
+  // const debounceRef = useRef<NodeJS.Timeout | null>(null);
+
+  // const debouncedRefetchCart = useCallback(() => {
+  //   if (debounceRef.current) {
+  //     clearTimeout(debounceRef.current);
+  //   }
+  //   debounceRef.current = setTimeout(() => {
+  //     refetchCart();
+  //   }, 1000);
+  // }, [refetchCart]);
+
+  // useEffect(() => {
+  //   debouncedRefetchCart();
+  // }, [location]);
 
   if (!plan) {
     return <div>No meal plan found</div>;
@@ -366,6 +413,19 @@ const MealPlanDetailPage = () => {
               </div>
             )}
           </div>
+
+          <div>
+          {isLoading ? (
+            <div>Loading...</div>
+          ) : (
+            searchedProducts?.map((product: any) => (
+              <div key={product.id}>
+                <h3>{product.name}</h3>
+                <p>{product.price}</p>
+              </div>
+            ))
+          )}
+        </div>
 
           <div className="bg-white rounded-xl relative">
             <div 
@@ -583,32 +643,6 @@ const MealPlanDetailPage = () => {
                 </div>
 
                 <div className="mt-6">
-                  {/* <p className="text-gray-600 mb-4">Saved addresses</p>
-                  <div className="flex flex-col divide-y">
-                    <label className="flex items-center justify-between py-4">
-                      <div>
-                        <span className="font-medium">68 5 89th st</span>
-                      </div>
-                      <input 
-                        type="radio" 
-                        name="deliveryAddress"
-                        value="68 5 89th st"
-                        className="h-5 w-5 text-[#ff6d3f]"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between py-4">
-                      <div className="flex items-center">
-                        <span className="font-medium">New address</span>
-                      </div>
-                      <input
-                        type="radio"
-                        name="deliveryAddress" 
-                        value="new"
-                        className="h-5 w-5 text-[#ff6d3f]"
-                      />
-                    </label>
-                  </div> */}
-
                   <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
                   <p className="text-gray-600 mb-4">Email</p>
                   <input
@@ -675,6 +709,12 @@ const MealPlanDetailPage = () => {
                     onChange={(e) => setSpecialInstructions(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f] min-h-[100px] resize-y"
                   />
+                  <button 
+                    onClick={handleSaveLocation}
+                    className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium"
+                  >
+                    Save Location
+                  </button>
                 </div>
               </div>
 
