@@ -1,4 +1,4 @@
-import { useQuery } from "react-query";
+import { useQuery, useMutation } from "react-query";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -153,10 +153,39 @@ export const useStoreInventory = (params: {
       return response.json();
     },
     {
-      enabled: !!store_id && !!latitude && !!longitude,
+      enabled: false,
       // Cache the results for 5 minutes
       cacheTime: 5 * 60 * 1000,
-      staleTime: 5 * 60 * 1000
+      staleTime: 5 * 60 * 1000,
+      retry: 0
+    }
+  );
+};
+
+export const useFitbiteInventory = (storeId: string, mealItems: any[]) => {
+  return useQuery(
+    ['fitbiteInventory', storeId, mealItems],
+    async () => {
+      const queryParams = new URLSearchParams({
+        store_id: storeId,
+        items: JSON.stringify(mealItems)
+      });
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/grocery/fitbite-inventory?${queryParams}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch fitbite inventory');
+      }
+
+      return response.json();
+    },
+    {
+      enabled: false,
+      cacheTime: 5 * 60 * 1000,
+      staleTime: 5 * 60 * 1000,
+      retry: 0
     }
   );
 };

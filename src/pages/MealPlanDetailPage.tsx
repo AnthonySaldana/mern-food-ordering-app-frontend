@@ -7,7 +7,7 @@ import { Card } from "@/components/ui/card";
 import MenuItem from "@/components/MenuItem";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSearchGroceryStores, useStoreInventory } from "@/api/GroceryApi";
+import { useSearchGroceryStores, useStoreInventory, useFitbiteInventory } from "@/api/GroceryApi";
 import PaymentMethodSection from "@/components/PaymentMethodSection";
 // import { ShoppingListItemType } from '../types/grocery';
 import { Toaster } from "@/components/ui/sonner";
@@ -101,7 +101,7 @@ const MealPlanDetailPage = () => {
     refetch();
   }, [open, pickup, sort, searchFocus, query, location, refetch]);
 
-  const { data: inventory, isLoading: inventoryLoading } = useStoreInventory({
+  const { data: inventory, isLoading: inventoryLoading, refetch: refetchInventory } = useStoreInventory({
     store_id: selectedStore?._id,
     ...(selectedCategory?.subcategory_id && { subcategory_id: selectedCategory.subcategory_id }),
     latitude: location?.latitude || 0,
@@ -120,9 +120,37 @@ const MealPlanDetailPage = () => {
     }
   }, [inventory, selectedCategory]);
 
-  const handleStoreSelection = (store: any) => {
+  const handleStoreSelection = async (store: any) => {
     setSelectedStore(store);
     setSelectedCategory(null); // Reset category selection when switching stores
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/grocery/process-inventory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          store_id: store._id,
+          latitude: location?.latitude || 0,
+          longitude: location?.longitude || 0,
+          user_street_num: streetNum,
+          user_street_name: streetName,
+          user_city: city,
+          user_state: state,
+          user_zipcode: zipcode,
+          user_country: country
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to queue inventory processing');
+      }
+
+      console.log('Inventory processing job added to the queue');
+    } catch (error) {
+      console.error('Error queuing inventory processing:', error);
+    }
   };
 
   console.log(inventory, 'inventory found here');
@@ -322,6 +350,49 @@ const MealPlanDetailPage = () => {
     return streetNum && streetName && city && state && zipcode && country && email;
   };
 
+  const { data: fitbiteInventory, refetch: fetchFitbiteInventory } = useFitbiteInventory(
+    selectedStore?._id, // Initial empty storeId
+    plan.menuItems // Initial empty menuItems
+  );
+
+  const handleOrderPlan = async (store: any) => {
+    console.log("storeId", store);
+    setSelectedStore(store);
+    if (!plan || !plan.menuItems) {
+      console.error("No meal plan or menu items found");
+      return;
+    }
+
+    await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
+
+    try {
+      // Update query parameters and refetch
+      const result = await fetchFitbiteInventory({
+        queryKey: ['fitbiteInventory', store._id, plan.menuItems]
+      });
+
+      console.log("result from fitbite inventory", result.data);
+
+      if (result.data) {
+        console.log("Fitbite inventory fetched successfully:", result.data);
+        // Handle success (e.g., navigate to a new page or show a success message)
+        // setShoppingList(result.data);
+        setShoppingList(result.data.map((item: any) => ({
+          product_id: item.product_id,
+          name: item.name,
+          quantity: 1,
+          product_marked_price: Math.round(item.price * 100), // Convert to cents
+          selected_options: [] // Add options if available from the API
+        })));
+        
+        console.log(shoppingList, 'shoppingList')
+      }
+    } catch (error) {
+      console.error("Error fetching fitbite inventory:", error);
+      toast.error("Failed to fetch fitbite inventory");
+    }
+  };
+
   if (isOrderPage) {
     return (
       <div className="flex flex-col lg:flex-row mt-[40px]">
@@ -391,7 +462,7 @@ const MealPlanDetailPage = () => {
             </div>
             {isStoresExpanded && (
               <div className="p-4 md:px-32">
-                <div className="space-y-4">
+                <div className="space-y-4 mb-8">
                   <p className="text-lg font-semibold mb-3">Search Options</p>
                   <div className="flex flex-col gap-4">
                     <label className="flex items-center gap-2">
@@ -459,34 +530,48 @@ const MealPlanDetailPage = () => {
                   <p className="text-gray-600">No stores found nearby</p>
                 ) : (
                   <div className="space-y-6">
-                    <div className="space-y-4">
-                      {storeMatches.stores.map((store: any) => (
-                        <div 
-                          key={store?._id || 'unknown'} 
-                          className={`flex justify-between items-center p-4 rounded-lg cursor-pointer ${
-                            selectedStore?.id === store.id ? 'bg-[#09C274] text-white' : 'bg-[#F2F6FB]'
-                          }`}
-                          onClick={() => handleStoreSelection(store)}
-                        >
-                          <div>
-                            <h4 className="font-medium">{store?.name || 'Unknown Store'}</h4>
-                            <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
-                              {store?.address?.street_addr}, {store?.address?.city}
-                            </p>
-                          </div>
-                          <div className="text-right">
-                            <p className="font-medium">
-                              {(store?.distance ?? 0).toFixed(1)} mi
-                            </p>
-                            <div className="flex items-center justify-end gap-1">
-                              <div className={`w-2 h-2 rounded-full ${store?.is_open ? 'bg-[#21ff00]' : 'bg-gray-500'}`}></div>
+                    <div className="overflow-x-auto">
+                      <p className="text-gray-600 mb-4">Select a nearby store to search for your meal plan</p>
+                      <div className="flex flex-row gap-4 pb-4" style={{minWidth: "min-content", height: "250px"}}>
+                        {storeMatches.stores.map((store: any) => (
+                          <div 
+                            key={store?._id || 'unknown'} 
+                            className={`flex-none w-80 p-4 rounded-lg cursor-pointer ${
+                              selectedStore?.id === store.id ? 'bg-[#09C274] text-white' : 'bg-[#F2F6FB]'
+                            }`}
+                          >
+                            <div>
+                              <h4 className="font-medium">{store?.name || 'Unknown Store'}</h4>
                               <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
-                                {store?.is_open ? 'Open' : 'Closed'}
+                                {store?.address?.street_addr}, {store?.address?.city}
                               </p>
                             </div>
+                            <div className="mt-2">
+                              <p className="font-medium">
+                                {(store?.miles ?? 0).toFixed(1)} mi
+                              </p>
+                              <div className="flex items-center gap-1">
+                                <div className={`w-2 h-2 rounded-full ${store?.is_open ? 'bg-[#21ff00]' : 'bg-gray-500'}`}></div>
+                                <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
+                                  {store?.is_open ? 'Open' : 'Closed'}
+                                </p>
+                              </div>
+                            </div>
+                            <button
+                              className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
+                              onClick={() => handleStoreSelection(store)}
+                            >
+                              Process Store Inventory
+                            </button>
+                            <button
+                              className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
+                              onClick={() => handleOrderPlan(store)}
+                            >
+                              Order Plan
+                            </button>
                           </div>
-                        </div>
-                      ))}
+                        ))}
+                      </div>
                     </div>
                     {selectedStore && (
                       <div className="mt-6">
@@ -500,10 +585,17 @@ const MealPlanDetailPage = () => {
                               key={category.id}
                               className={`p-4 rounded-lg text-left ${
                                 selectedCategory?.id === category.id 
-                                  ? 'bg-[#09C274] text-white' 
-                                  : 'bg-[#F2F6FB]'
+                                  ? 'bg-[#09C274] text-white'
+                                  : category.has_subcategories 
+                                    ? 'bg-[#F2F6FB]'
+                                    : 'bg-gray-300'
                               }`}
-                              onClick={() => setSelectedCategory(category)}
+                              onClick={() => {
+                                if (category.has_subcategories) {
+                                  setSelectedCategory(category);
+                                  refetchInventory();
+                                }
+                              }}
                             >
                               <p className="font-medium">{category.name}</p>
                               {/* <p className={`text-sm ${
@@ -518,7 +610,7 @@ const MealPlanDetailPage = () => {
                         </div>
                       </div>
                     )}
-                    {selectedCategory && !inventoryLoading && (
+                    {!inventoryLoading && (
                       <div className="mt-6">
                         <h3 className="text-lg font-semibold mb-4">Available Items</h3>
                         <div className="grid grid-cols-3 gap-4">
@@ -761,11 +853,11 @@ const MealPlanDetailPage = () => {
             </div>
           </div>
           <div className="flex flex-col gap-2">
-            {shoppingList.length > 0 && (
+            {shoppingList?.length > 0 && (
               <div className="mb-6">
                 <h3 className="font-medium mb-3">Shopping List</h3>
                 <div className="space-y-2">
-                  {shoppingList.map((item) => (
+                  {shoppingList.map((item: any) => (
                     <div key={item.product_id} className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
                         <span className="bg-gray-100 px-2 py-1 rounded">{item.quantity}</span>
