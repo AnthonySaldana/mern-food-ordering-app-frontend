@@ -81,7 +81,7 @@ const MealPlanDetailPage = () => {
 
   const plan = influencer?.mealPlans[Number(planIndex) || 0];
 
-  const { data: storeMatches, refetch } = useSearchGroceryStores({
+  const { data: storeMatches } = useSearchGroceryStores({
     latitude: location?.latitude || 0,
     longitude: location?.longitude || 0,
     open,
