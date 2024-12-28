@@ -14,7 +14,6 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import QuoteDetails from "@/components/QuoteMealMe";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
-const MEALME_API_KEY = import.meta.env.VITE_MEALME_API_KEY;
 
 const fetchInfluencerById = async (id: string): Promise<Influencer> => {
   const response = await fetch(`${API_BASE_URL}/api/influencer/${id}`);
