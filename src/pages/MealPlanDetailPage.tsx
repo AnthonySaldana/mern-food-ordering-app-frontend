@@ -355,6 +355,8 @@ const MealPlanDetailPage = () => {
     plan.menuItems // Initial empty menuItems
   );
 
+  console.log(fitbiteInventory, 'fitbiteInventory')
+
   const handleOrderPlan = async (store: any) => {
     console.log("storeId", store);
     setSelectedStore(store);
