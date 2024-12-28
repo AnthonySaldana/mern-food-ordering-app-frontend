@@ -79,6 +79,8 @@ const MealPlanDetailPage = () => {
     }
   );
 
+  const plan = influencer?.mealPlans[Number(planIndex) || 0];
+
   const { data: storeMatches, refetch } = useSearchGroceryStores({
     latitude: location?.latitude || 0,
     longitude: location?.longitude || 0,
@@ -95,10 +97,10 @@ const MealPlanDetailPage = () => {
     query
   });
 
-  useEffect(() => {
-    // Re-call the search stores endpoint when options change
-    refetch();
-  }, [open, pickup, sort, searchFocus, query, location, refetch]);
+  // useEffect(() => {
+  //   // Re-call the search stores endpoint when options change
+  //   refetch();
+  // }, [open, pickup, sort, searchFocus, query, location, refetch]);
 
   const { data: inventory, isLoading: inventoryLoading, refetch: refetchInventory } = useStoreInventory({
     store_id: selectedStore?._id,
@@ -112,6 +114,11 @@ const MealPlanDetailPage = () => {
     user_zipcode: zipcode,
     user_country: country
   });
+
+  const { data: fitbiteInventory, refetch: fetchFitbiteInventory } = useFitbiteInventory(
+    selectedStore?._id, // Initial empty storeId
+    plan?.menuItems || [] // Initial empty menuItems
+  );
 
   useEffect(() => {
     if (inventory && !selectedCategory) {
@@ -201,7 +208,6 @@ const MealPlanDetailPage = () => {
     updateLocation();
   }, [streetNum, streetName, city, state, zipcode, country]);
 
-  const plan = influencer?.mealPlans[Number(planIndex) || 0];
   console.log(" --------- ");
   console.log(plan);
   console.log(planIndex);
@@ -348,11 +354,6 @@ const MealPlanDetailPage = () => {
   const areDeliveryDetailsComplete = () => {
     return streetNum && streetName && city && state && zipcode && country && email;
   };
-
-  const { data: fitbiteInventory, refetch: fetchFitbiteInventory } = useFitbiteInventory(
-    selectedStore?._id, // Initial empty storeId
-    plan.menuItems // Initial empty menuItems
-  );
 
   console.log(fitbiteInventory, 'fitbiteInventory')
 
