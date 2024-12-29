@@ -158,10 +158,6 @@ const MealPlanDetailPage = () => {
       console.error('Error queuing inventory processing:', error);
     }
   };
-
-  console.log(inventory, 'inventory found here');
-  console.log(inventoryLoading, 'inventoryLoading found here');
-
   // const { data: storeMatches } = useFindStoresForShoppingList({
   //   menuItems: plan?.menuItems || [],
   //   latitude: location?.latitude || 0,
@@ -369,23 +365,35 @@ const MealPlanDetailPage = () => {
 
     try {
       // Update query parameters and refetch
-      const result = await fetchFitbiteInventory({
-        queryKey: ['fitbiteInventory', store._id, plan.menuItems]
+      // const result = await fetchFitbiteInventory();
+      const queryParams = new URLSearchParams({
+        store_id: store._id,
+        items: JSON.stringify(plan.menuItems)
       });
+      const response = await fetch(
+        `${API_BASE_URL}/api/grocery/fitbite-inventory?${queryParams}`
+      );
 
-      console.log("result from fitbite inventory", result.data);
+      if (!response.ok) {
+        throw new Error('Failed to fetch fitbite inventory');
+      }
 
-      if (result.data) {
-        console.log("Fitbite inventory fetched successfully:", result.data);
+      const result = await response.json();
+      await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
+
+      if (result) {
+        console.log("Fitbite inventory fetched successfully:", result);
         // Handle success (e.g., navigate to a new page or show a success message)
         // setShoppingList(result.data);
-        setShoppingList(result.data.map((item: any) => ({
-          product_id: item.product_id,
-          name: item.name,
-          quantity: 1,
-          product_marked_price: Math.round(item.price * 100), // Convert to cents
-          selected_options: [] // Add options if available from the API
-        })));
+        setShoppingList(result.matches
+          .filter((item: any) => item.price && item.price > 0)
+          .map((item: any) => ({
+            product_id: item.product_id,
+            name: item.name,
+            quantity: 1,
+            product_marked_price: Math.round(item.price * 100), // Convert to cents
+            selected_options: [] // Add options if available from the API
+          })));
         
         console.log(shoppingList, 'shoppingList')
       }
