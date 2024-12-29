@@ -115,7 +115,7 @@ const MealPlanDetailPage = () => {
     user_country: country
   });
 
-  const { data: fitbiteInventory, refetch: fetchFitbiteInventory } = useFitbiteInventory(
+  const { data: fitbiteInventory } = useFitbiteInventory(
     selectedStore?._id, // Initial empty storeId
     plan?.menuItems || [] // Initial empty menuItems
   );
