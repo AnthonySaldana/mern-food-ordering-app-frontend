@@ -60,7 +60,7 @@ const MealPlanDetailPage = () => {
   const [country, setCountry] = useState<string>("");
   const [tipAmount, setTipAmount] = useState<number>(0);
   const [specialInstructions, setSpecialInstructions] = useState<string>("");
-  const [open, setOpen] = useState(false);
+  const [open, setOpen] = useState(true);
   const [pickup, setPickup] = useState(false);
   const [sort, setSort] = useState('relevance');
   const [searchFocus, setSearchFocus] = useState('store');
@@ -472,7 +472,7 @@ const MealPlanDetailPage = () => {
             </div>
             {isStoresExpanded && (
               <div className="p-4 md:px-32">
-                <div className="space-y-4 mb-8">
+                <div className="space-y-4 mb-8 hidden">
                   <p className="text-lg font-semibold mb-3">Search Options</p>
                   <div className="flex flex-col gap-4">
                     <label className="flex items-center gap-2">
@@ -797,15 +797,6 @@ const MealPlanDetailPage = () => {
               </div>
 
               <>
-                <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4 mb-6">
-                  {plan.menuItems.sort(randValue).slice(0, 3).map((menuItem) => (
-                    <MenuItem
-                      key={menuItem._id}
-                      menuItem={menuItem}
-                    />
-                  ))}
-                </div>
-
                 <PaymentMethodSection 
                   email={email}
                   onPaymentMethodSelect={(paymentMethodId) => setSelectedPaymentMethod(paymentMethodId)} 

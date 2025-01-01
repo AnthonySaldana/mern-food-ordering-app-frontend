@@ -30,7 +30,7 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: P
   const [isExpanded, setIsExpanded] = useState(false);
   // const [email, setEmail] = useState('');
 
-  const { data: paymentMethods, isLoading, refetch } = useQuery(
+  const { data: paymentMethods = [], isLoading, refetch } = useQuery(
     'paymentMethods',
     async () => {
       const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods?user_email=${email}`);
@@ -89,9 +89,12 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: P
       <div className="border rounded-lg">
         <div 
           className="flex justify-between items-center p-4 cursor-pointer"
-          onClick={() => setIsExpanded(!isExpanded)}
+          onClick={() => email && setIsExpanded(!isExpanded)}
         >
-          <h3 className="text-lg font-semibold">Payment Method</h3>
+          <div>
+            <h3 className="text-lg font-semibold">Payment Method</h3>
+            {!email && <p className="text-sm text-gray-500">(email required)</p>}
+          </div>
           <svg 
             width="24" 
             height="24" 
@@ -116,7 +119,7 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: P
                 <p>Loading payment methods...</p>
               ) : (
                 <>
-                  {paymentMethods?.map((method: PaymentMethod) => (
+                  {!paymentMethods.message && paymentMethods?.map((method: PaymentMethod) => (
                     <div
                       key={method.id}
                       className={`p-4 border rounded-lg cursor-pointer ${
