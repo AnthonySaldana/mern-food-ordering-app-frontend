@@ -11,6 +11,8 @@ import OrderStatusPage from "./pages/OrderStatusPage";
 import InfluencerDetailPage from "./pages/InfluencerDetailPage";
 import MealPlanDetailPage from "./pages/MealPlanDetailPage";
 import MealPlansPage from "./pages/MealPlansPage";
+import OrderReviewPage from "./pages/OrderReviewPage";
+// import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 
 const AppRoutes = () => {
   return (
@@ -64,6 +66,22 @@ const AppRoutes = () => {
           </Layout>
         }
       />
+      <Route
+          path="/order-review/:orderId"
+          element={
+            <Layout>
+              <OrderReviewPage />
+            </Layout>
+          }
+        />
+        <Route
+          path="/order-confirmation"
+          element={
+            <Layout>
+              <OrderReviewPage />
+            </Layout>
+          }
+        />
       <Route element={<ProtectedRoute />}>
         <Route
           path="/order-status"
