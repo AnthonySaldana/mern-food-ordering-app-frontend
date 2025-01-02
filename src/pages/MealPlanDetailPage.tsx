@@ -286,7 +286,8 @@ const MealPlanDetailPage = () => {
     const subtotal = calculateSubtotal();
     const tax = calculateTax(subtotal);
     const shipping = calculateShipping();
-    return subtotal + tax + shipping;
+    const total = subtotal + tax + shipping + (tipAmount * 100);
+    return total;
   };
 
   const handleCreateOrder = async () => {
@@ -938,11 +939,15 @@ const MealPlanDetailPage = () => {
               <span>${(calculateSubtotal() / 100).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span>Taxes</span>
+              <span>Estimated Taxes</span>
               <span>${(calculateTax(calculateSubtotal()) / 100).toFixed(2)}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span>Shipping</span>
+              <span>Tip</span>
+              <span>${tipAmount.toFixed(2)}</span>
+            </div>
+            <div className="flex justify-between text-sm">
+              <span>Creator Fee</span>
               <span>${(calculateShipping() / 100).toFixed(2)}</span>
             </div>
             <div className="h-[1px] bg-gray-200 my-2"></div>
