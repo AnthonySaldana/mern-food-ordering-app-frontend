@@ -116,7 +116,7 @@ const MealPlanDetailPage = () => {
     user_country: country
   });
 
-  const { data: fitbiteInventory } = useFitbiteInventory(
+  const { data: fitbiteInventory, error: storeError } = useFitbiteInventory(
     selectedStore?._id, // Initial empty storeId
     plan?.menuItems || [] // Initial empty menuItems
   );
@@ -126,6 +126,15 @@ const MealPlanDetailPage = () => {
       setQuote(inventory.quote);
     }
   }, [inventory, selectedCategory]);
+
+  useEffect(() => {
+    if (storeError) {
+      const errorMessage = "This store is not available right now. Please select a different store.";
+      setErrorMessage(errorMessage);
+      toast.error(errorMessage); // Display the error using a toast notification
+    }
+  }, [storeError]);
+  
 
   const handleStoreSelection = async (store: any) => {
     setSelectedStore(store);
@@ -151,8 +160,12 @@ const MealPlanDetailPage = () => {
       });
 
       if (!response.ok) {
+        // setErrorMessage("This store is not available right now. Please select a different store.");
+        toast.error("This store is not available right now. Please select a different store.");
         throw new Error('Failed to queue inventory processing');
       }
+
+      toast.success("Inventory for this store is being processed. Please order in a minute.");
 
       console.log('Inventory processing job added to the queue');
     } catch (error) {
