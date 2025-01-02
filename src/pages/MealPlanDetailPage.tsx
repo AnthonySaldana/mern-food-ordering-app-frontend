@@ -81,7 +81,7 @@ const MealPlanDetailPage = () => {
 
   const plan = influencer?.mealPlans[Number(planIndex) || 0];
 
-  const { data: storeMatches } = useSearchGroceryStores({
+  const { data: storeMatches, refetch: refetchStoreMatches } = useSearchGroceryStores({
     latitude: location?.latitude || 0,
     longitude: location?.longitude || 0,
     open,
@@ -187,27 +187,37 @@ const MealPlanDetailPage = () => {
       return null;
     }
   };
-  useEffect(() => {
-    const updateLocation = async () => {
-      if (areDeliveryDetailsComplete()) {
-        const address = `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`;
-        const coordinates = await fetchCoordinates(address);
-        if (coordinates) {
-          setLocation({
-            latitude: coordinates.lat,
-            longitude: coordinates.lng
-          });
-        }
+  // useEffect(() => {
+  //   const updateLocation = async () => {
+  //     if (areDeliveryDetailsComplete()) {
+  //       const address = `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`;
+  //       const coordinates = await fetchCoordinates(address);
+  //       if (coordinates) {
+  //         setLocation({
+  //           latitude: coordinates.lat,
+  //           longitude: coordinates.lng
+  //         });
+  //       }
+  //     }
+  //   };
+
+  //   updateLocation();
+  // }, [streetNum, streetName, city, state, zipcode, country]);
+  const updateDeliveryDetails = async () => {
+    if (areDeliveryDetailsComplete()) {
+      const address = `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`;
+      const coordinates = await fetchCoordinates(address);
+      if (coordinates) {
+        setLocation({
+          latitude: coordinates.lat,
+          longitude: coordinates.lng
+        });
+        // Trigger the store search manually
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        refetchStoreMatches();
       }
-    };
-
-    updateLocation();
-  }, [streetNum, streetName, city, state, zipcode, country]);
-
-  console.log(" --------- ");
-  console.log(plan);
-  console.log(planIndex);
-  console.log(influencer);
+    }
+  };
 
   if (!plan) {
     return <div>No meal plan found</div>;
@@ -777,6 +787,12 @@ const MealPlanDetailPage = () => {
                     onChange={(e) => setSpecialInstructions(e.target.value)}
                     className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f] min-h-[100px] resize-y"
                   />
+                  <button 
+                    onClick={updateDeliveryDetails}
+                    className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium"
+                  >
+                    Update Delivery Details
+                  </button>
                 </div>
               </div>
 
