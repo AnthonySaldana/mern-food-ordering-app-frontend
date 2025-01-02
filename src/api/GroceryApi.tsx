@@ -45,7 +45,7 @@ export const useSearchGroceryStores = (params: {
       return response.json();
     },
     {
-      enabled: !!latitude && !!longitude,
+      enabled: false,
     }
   );
 };
