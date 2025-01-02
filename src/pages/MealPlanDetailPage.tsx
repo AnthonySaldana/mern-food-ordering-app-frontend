@@ -37,6 +37,7 @@ interface ShoppingListItem {
 }
 
 const MealPlanDetailPage = () => {
+  const isStoresExpanded = true;
   const { influencerId, planIndex } = useParams();
   const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string | null>(null);
   const [selectedStartDay, setSelectedStartDay] = useState<string | null>("Mon");
@@ -44,7 +45,7 @@ const MealPlanDetailPage = () => {
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
   const [isOrderPage, setIsOrderPage] = useState(false);
   const [isMenuExpanded, setIsMenuExpanded] = useState(false);
-  const [isStoresExpanded, setIsStoresExpanded] = useState(false);
+  // const [isStoresExpanded, setIsStoresExpanded] = useState(true);
   const [selectedStore, setSelectedStore] = useState<any>(null);
   const [selectedCategory, setSelectedCategory] = useState<any>(null);
   const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
@@ -59,7 +60,7 @@ const MealPlanDetailPage = () => {
   const [zipcode, setZipcode] = useState<string>("");
   const [country, setCountry] = useState<string>("");
   const [tipAmount, setTipAmount] = useState<number>(0);
-  const [specialInstructions, setSpecialInstructions] = useState<string>("");
+  const [specialInstructions, setSpecialInstructions] = useState<string>("n/a");
   const [open, setOpen] = useState(true);
   const [pickup, setPickup] = useState(false);
   const [sort, setSort] = useState('relevance');
@@ -461,10 +462,10 @@ const MealPlanDetailPage = () => {
           <div className="bg-white rounded-xl relative">
             <div 
               className="flex justify-between items-center cursor-pointer p-4 md:px-32" 
-              onClick={() => setIsStoresExpanded(!isStoresExpanded)}
+              // onClick={() => setIsStoresExpanded(!isStoresExpanded)}
             >
               <p className="text-md font-bold">Available at Stores Nearby</p>
-              <svg 
+              {/* <svg 
                 width="24" 
                 height="24" 
                 viewBox="0 0 24 24"
@@ -478,7 +479,7 @@ const MealPlanDetailPage = () => {
                   strokeLinejoin="round"
                   fill="none"
                 />
-              </svg>
+              </svg> */}
             </div>
             {isStoresExpanded && (
               <div className="p-4 md:px-32">
@@ -722,71 +723,107 @@ const MealPlanDetailPage = () => {
                   </div> */}
 
                   <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
-                  <p className="text-gray-600 mb-4">Email</p>
-                  <input
-                    type="email"
-                    placeholder="your@email.com"
-                    value={email}
-                    onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                    required
-                  />
-                  <input
-                    type="text"
-                    placeholder="Street Number"
-                    value={streetNum}
-                    onChange={(e) => setStreetNum(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Street Name"
-                    value={streetName}
-                    onChange={(e) => setStreetName(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                  />
-                  <input
-                    type="text"
-                    placeholder="City"
-                    value={city}
-                    onChange={(e) => setCity(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                  />
-                  <input
-                    type="text"
-                    placeholder="State"
-                    value={state}
-                    onChange={(e) => setState(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Zipcode"
-                    value={zipcode}
-                    onChange={(e) => setZipcode(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                  />
-                  <input
-                    type="text"
-                    placeholder="Country"
-                    value={country}
-                    onChange={(e) => setCountry(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                  />
-                  <p className="text-gray-600 mb-4">Tip Amount</p>
-                  <input
-                    type="number"
-                    placeholder="Tip Amount"
-                    value={tipAmount}
-                    onChange={(e) => setTipAmount(Number(e.target.value))}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                  />
-                  <textarea
-                    placeholder="Special Instructions"
-                    value={specialInstructions}
-                    onChange={(e) => setSpecialInstructions(e.target.value)}
-                    className="w-full px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f] min-h-[100px] resize-y"
-                  />
+                  <label className="block text-gray-600 mb-2">
+                    Email *
+                    <input
+                      type="email" 
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                      required
+                    />
+                  </label>
+                  <label className="block text-gray-600 mb-2">
+                    Street Number *
+                    <input
+                      type="text"
+                      placeholder="Street Number"
+                      value={streetNum}
+                      onChange={(e) => setStreetNum(e.target.value)}
+                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                      required
+                    />
+                  </label>
+                  <label className="block text-gray-600 mb-2">
+                    Street Name *
+                    <input
+                      type="text"
+                      placeholder="Street Name"
+                      value={streetName}
+                      onChange={(e) => setStreetName(e.target.value)}
+                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                      required
+                    />
+                  </label>
+                  <label className="block text-gray-600 mb-2">
+                    City *
+                    <input
+                      type="text"
+                      placeholder="City"
+                      value={city}
+                      required
+                      onChange={(e) => setCity(e.target.value)}
+                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                    />
+                  </label>
+                  <label className="block text-gray-600 mb-2">
+                    State (use state code like NY, CA, etc.) *
+                    <input
+                      type="text"
+                      placeholder="State"
+                      value={state}
+                      required
+                      onChange={(e) => setState(e.target.value)}
+                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                    />
+                  </label>
+                  <label className="block text-gray-600 mb-2">
+                    Zipcode *
+                    <input
+                      type="text"
+                      placeholder="Zipcode"
+                      value={zipcode}
+                      required
+                      onChange={(e) => setZipcode(e.target.value)}
+                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                    />
+                  </label>
+                  <label className="block text-gray-600 mb-2">
+                    Country (use country code like US, CA, etc.) *
+                    <input
+                      type="text"
+                      placeholder="Country"
+                      value={country}
+                      required
+                      onChange={(e) => setCountry(e.target.value)}
+                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                    />
+                  </label>
+                  <label className="block text-gray-600 mb-2">
+                    Tip Amount
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2">$</span>
+                      <input
+                        type="number"
+                        step=".50"
+                        min="0"
+                        placeholder="Tip Amount"
+                        value={tipAmount.toFixed(2)}
+                        onChange={(e) => setTipAmount(Number(parseFloat(e.target.value).toFixed(2)))}
+                        className="w-full mt-2 px-4 py-3 pl-8 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                      />
+                    </div>
+                  </label>
+                  <label className="block text-gray-600 mb-2">
+                    Special Instructions
+                    <textarea
+                      placeholder="Special Instructions (optional)"
+                      value={specialInstructions}
+                      onChange={(e) => setSpecialInstructions(e.target.value)}
+                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f] min-h-[100px] resize-y"
+                    />
+                  </label>
                   <button 
                     onClick={updateDeliveryDetails}
                     className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium"
