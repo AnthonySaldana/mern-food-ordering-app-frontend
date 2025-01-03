@@ -233,8 +233,10 @@ const MealPlanDetailPage = () => {
           longitude: coordinates.lng
         });
         // Trigger the store search manually
+        setIsLoading(true);
         await new Promise(resolve => setTimeout(resolve, 1000));
-        refetchStoreMatches();
+        await refetchStoreMatches();
+        setIsLoading(false);
       }
     }
   };
@@ -386,6 +388,7 @@ const MealPlanDetailPage = () => {
 
   const handleOrderPlan = async (store: any) => {
     console.log("storeId", store);
+    setIsLoading(true);
     setSelectedStore(store);
     if (!plan || !plan.menuItems) {
       console.error("No meal plan or menu items found");
@@ -427,6 +430,7 @@ const MealPlanDetailPage = () => {
           })));
         
         console.log(shoppingList, 'shoppingList')
+        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error fetching fitbite inventory:", error);
