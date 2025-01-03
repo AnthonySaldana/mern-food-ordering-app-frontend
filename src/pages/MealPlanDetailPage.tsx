@@ -13,6 +13,8 @@ import PaymentMethodSection from "@/components/PaymentMethodSection";
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import QuoteDetails from "@/components/QuoteMealMe";
+import LoadingOverlay from "@/components/LoadingOverlay";
+
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchInfluencerById = async (id: string): Promise<Influencer> => {
@@ -69,10 +71,11 @@ const MealPlanDetailPage = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [email, setEmail] = useState<string>("");
   const [quote, setQuote] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(false);
 
   console.log(errorMessage, 'errorMessage found here');
 
-  const { data: influencer, isLoading, error } = useQuery(
+  const { data: influencer, isLoading: isLoadingInfluencer, error } = useQuery(
     ["fetchInfluencer", influencerId],
     () => fetchInfluencerById(influencerId as string),
     {
@@ -141,6 +144,7 @@ const MealPlanDetailPage = () => {
     setSelectedCategory(null); // Reset category selection when switching stores
 
     try {
+      setIsLoading(true);
       const response = await fetch(`${API_BASE_URL}/api/grocery/process-inventory`, {
         method: 'POST',
         headers: {
@@ -170,6 +174,8 @@ const MealPlanDetailPage = () => {
       console.log('Inventory processing job added to the queue');
     } catch (error) {
       console.error('Error queuing inventory processing:', error);
+    } finally {
+      setIsLoading(false);
     }
   };
   // const { data: storeMatches } = useFindStoresForShoppingList({
@@ -237,7 +243,7 @@ const MealPlanDetailPage = () => {
     return <div>No meal plan found</div>;
   }
 
-  if (isLoading) {
+  if (isLoadingInfluencer) {
     return <div>Loading...</div>;
   }
 
@@ -431,6 +437,7 @@ const MealPlanDetailPage = () => {
   if (isOrderPage) {
     return (
       <div className="flex flex-col lg:flex-row mt-[40px]">
+        {isLoading && <LoadingOverlay />}
         <div className="flex lg:w-3/4 flex-col gap-4 bg-white p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
           <div className="flex flex-row items-center gap-2 md:px-32 cursor-pointer" onClick={() => setIsOrderPage(false)}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -1192,7 +1199,7 @@ const MealPlanDetailPage = () => {
             </div>
           </div>
 
-          <div className="flex flex-col">
+          {/* <div className="flex flex-col">
             <div className="bg-[#F2F6FB] rounded-lg p-4 flex flex-col w-[240px] h-[150px]">
               <div className="flex justify-between items-center mb-3">
                 <span className="text-sm font-medium text-gray-900">Sugars</span>
@@ -1207,7 +1214,7 @@ const MealPlanDetailPage = () => {
                 <p className="font-semibold text-xs text-gray-900">- g/day</p>
               </div>
             </div>
-          </div>
+          </div> */}
         </div>
       </div>
 
