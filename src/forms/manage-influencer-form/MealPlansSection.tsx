@@ -130,7 +130,7 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
             removeMenuItem={() => removeMenuItem(menuItemIndex)}
           />
         ))}
-        <Button type="button" onClick={() => appendMenuItem({ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined })}>
+        <Button type="button" onClick={() => appendMenuItem({ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined, positiveDescriptors: "", negativeDescriptors: "" })}>
           Add Menu Item
         </Button>
       </div>

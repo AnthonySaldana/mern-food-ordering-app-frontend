@@ -20,6 +20,8 @@ export type MenuItem = {
     carbs: number;
     fat: number;
   };
+  positiveDescriptors?: string;
+  negativeDescriptors?: string;
 };
 
 export type Restaurant = {
