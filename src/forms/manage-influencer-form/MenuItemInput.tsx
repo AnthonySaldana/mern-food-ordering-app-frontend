@@ -188,6 +188,42 @@ const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
           />
         </div>
       </div>
+      <FormField
+        control={control}
+        name={`mealPlans.${mealPlanIndex}.menuItems.${index}.positiveDescriptors`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-1">
+              Positive Descriptors <FormMessage />
+            </FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="e.g., delicious, healthy"
+                className="bg-white"
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
+      <FormField
+        control={control}
+        name={`mealPlans.${mealPlanIndex}.menuItems.${index}.negativeDescriptors`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel className="flex items-center gap-1">
+              Negative Descriptors <FormMessage />
+            </FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                placeholder="e.g., spicy, high-calorie"
+                className="bg-white"
+              />
+            </FormControl>
+          </FormItem>
+        )}
+      />
       <Button
         type="button"
         onClick={removeMenuItem}
