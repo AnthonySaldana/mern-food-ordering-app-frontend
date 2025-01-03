@@ -299,7 +299,7 @@ const MealPlanDetailPage = () => {
 
   const calculateShipping = () => {
     // You can implement dynamic shipping logic here
-    const BASE_SHIPPING = 500; // $5.00 in cents
+    const BASE_SHIPPING = 2000; // $5.00 in cents
     return BASE_SHIPPING;
   };
 
@@ -430,11 +430,12 @@ const MealPlanDetailPage = () => {
           })));
         
         console.log(shoppingList, 'shoppingList')
-        setIsLoading(false);
       }
     } catch (error) {
       console.error("Error fetching fitbite inventory:", error);
       toast.error("Failed to fetch fitbite inventory");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -1253,7 +1254,7 @@ const MealPlanDetailPage = () => {
               onClick={() => setIsOrderPage(true)}
               className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium"
             >
-              Order this plan - $74.95
+              Order this plan
             </button>
           </>
         </div>
