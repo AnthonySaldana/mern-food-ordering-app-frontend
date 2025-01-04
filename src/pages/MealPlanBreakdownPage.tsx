@@ -1,17 +1,9 @@
 /* eslint-disable */
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
-// import { Influencer, MenuItem as MenuItemType } from "@/types";
 import { Influencer } from "@/types";
-import { Card } from "@/components/ui/card";
 import MenuItemDetail from "@/components/MenuItemDetail";
-import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { useSearchGroceryStores, useStoreInventory, useFitbiteInventory } from "@/api/GroceryApi";
-import PaymentMethodSection from "@/components/PaymentMethodSection";
-// import { ShoppingListItemType } from '../types/grocery';
 import { Toaster } from "@/components/ui/sonner";
-import { toast } from "sonner";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -23,46 +15,8 @@ const fetchInfluencerById = async (id: string): Promise<Influencer> => {
   return response.json();
 };
 
-interface ShoppingListItem {
-  product_id: string;
-  name: string;
-  quantity: number;
-  product_marked_price: number;
-  selected_options?: Array<{
-    option_id: string;
-    quantity: number;
-    marked_price?: number;
-    notes?: string;
-  }>;
-}
-
 const MealPlanDetailPage = () => {
   const { influencerId, planIndex } = useParams();
-  const [isBioExpanded, setIsBioExpanded] = useState(false);
-  const [isPlanExpanded, setIsPlanExpanded] = useState(false);
-  const [isMenuExpanded, setIsMenuExpanded] = useState(false);
-  // const [isStoresExpanded, setIsStoresExpanded] = useState(true);
-  const [selectedStore, setSelectedStore] = useState<any>(null);
-  const [selectedCategory, setSelectedCategory] = useState<any>(null);
-  const [location, setLocation] = useState<{latitude: number; longitude: number} | null>(null);
-  const navigate = useNavigate();
-  const randValue = () => Math.random() - 0.5;
-  const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
-  const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
-  const [streetNum, setStreetNum] = useState<string>("");
-  const [streetName, setStreetName] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [state, setState] = useState<string>("");
-  const [zipcode, setZipcode] = useState<string>("");
-  const [country, setCountry] = useState<string>("");
-  const [tipAmount, setTipAmount] = useState<number>(0);
-  const [specialInstructions, setSpecialInstructions] = useState<string>("n/a");
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
-  const [email, setEmail] = useState<string>("");
-  const [quote, setQuote] = useState<any>(null);
-  const [isLoading, setIsLoading] = useState(false);
-
-  console.log(errorMessage, 'errorMessage found here');
 
   const { data: influencer, isLoading: isLoadingInfluencer, error } = useQuery(
     ["fetchInfluencer", influencerId],
@@ -73,86 +27,6 @@ const MealPlanDetailPage = () => {
   );
 
   const plan = influencer?.mealPlans[Number(planIndex) || 0];
-
-  const handleStoreSelection = async (store: any) => {
-    setSelectedStore(store);
-    setSelectedCategory(null); // Reset category selection when switching stores
-
-    try {
-      setIsLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/grocery/process-inventory`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          store_id: store._id,
-          latitude: location?.latitude || 0,
-          longitude: location?.longitude || 0,
-          user_street_num: streetNum,
-          user_street_name: streetName,
-          user_city: city,
-          user_state: state,
-          user_zipcode: zipcode,
-          user_country: country
-        })
-      });
-
-      if (!response.ok) {
-        // setErrorMessage("This store is not available right now. Please select a different store.");
-        toast.error("This store is not available right now. Please select a different store.");
-        throw new Error('Failed to queue inventory processing');
-      }
-
-      toast.success("Inventory for this store is being processed. Please order in a minute.");
-
-      console.log('Inventory processing job added to the queue');
-    } catch (error) {
-      console.error('Error queuing inventory processing:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-  // const { data: storeMatches } = useFindStoresForShoppingList({
-  //   menuItems: plan?.menuItems || [],
-  //   latitude: location?.latitude || 0,
-  //   longitude: location?.longitude || 0,
-  // });
-
-  const fetchCoordinates = async (address: string) => {
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/grocery/geocode-address`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ address })
-      });
-  
-      if (!response.ok) {
-        throw new Error('Failed to fetch coordinates');
-      }
-  
-      const data = await response.json();
-      return data; // Assuming the backend returns the coordinates directly
-    } catch (error) {
-      console.error('Error fetching coordinates:', error);
-      return null;
-    }
-  };
-  // useEffect(() => {
-  //   const updateLocation = async () => {
-  //     if (areDeliveryDetailsComplete()) {
-  //       const address = `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`;
-  //       const coordinates = await fetchCoordinates(address);
-  //       if (coordinates) {
-  //         setLocation({
-  //           latitude: coordinates.lat,
-  //           longitude: coordinates.lng
-  //         });
-  //       }
-  //     }
-  //   };
 
   if (!plan) {
     return <div>No meal plan found</div>;
@@ -169,101 +43,6 @@ const MealPlanDetailPage = () => {
   if (!influencer?.mealPlans?.length) {
     return <div>No meal plans found</div>;
   }
-
-  const calculateSubtotal = () => {
-    return shoppingList.reduce((total, item) => {
-      const itemTotal = (item.product_marked_price * item.quantity);
-      return total + itemTotal;
-    }, 0);
-  };
-
-  const calculateTax = (subtotal: number) => {
-    const TAX_RATE = 0.08; // 8% tax rate - adjust as needed
-    return Math.round(subtotal * TAX_RATE);
-  };
-
-  const calculateShipping = () => {
-    // You can implement dynamic shipping logic here
-    const BASE_SHIPPING = 2000; // $5.00 in cents
-    return BASE_SHIPPING;
-  };
-
-  const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const tax = calculateTax(subtotal);
-    const shipping = calculateShipping();
-    const total = subtotal + tax + shipping + (tipAmount * 100);
-    return total;
-  };
-
-  const handleCreateOrder = async () => {
-    if (!selectedStore || !location) {
-      console.error("Store or location not selected");
-      return;
-    }
-
-    const deliveryDetails = {
-      address: `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`,
-      latitude: location.latitude,
-      longitude: location.longitude,
-      street_num: streetNum,
-      street_name: streetName,
-      city: city,
-      state: state,
-      zipcode: zipcode,
-      country: country,
-      instructions: specialInstructions,
-      tip_amount: tipAmount
-    };
-
-    const orderData = {
-      store_id: selectedStore._id,
-      items: shoppingList.map(item => ({
-        product_id: item.product_id,
-        quantity: item.quantity,
-        instructions: "" // Add any special instructions if needed
-      })),
-      delivery_details: deliveryDetails,
-      payment_details: {
-        payment_method_id: selectedPaymentMethod,
-        payment_amount: calculateTotal()
-      },
-      place_order: true,
-      final_quote: false // Adjust as needed
-    };
-
-    try {
-      const response = await fetch(`${API_BASE_URL}/api/grocery/create-order`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        setErrorMessage(errorData.message || "Failed to create order");
-        toast.error(errorData.message || "Failed to create order");
-        return;
-      }
-
-      const data = await response.json();
-
-      if (data.order_placed && data.tracking_link) {
-        // Open the tracking link in a new tab
-        window.open(data.tracking_link, '_blank');
-      } else {
-        // Handle the case where the order was not placed successfully
-        toast.error("Order could not be placed. Please try again.");
-      }
-      console.log("Order created successfully:", data);
-    } catch (error) {
-      console.error("Error creating order:", error);
-      setErrorMessage("Error creating order");
-      toast.error("Error creating order");
-    }
-  };
 
   return (
     <div className="flex flex-col gap-4 bg-white p-3 rounded-md lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8">
