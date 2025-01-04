@@ -453,7 +453,7 @@ const MealPlanDetailPage = () => {
           </div>
           <div className="bg-white rounded-xl relative">
             <div 
-              className="flex justify-between items-center cursor-pointer p-4 md:px-32" 
+              className="flex justify-between items-center cursor-pointer p-4 md:px-16" 
               onClick={() => setIsMenuExpanded(!isMenuExpanded)}
             >
               <p className="text-md font-bold">Plan Items ({plan.menuItems.length})</p>
@@ -918,12 +918,12 @@ const MealPlanDetailPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 bg-white p-4 rounded-md lg:w-1/4 lg:px-2 px-32">
+        <div className="flex flex-col gap-4 bg-white p-4 rounded-md lg:w-1/4 lg:px-2 px-16">
           <div className="mb-6 -bottom-[61px] left-0 right-0">
             <div className="flex flex-col items-start gap-2 flex justify-start">
               <h2 className="text-lg font-bold">{plan.name}</h2>
               <div className="flex items-center gap-2">
-                <span className="bg-[#D9D6FF] text-black px-4 py-2 rounded-full text-sm font-bold text-center min-w-[200px]">
+                <span className="bg-[#D9D6FF] text-black px-4 py-2 rounded-full text-sm font-bold text-center min-w-[150px]">
                   {plan.totalCalories} cal/day
                 </span>
                 <span className="text-gray-500 text-sm text-center min-w-[150px]">

@@ -13,6 +13,7 @@ import MealPlanDetailPage from "./pages/MealPlanDetailPage";
 import MealPlansPage from "./pages/MealPlansPage";
 import OrderReviewPage from "./pages/OrderReviewPage";
 // import OrderConfirmationPage from "./pages/OrderConfirmationPage";
+import MealPlanBreakdownPage from "./pages/MealPlanBreakdownPage";
 
 const AppRoutes = () => {
   return (
@@ -82,6 +83,14 @@ const AppRoutes = () => {
             </Layout>
           }
         />
+      <Route
+        path="/recipe/:influencerId/mealplan/:planIndex"
+        element={
+          <Layout>
+            <MealPlanBreakdownPage />
+          </Layout>
+        }
+      />
       <Route element={<ProtectedRoute />}>
         <Route
           path="/order-status"
