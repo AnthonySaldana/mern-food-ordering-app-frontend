@@ -139,45 +139,45 @@ const MealPlanDetailPage = () => {
   }, [storeError]);
   
 
-  const handleStoreSelection = async (store: any) => {
-    setSelectedStore(store);
-    setSelectedCategory(null); // Reset category selection when switching stores
+  // const handleStoreSelection = async (store: any) => {
+  //   setSelectedStore(store);
+  //   setSelectedCategory(null); // Reset category selection when switching stores
 
-    try {
-      setIsLoading(true);
-      const response = await fetch(`${API_BASE_URL}/api/grocery/process-inventory`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          store_id: store._id,
-          latitude: location?.latitude || 0,
-          longitude: location?.longitude || 0,
-          user_street_num: streetNum,
-          user_street_name: streetName,
-          user_city: city,
-          user_state: state,
-          user_zipcode: zipcode,
-          user_country: country
-        })
-      });
+  //   try {
+  //     setIsLoading(true);
+  //     const response = await fetch(`${API_BASE_URL}/api/grocery/process-inventory`, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({
+  //         store_id: store._id,
+  //         latitude: location?.latitude || 0,
+  //         longitude: location?.longitude || 0,
+  //         user_street_num: streetNum,
+  //         user_street_name: streetName,
+  //         user_city: city,
+  //         user_state: state,
+  //         user_zipcode: zipcode,
+  //         user_country: country
+  //       })
+  //     });
 
-      if (!response.ok) {
-        // setErrorMessage("This store is not available right now. Please select a different store.");
-        toast.error("This store is not available right now. Please select a different store.");
-        throw new Error('Failed to queue inventory processing');
-      }
+  //     if (!response.ok) {
+  //       // setErrorMessage("This store is not available right now. Please select a different store.");
+  //       toast.error("This store is not available right now. Please select a different store.");
+  //       throw new Error('Failed to queue inventory processing');
+  //     }
 
-      toast.success("Inventory for this store is being processed. Please order in a minute.");
+  //     toast.success("Inventory for this store is being processed. Please order in a minute.");
 
-      console.log('Inventory processing job added to the queue');
-    } catch (error) {
-      console.error('Error queuing inventory processing:', error);
-    } finally {
-      setIsLoading(false);
-    }
-  };
+  //     console.log('Inventory processing job added to the queue');
+  //   } catch (error) {
+  //     console.error('Error queuing inventory processing:', error);
+  //   } finally {
+  //     setIsLoading(false);
+  //   }
+  // };
   // const { data: storeMatches } = useFindStoresForShoppingList({
   //   menuItems: plan?.menuItems || [],
   //   latitude: location?.latitude || 0,
