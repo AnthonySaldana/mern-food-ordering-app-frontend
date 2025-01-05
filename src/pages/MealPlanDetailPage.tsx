@@ -441,6 +441,51 @@ const MealPlanDetailPage = () => {
     }
   };
 
+  const handleProcessAndOrder = async (store: any) => {
+    setSelectedStore(store);
+    setSelectedCategory(null); // Reset category selection when switching stores
+  
+    try {
+      setIsLoading(true);
+      const response = await fetch(`${API_BASE_URL}/api/grocery/process-inventory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          store_id: store._id,
+          latitude: location?.latitude || 0,
+          longitude: location?.longitude || 0,
+          user_street_num: streetNum,
+          user_street_name: streetName,
+          user_city: city,
+          user_state: state,
+          user_zipcode: zipcode,
+          user_country: country
+        })
+      });
+  
+      if (!response.ok) {
+        toast.error("This store is not available right now. Please select a different store.");
+        throw new Error('Failed to queue inventory processing');
+      }
+  
+      toast.success("Inventory for this store is being processed. Please order in a minute.");
+      console.log('Inventory processing job added to the queue');
+  
+      // Wait for 20 seconds before proceeding to order
+      await new Promise(resolve => setTimeout(resolve, 20000));
+  
+      // Proceed to order
+      await handleOrderPlan(store);
+  
+    } catch (error) {
+      console.error('Error processing inventory and creating order:', error);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   if (isOrderPage) {
     return (
       <div className="flex flex-col lg:flex-row mt-[40px]">
@@ -606,7 +651,7 @@ const MealPlanDetailPage = () => {
                                 </p>
                               </div>
                             </div>
-                            <button
+                            {/* <button
                               className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
                               onClick={() => handleStoreSelection(store)}
                             >
@@ -617,6 +662,12 @@ const MealPlanDetailPage = () => {
                               onClick={() => handleOrderPlan(store)}
                             >
                               Order Plan
+                            </button> */}
+                            <button
+                              className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
+                              onClick={() => handleProcessAndOrder(store)}
+                            >
+                              Order
                             </button>
                           </div>
                         ))}
