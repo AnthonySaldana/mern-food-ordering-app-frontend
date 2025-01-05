@@ -241,6 +241,16 @@ const MealPlanDetailPage = () => {
     }
   };
 
+  const updateItemQuantity = (productId: string, quantityChange: number) => {
+    setShoppingList(prevList => {
+      return prevList.map(item => 
+        item.product_id === productId 
+          ? { ...item, quantity: Math.max(1, item.quantity + quantityChange) } // Ensure quantity doesn't go below 1
+          : item
+      );
+    });
+  };
+
   if (!plan) {
     return <div>No meal plan found</div>;
   }
@@ -335,7 +345,7 @@ const MealPlanDetailPage = () => {
       store_id: selectedStore._id,
       items: shoppingList.map(item => ({
         product_id: item.product_id,
-        quantity: item.quantity,
+        quantity: item.quantity, // Use updated quantity
         instructions: "" // Add any special instructions if needed
       })),
       delivery_details: deliveryDetails,
@@ -993,7 +1003,9 @@ const MealPlanDetailPage = () => {
                   {shoppingList.map((item: any) => (
                     <div key={item.product_id} className="flex justify-between items-center">
                       <div className="flex items-center gap-2">
+                        <button onClick={() => updateItemQuantity(item.product_id, -1)}>-</button>
                         <span className="bg-gray-100 px-2 py-1 rounded">{item.quantity}</span>
+                        <button onClick={() => updateItemQuantity(item.product_id, 1)}>+</button>
                         <span>{item.name}</span>
                       </div>
                       <div className="flex items-center gap-4">
