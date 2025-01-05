@@ -344,7 +344,9 @@ const MealPlanDetailPage = () => {
         payment_amount: calculateTotal()
       },
       place_order: true,
-      final_quote: false // Adjust as needed
+      final_quote: false,
+      influencer_id: influencer._id,
+      meal_plan_name: plan.name
     };
 
     try {
