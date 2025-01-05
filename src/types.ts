@@ -105,3 +105,14 @@ export type MealPlan = {
   deliveryOptions: string[];
   startDayOptions: string[];
 };
+
+export type Recipe = {
+  _id: string;
+  name: string;
+  calories: number;
+  carbs: number;
+  fat: number;
+  protein: number;
+  ingredients: string;
+  instructions: string;
+};

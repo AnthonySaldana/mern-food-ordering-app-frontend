@@ -4,13 +4,15 @@ import {
 import {
   useGetMyInfluencer,
   useUpdateMyInfluencer,
-  useCreateMyInfluencer
+  useCreateMyInfluencer,
+  useGetRecipes,
+  useCreateRecipe,
 } from "@/api/InfluencerApi";
 import OrderItemCard from "@/components/OrderItemCard";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 // import ManageRestaurantForm from "@/forms/manage-restaurant-form/ManageRestaurantForm";
 import ManageInfluencerForm from "@/forms/manage-influencer-form/ManageInfluencerForm";
-
+import ManageRecipesForm from "@/forms/manage-recipes-form/ManageRecipesForm";
 const ManageRestaurantPage = () => {
   // const { createRestaurant, isLoading: isCreateLoading } =
   //   useCreateMyRestaurant();
@@ -22,6 +24,8 @@ const ManageRestaurantPage = () => {
     useCreateMyInfluencer();
   const { updateInfluencer, isLoading: isUpdateInfluencerLoading } =
     useUpdateMyInfluencer();
+  const { createRecipe, isLoading: isCreateRecipeLoading } = useCreateRecipe();
+  const { recipes } = useGetRecipes();
 
   const { orders } = useGetMyRestaurantOrders();
 
@@ -34,6 +38,7 @@ const ManageRestaurantPage = () => {
       <TabsList>
         <TabsTrigger value="orders">Orders</TabsTrigger>
         <TabsTrigger value="manage-influencer">Manage Influencer</TabsTrigger>
+        <TabsTrigger value="manage-recipes">Manage Recipes</TabsTrigger>
       </TabsList>
       <TabsContent
         value="orders"
@@ -49,6 +54,13 @@ const ManageRestaurantPage = () => {
           influencer={influencer}
           onSave={isEditing ? updateInfluencer : createInfluencer}
           isLoading={isCreateInfluencerLoading || isUpdateInfluencerLoading}
+        />
+      </TabsContent>
+      <TabsContent value="manage-recipes">
+        <ManageRecipesForm
+          recipes={recipes}
+          onSave={createRecipe}
+          isLoading={isCreateRecipeLoading}
         />
       </TabsContent>
     </Tabs>

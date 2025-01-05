@@ -41,7 +41,7 @@ interface ShoppingListItem {
 const MealPlanDetailPage = () => {
   const isStoresExpanded = true;
   const { influencerId, planIndex } = useParams();
-  const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string | null>(null);
+  const [selectedDeliveryDate, setSelectedDeliveryDate] = useState<string | null>("ASAP");
   const [selectedStartDay, setSelectedStartDay] = useState<string | null>("Mon");
   const [isBioExpanded, setIsBioExpanded] = useState(false);
   const [isPlanExpanded, setIsPlanExpanded] = useState(false);
