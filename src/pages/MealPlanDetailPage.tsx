@@ -1,14 +1,15 @@
-/* eslint-disable */
+
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 // import { Influencer, MenuItem as MenuItemType } from "@/types";
-import { Influencer } from "@/types";
+import { Influencer, Address } from "@/types";
 import { Card } from "@/components/ui/card";
 import MenuItem from "@/components/MenuItem";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchGroceryStores, useStoreInventory, useFitbiteInventory } from "@/api/GroceryApi";
 import PaymentMethodSection from "@/components/PaymentMethodSection";
+import AddressSection from "@/components/AddressSection";
 // import { ShoppingListItemType } from '../types/grocery';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
@@ -72,6 +73,8 @@ const MealPlanDetailPage = () => {
   const [email, setEmail] = useState<string>("");
   const [quote, setQuote] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [tempEmail, setTempEmail] = useState<string>("");
 
   console.log(errorMessage, 'errorMessage found here');
 
@@ -91,12 +94,12 @@ const MealPlanDetailPage = () => {
     open,
     pickup,
     sort,
-    user_street_num: streetNum,
-    user_street_name: streetName,
-    user_city: city,
-    user_state: state,
-    user_zipcode: zipcode,
-    user_country: country,
+    user_street_num: selectedAddress?.streetNum,
+    user_street_name: selectedAddress?.streetName,
+    user_city: selectedAddress?.city,
+    user_state: selectedAddress?.state,
+    user_zipcode: selectedAddress?.zipcode,
+    user_country: selectedAddress?.country,
     search_focus: searchFocus,
     query
   });
@@ -224,8 +227,9 @@ const MealPlanDetailPage = () => {
   //   updateLocation();
   // }, [streetNum, streetName, city, state, zipcode, country]);
   const updateDeliveryDetails = async () => {
-    if (areDeliveryDetailsComplete()) {
-      const address = `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`;
+    if (selectedAddress) {
+      console.log(selectedAddress, 'selectedAddress in updateDeliveryDetails')
+      const address = `${selectedAddress.streetNum} ${selectedAddress.streetName}, ${selectedAddress.city} ${selectedAddress.state} ${selectedAddress.zipcode}, ${selectedAddress.country}`;
       const coordinates = await fetchCoordinates(address);
       if (coordinates) {
         setLocation({
@@ -356,7 +360,8 @@ const MealPlanDetailPage = () => {
       place_order: true,
       final_quote: false,
       influencer_id: influencer._id,
-      meal_plan_name: plan.name
+      meal_plan_name: plan.name,
+      plan_start_day: selectedStartDay
     };
 
     try {
@@ -393,7 +398,7 @@ const MealPlanDetailPage = () => {
   };
 
   const areDeliveryDetailsComplete = () => {
-    return streetNum && streetName && city && state && zipcode && country && email;
+    return storeMatches?.stores?.length > 0;
   };
 
   console.log(fitbiteInventory, 'fitbiteInventory')
@@ -637,7 +642,7 @@ const MealPlanDetailPage = () => {
                     <div className="overflow-x-auto">
                       <p className="text-gray-600 mb-4">Select a nearby store to search for your meal plan</p>
                       <div className="flex flex-row gap-4 pb-4" style={{minWidth: "min-content", height: "250px"}}>
-                        {storeMatches.stores.map((store: any) => (
+                        {storeMatches?.stores?.map((store: any) => (
                           <div 
                             key={store?._id || 'unknown'} 
                             className={`flex-none w-80 p-4 rounded-lg cursor-pointer ${
@@ -765,8 +770,26 @@ const MealPlanDetailPage = () => {
           <div className="px-2 md:px-32">
             <div className="space-y-4">
               <div className="bg-[#F2F6FB] rounded-xl p-6">
-                <h3 className="text-lg font-semibold mb-3">Delivery</h3>
-                <p className="text-gray-600 mb-4">Choose delivery time</p>
+                <div className="block mb-2">
+                  <h3 className="text-lg font-semibold mb-3">Email *</h3>
+                  <div className="flex gap-2">
+                    <input
+                      type="email" 
+                      placeholder="your@email.com"
+                      value={tempEmail}
+                      onChange={(e) => setTempEmail(e.target.value)}
+                      className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                      required
+                    />
+                    <button 
+                      onClick={() => setEmail(tempEmail)}
+                      className="bg-[#09C274] text-white px-4 py-2 rounded-xl whitespace-nowrap"
+                    >
+                      Set Email
+                    </button>
+                  </div>
+                </div>
+                <h3 className="text-lg font-semibold mt-4">Delivery</h3>
                 <div className="flex flex-col divide-y">
                   <label className="flex items-center justify-between py-4">
                     <div>
@@ -811,7 +834,24 @@ const MealPlanDetailPage = () => {
                     </label>
                   </div> */}
 
-                  <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
+                  <AddressSection 
+                    email={email}
+                    onAddressSelect={(address: Address) => setSelectedAddress(address)} 
+                  />
+
+                  <button 
+                    onClick={updateDeliveryDetails}
+                    disabled={!selectedAddress}
+                    className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
+                      selectedAddress 
+                        ? 'bg-[#09C274] text-white'
+                        : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                    }`}
+                  >
+                    {selectedAddress ? 'Search for stores' : 'Select address'}
+                  </button>
+
+                  {/* <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
                   <label className="block text-gray-600 mb-2">
                     Email *
                     <input
@@ -918,7 +958,7 @@ const MealPlanDetailPage = () => {
                     className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium"
                   >
                     Update Delivery Details
-                  </button>
+                  </button> */}
                 </div>
               </div>
 

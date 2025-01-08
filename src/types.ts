@@ -116,3 +116,14 @@ export type Recipe = {
   ingredients: string;
   instructions: string;
 };
+
+export type Address = {
+  streetNum: string;
+  streetName: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+};
