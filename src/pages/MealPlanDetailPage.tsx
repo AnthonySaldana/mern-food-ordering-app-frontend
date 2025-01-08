@@ -56,6 +56,8 @@ const MealPlanDetailPage = () => {
   const randValue = () => Math.random() - 0.5;
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
+  const [tipAmount, setTipAmount] = useState<number>(0);
+  const [specialInstructions, setSpecialInstructions] = useState<string>("n/a");
   const [open, setOpen] = useState(true);
   const [pickup, setPickup] = useState(false);
   const [sort, setSort] = useState('relevance');
@@ -324,15 +326,15 @@ const MealPlanDetailPage = () => {
     }
 
     const deliveryDetails = {
-      address: `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`,
+      address: `${selectedAddress?.streetNum} ${selectedAddress?.streetName}, ${selectedAddress?.city} ${selectedAddress?.state} ${selectedAddress?.country}, ${selectedAddress?.zipcode}`,
       latitude: location.latitude,
       longitude: location.longitude,
-      street_num: streetNum,
-      street_name: streetName,
-      city: city,
-      state: state,
-      zipcode: zipcode,
-      country: country,
+      street_num: selectedAddress?.streetNum,
+      street_name: selectedAddress?.streetName,
+      city: selectedAddress?.city,
+      state: selectedAddress?.state,
+      zipcode: selectedAddress?.zipcode,
+      country: selectedAddress?.country,
       instructions: specialInstructions,
       tip_amount: tipAmount
     };
@@ -463,12 +465,12 @@ const MealPlanDetailPage = () => {
           store_id: store._id,
           latitude: location?.latitude || 0,
           longitude: location?.longitude || 0,
-          user_street_num: streetNum,
-          user_street_name: streetName,
-          user_city: city,
-          user_state: state,
-          user_zipcode: zipcode,
-          user_country: country
+          user_street_num: selectedAddress?.streetNum,
+          user_street_name: selectedAddress?.streetName,
+          user_city: selectedAddress?.city,
+          user_state: selectedAddress?.state,
+          user_zipcode: selectedAddress?.zipcode,
+          user_country: selectedAddress?.country
         })
       });
   
@@ -830,6 +832,31 @@ const MealPlanDetailPage = () => {
                     email={email}
                     onAddressSelect={(address: Address) => setSelectedAddress(address)} 
                   />
+
+                  <label className="block text-gray-600 mt-4">
+                    Tip Amount
+                    <div className="relative">
+                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2">$</span>
+                      <input
+                        type="number"
+                        step=".50"
+                        min="0"
+                        placeholder="Tip Amount"
+                        value={tipAmount.toFixed(2)}
+                        onChange={(e) => setTipAmount(Number(parseFloat(e.target.value).toFixed(2)))}
+                        className="w-full mt-2 px-4 py-3 pl-8 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                      />
+                    </div>
+                  </label>
+                  <label className="block text-gray-600 mb-2">
+                    Special Instructions
+                    <textarea
+                      placeholder="Special Instructions (optional)"
+                      value={specialInstructions}
+                      onChange={(e) => setSpecialInstructions(e.target.value)}
+                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f] min-h-[100px] resize-y"
+                    />
+                  </label>
 
                   <button 
                     onClick={updateDeliveryDetails}
