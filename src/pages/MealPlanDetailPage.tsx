@@ -56,14 +56,6 @@ const MealPlanDetailPage = () => {
   const randValue = () => Math.random() - 0.5;
   const [shoppingList, setShoppingList] = useState<ShoppingListItem[]>([]);
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
-  const [streetNum, setStreetNum] = useState<string>("");
-  const [streetName, setStreetName] = useState<string>("");
-  const [city, setCity] = useState<string>("");
-  const [state, setState] = useState<string>("");
-  const [zipcode, setZipcode] = useState<string>("");
-  const [country, setCountry] = useState<string>("");
-  const [tipAmount, setTipAmount] = useState<number>(0);
-  const [specialInstructions, setSpecialInstructions] = useState<string>("n/a");
   const [open, setOpen] = useState(true);
   const [pickup, setPickup] = useState(false);
   const [sort, setSort] = useState('relevance');
@@ -114,12 +106,12 @@ const MealPlanDetailPage = () => {
     ...(selectedCategory?.subcategory_id && { subcategory_id: selectedCategory.subcategory_id }),
     latitude: location?.latitude || 0,
     longitude: location?.longitude || 0,
-    user_street_num: streetNum,
-    user_street_name: streetName,
-    user_city: city,
-    user_state: state,
-    user_zipcode: zipcode,
-    user_country: country
+    user_street_num: selectedAddress?.streetNum,
+    user_street_name: selectedAddress?.streetName,
+    user_city: selectedAddress?.city,
+    user_state: selectedAddress?.state,
+    user_zipcode: selectedAddress?.zipcode,
+    user_country: selectedAddress?.country
   });
 
   const { data: fitbiteInventory, error: storeError } = useFitbiteInventory(
