@@ -8,7 +8,11 @@ import { FormField, FormItem, FormLabel, FormControl, FormMessage } from "@/comp
 import { Input } from "@/components/ui/input";
 
 const formSchema = z.object({
-  recipeName: z.string().min(1, "Recipe name is required"),
+  name: z.string().min(1, "Recipe name is required"),
+  calories: z.number().min(0, "Calories must be a positive number"),
+  carbs: z.number().min(0, "Carbs must be a positive number"),
+  fat: z.number().min(0, "Fat must be a positive number"), 
+  protein: z.number().min(0, "Protein must be a positive number"),
   ingredients: z.string().min(1, "Ingredients are required"),
   instructions: z.string().min(1, "Instructions are required"),
   imageUrl: z.string().optional(),
@@ -25,13 +29,20 @@ type Props = {
 
 const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
   const [selectedRecipeIndex, setSelectedRecipeIndex] = useState<number>(-1);
+  console.log(recipes, 'Recipes in manage recipes form');
 
   const form = useForm<RecipeFormData>({
     resolver: zodResolver(formSchema),
     defaultValues: {
-      recipeName: "",
+      name: "",
+      calories: 0,
+      carbs: 0,
+      fat: 0,
+      protein: 0,
       ingredients: "",
       instructions: "",
+      imageUrl: "",
+      imageFile: undefined,
     },
   });
 
@@ -40,7 +51,11 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
   //     form.reset(recipes[selectedRecipeIndex]);
   //   } else {
   //     form.reset({
-  //       recipeName: "",
+  //       name: "",
+  //       calories: 0,
+  //       carbs: 0,
+  //       fat: 0,
+  //       protein: 0,
   //       ingredients: "",
   //       instructions: "",
   //     });
@@ -48,28 +63,48 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
   // }, [selectedRecipeIndex, recipes]);
 
   const onSubmit = (formDataJson: RecipeFormData) => {
-    const formData = new FormData();
-    formData.append("recipeName", formDataJson.recipeName);
-    formData.append("ingredients", formDataJson.ingredients);
-    formData.append("instructions", formDataJson.instructions);
-    if (formDataJson.imageFile) {
-      formData.append("imageFile", formDataJson.imageFile);
+    try {
+      console.log(formDataJson);
+      console.log("Running submit on save");
+
+      const formData = new FormData();
+      formData.append("name", formDataJson.name);
+      formData.append("calories", formDataJson.calories.toString());
+      formData.append("carbs", formDataJson.carbs.toString());
+      formData.append("fat", formDataJson.fat.toString());
+      formData.append("protein", formDataJson.protein.toString());
+      formData.append("ingredients", formDataJson.ingredients);
+      formData.append("instructions", formDataJson.instructions);
+      if (formDataJson.imageFile) {
+        formData.append("imageFile", formDataJson.imageFile);
+      }
+      if (formDataJson.imageUrl) {
+        formData.append("imageUrl", formDataJson.imageUrl);
+      }
+      if (selectedRecipeIndex >= 0) {
+        formData.append("recipeIndex", selectedRecipeIndex.toString());
+      }
+
+      onSave(formData);
+      setSelectedRecipeIndex(-1);
+      form.reset({
+        name: "",
+        calories: 0,
+        carbs: 0,
+        fat: 0,
+        protein: 0,
+        ingredients: "",
+        instructions: "",
+      });
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      // You might want to show an error message to the user here
     }
-    if (selectedRecipeIndex >= 0) {
-      formData.append("recipeIndex", selectedRecipeIndex.toString());
-    }
-    onSave(formData);
-    setSelectedRecipeIndex(-1);
-    form.reset({
-      recipeName: "",
-      ingredients: "",
-      instructions: "",
-    });
   };
 
   return (
     <div className="space-y-8">
-      <div className="flex flex-wrap gap-4">
+      {/* <div className="flex flex-wrap gap-4">
         {recipes.map((recipe, index) => (
           <Button
             key={index}
@@ -77,7 +112,7 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
             onClick={() => setSelectedRecipeIndex(index)}
             className={selectedRecipeIndex === index ? "bg-primary text-white" : ""}
           >
-            {recipe.recipeName}
+            {recipe.name}
           </Button>
         ))}
         <Button 
@@ -87,14 +122,14 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
         >
           + Add New Recipe
         </Button>
-      </div>
+      </div> */}
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 bg-gray-50 p-10 rounded-lg">
           <div className="space-y-8">
             <FormField
               control={form.control}
-              name="recipeName"
+              name="name"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Recipe Name</FormLabel>
@@ -105,6 +140,84 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
                 </FormItem>
               )}
             />
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <FormField
+                control={form.control}
+                name="calories"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Calories</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="bg-white" 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="carbs"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Carbs (g)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="bg-white" 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="fat"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Fat (g)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="bg-white" 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="protein"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Protein (g)</FormLabel>
+                    <FormControl>
+                      <Input 
+                        type="number" 
+                        {...field} 
+                        onChange={(e) => field.onChange(Number(e.target.value))}
+                        className="bg-white" 
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </div>
 
             <FormField
               control={form.control}
@@ -170,6 +283,23 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
           </Button>
         </form>
       </Form>
+
+      <div className="mt-8">
+        <h2 className="text-lg font-bold">Recipe List</h2>
+        <ul className="space-y-4">
+          {recipes.map((recipe) => (
+            <li key={recipe.name} className="p-4 border rounded-lg bg-white shadow-sm">
+              <h3 className="font-semibold">{recipe.name}</h3>
+              <p>Calories: {recipe.calories}</p>
+              <p>Carbs: {recipe.carbs}g</p>
+              <p>Fat: {recipe.fat}g</p>
+              <p>Protein: {recipe.protein}g</p>
+              <p>Ingredients: {recipe.ingredients}</p>
+              <p>Instructions: {recipe.instructions}</p>
+            </li>
+          ))}
+        </ul>
+      </div>
     </div>
   );
 };

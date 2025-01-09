@@ -257,10 +257,30 @@ export const useUpdateMyInfluencerMealPlan = () => {
 };
 
 export const useCreateRecipe = () => {
+  const { getAccessTokenSilently } = useAuth0();
+
   const createRecipeRequest = async (recipeFormData: FormData): Promise<Recipe> => {
-    const response = await fetch(`${API_BASE_URL}/api/recipes`, {
+    const accessToken = await getAccessTokenSilently();
+
+    // Convert FormData to JSON object
+    const jsonData = Object.fromEntries(recipeFormData.entries());
+
+    // Convert numeric strings to numbers
+    const parsedData = {
+      ...jsonData,
+      calories: Number(jsonData.calories),
+      carbs: Number(jsonData.carbs),
+      fat: Number(jsonData.fat), 
+      protein: Number(jsonData.protein)
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/recipe`, {
       method: "POST",
-      body: recipeFormData,
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(parsedData),
     });
 
     if (!response.ok) {
@@ -277,7 +297,7 @@ export const useCreateRecipe = () => {
 
 export const useGetRecipes = () => {
   const getRecipesRequest = async (): Promise<Recipe[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/recipes`);
+    const response = await fetch(`${API_BASE_URL}/api/recipe`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch recipes");
