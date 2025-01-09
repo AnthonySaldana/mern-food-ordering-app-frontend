@@ -1,9 +1,9 @@
 import { useState } from "react";
-import { type MenuItem } from "../types";
+import { type Recipe } from "../types";
 import { CardContent } from "./ui/card";
 
 type Props = {
-  menuItem: MenuItem;
+  menuItem: Recipe;
   addToCart?: () => void;
   onClick?: () => void;
 };
@@ -23,21 +23,11 @@ const MenuItem = ({ menuItem }: Props) => {
             <h3 className="text-lg font-medium">{menuItem.name}</h3>
             <div className="text-sm flex flex-wrap gap-4 mt-2">
               <p>Calories: {menuItem?.calories}</p>
-              <p>Protein: {menuItem?.macros?.protein}g</p>
-              <p>Carbs: {menuItem?.macros?.carbs}g</p>
-              <p>Fat: {menuItem?.macros?.fat}g</p>
+              <p>Protein: {menuItem?.protein}g</p>
+              <p>Carbs: {menuItem?.carbs}g</p>
+              <p>Fat: {menuItem?.fat}g</p>
             </div>
           </div>
-          
-          {menuItem.imageUrl && (
-            <div className="relative mt-4 sm:mt-0" style={{ width: "120px", height: "120px", flexShrink: 0 }}>
-              <img
-                src={menuItem.imageUrl}
-                alt={menuItem.name}
-                className="w-full h-full object-cover rounded-lg"
-              />
-            </div>
-          )}
         </CardContent>
       </div>
 

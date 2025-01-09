@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import MenuItemDetail from "@/components/MenuItemDetail";
 import { Toaster } from "@/components/ui/sonner";
-
+import { Recipe } from "@/types";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchRecipes = async (): Promise<Recipe[]> => {
@@ -16,6 +16,7 @@ const fetchRecipes = async (): Promise<Recipe[]> => {
 
 const MealPlanDetailPage = () => {
   const { influencerId, planIndex } = useParams();
+  console.log(influencerId, planIndex, 'influencerId and planIndex');
 
   const { data: recipes, isLoading: isLoadingRecipes, error: recipesError } = useQuery(
     "fetchRecipes",
@@ -38,7 +39,7 @@ const MealPlanDetailPage = () => {
           <div className="grid grid-cols-1 gap-4 mb-6">
             {recipes?.map((recipe) => (
               <MenuItemDetail
-                key={recipe.id}
+                key={recipe._id}
                 menuItem={recipe}
               />
             ))}
