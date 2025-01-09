@@ -1,4 +1,3 @@
-
 import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 // import { Influencer, MenuItem as MenuItemType } from "@/types";
@@ -411,13 +410,18 @@ const MealPlanDetailPage = () => {
     try {
       // Update query parameters and refetch
       // const result = await fetchFitbiteInventory();
-      const queryParams = new URLSearchParams({
+      const requestBody = {
         store_id: store._id,
-        items: JSON.stringify(plan.menuItems)
+        items: plan.menuItems
+      };
+
+      const response = await fetch(`${API_BASE_URL}/api/grocery/fitbite-inventory`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(requestBody)
       });
-      const response = await fetch(
-        `${API_BASE_URL}/api/grocery/fitbite-inventory?${queryParams}`
-      );
 
       if (!response.ok) {
         throw new Error('Failed to fetch fitbite inventory');
