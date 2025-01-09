@@ -46,21 +46,21 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
     },
   });
 
-  // useEffect(() => {
-  //   if (selectedRecipeIndex >= 0 && recipes[selectedRecipeIndex]) {
-  //     form.reset(recipes[selectedRecipeIndex]);
-  //   } else {
-  //     form.reset({
-  //       name: "",
-  //       calories: 0,
-  //       carbs: 0,
-  //       fat: 0,
-  //       protein: 0,
-  //       ingredients: "",
-  //       instructions: "",
-  //     });
-  //   }
-  // }, [selectedRecipeIndex, recipes]);
+  useEffect(() => {
+    if (selectedRecipeIndex >= 0 && recipes[selectedRecipeIndex]) {
+      form.reset(recipes[selectedRecipeIndex]);
+    } else {
+      form.reset({
+        name: "",
+        calories: 0,
+        carbs: 0,
+        fat: 0,
+        protein: 0,
+        ingredients: "",
+        instructions: "",
+      });
+    }
+  }, [selectedRecipeIndex, recipes]);
 
   const onSubmit = (formDataJson: RecipeFormData) => {
     try {
@@ -104,7 +104,7 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
 
   return (
     <div className="space-y-8">
-      {/* <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-4">
         {recipes.map((recipe, index) => (
           <Button
             key={index}
@@ -122,7 +122,7 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
         >
           + Add New Recipe
         </Button>
-      </div> */}
+      </div>
 
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-8 bg-gray-50 p-10 rounded-lg">
@@ -287,8 +287,8 @@ const ManageRecipesForm = ({ recipes = [], onSave, isLoading }: Props) => {
       <div className="mt-8">
         <h2 className="text-lg font-bold">Recipe List</h2>
         <ul className="space-y-4">
-          {recipes.map((recipe) => (
-            <li key={recipe.name} className="p-4 border rounded-lg bg-white shadow-sm">
+          {recipes.map((recipe, index) => (
+            <li key={recipe.name} className="p-4 border rounded-lg bg-white shadow-sm cursor-pointer" onClick={() => setSelectedRecipeIndex(index)}>
               <h3 className="font-semibold">{recipe.name}</h3>
               <p>Calories: {recipe.calories}</p>
               <p>Carbs: {recipe.carbs}g</p>
