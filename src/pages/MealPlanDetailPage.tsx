@@ -1062,6 +1062,9 @@ const MealPlanDetailPage = () => {
             {shoppingList?.length > 0 && (
               <div className="mb-6">
                 <h3 className="font-medium mb-3">Shopping List</h3>
+                <div className="flex justify-between items-center mb-3">
+                  <h3 className="font-medium">Cart ({shoppingList.length})</h3>
+                </div>
                 <div className="space-y-2">
                   {shoppingList.map((item: any) => (
                     <div key={item.product_id} className="flex justify-between items-center">
