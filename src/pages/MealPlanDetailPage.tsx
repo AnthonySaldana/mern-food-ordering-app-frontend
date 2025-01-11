@@ -1212,6 +1212,22 @@ const MealPlanDetailPage = () => {
                 <path d="M18 18L6 6M6 6H18M6 6V18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
               </svg>
             </button>
+            <button 
+              onClick={() => {
+                const params = new URLSearchParams(window.location.search);
+                if (!params.get('bypassRecipe')) {
+                  toast.info("Purchase this meal plan to view recipes");
+                } else {
+                  navigate(`/recipe/${influencerId}/mealplan/0`);
+                }
+              }}
+              className="flex items-center gap-2 border-2 border-[#09C274] text-[#09C274] px-4 py-2 rounded-full font-semibold hover:bg-[#09C274] hover:text-white transition-colors"
+            >
+              View Recipes
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
+                <path d="M18 18L6 6M6 6H18M6 6V18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+              </svg>
+            </button>
           </div>
 
           <div className="space-y-6 absolute">

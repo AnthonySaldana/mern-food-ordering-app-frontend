@@ -115,6 +115,7 @@ export type Recipe = {
   protein: number;
   ingredients: string;
   instructions: string;
+  imageFile: string;
 };
 
 export type Address = {

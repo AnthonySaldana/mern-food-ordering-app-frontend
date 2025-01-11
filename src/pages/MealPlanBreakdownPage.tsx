@@ -32,7 +32,7 @@ const MealPlanDetailPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-white p-3 rounded-md lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8">
+    <div className="flex flex-col gap-4 bg-white p-3 rounded-md lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8 max-w-[900px] mx-auto">
       <div className="block px-4 lg:px-0">
         <div key={planIndex} className="mb-12">
           <p className="text-md font-bold">Here are the recipes!</p>
