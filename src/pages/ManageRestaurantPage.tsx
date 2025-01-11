@@ -58,7 +58,7 @@ const ManageRestaurantPage = () => {
       </TabsContent>
       <TabsContent value="manage-recipes">
         <ManageRecipesForm
-          recipes={recipes}
+          recipes={recipes as any} // TODO: Fix type error properly
           onSave={createRecipe}
           isLoading={isCreateRecipeLoading}
         />
