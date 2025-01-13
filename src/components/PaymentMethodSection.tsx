@@ -3,6 +3,7 @@ import { useQuery } from 'react-query';
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { toast } from "sonner";
 
 interface PaymentMethod {
   id: string;
@@ -34,6 +35,10 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: P
     'paymentMethods',
     async () => {
       const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods?user_email=${email}`);
+      if (response.status === 401) {
+        toast("You need to login first");
+        return [];
+      }
       return response.json();
     }
   );
