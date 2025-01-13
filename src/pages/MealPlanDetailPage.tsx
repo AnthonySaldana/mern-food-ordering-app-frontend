@@ -14,6 +14,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import QuoteDetails from "@/components/QuoteMealMe";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -68,6 +69,19 @@ const MealPlanDetailPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [tempEmail, setTempEmail] = useState<string>("");
+  const { loginWithRedirect, isAuthenticated, user } = useAuth0();
+
+  useEffect(() => {
+    if (isAuthenticated && user?.email) {
+      setEmail(user.email);
+    }
+  }, [isAuthenticated, user]);
+
+  const handleLogin = async () => {
+    if (!isAuthenticated) {
+      await loginWithRedirect();
+    }
+  };
 
   console.log(errorMessage, 'errorMessage found here');
 
@@ -771,19 +785,36 @@ const MealPlanDetailPage = () => {
                 <div className="block mb-2">
                   <h3 className="text-lg font-semibold mb-3">Email *</h3>
                   <div className="flex gap-2">
-                    <input
-                      type="email" 
-                      placeholder="your@email.com"
-                      value={tempEmail}
-                      onChange={(e) => setTempEmail(e.target.value)}
-                      className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                      required
-                    />
-                    <button 
-                      onClick={() => setEmail(tempEmail)}
-                      className="bg-[#09C274] text-white px-4 py-2 rounded-xl whitespace-nowrap"
+                    {isAuthenticated ? (
+                      <input
+                        type="email"
+                        value={email}
+                        disabled
+                        className="flex-1 px-4 py-3 rounded-xl border border-gray-200 bg-gray-100"
+                      />
+                    ) : (
+                      <>
+                        <input
+                          type="email" 
+                          placeholder="your@email.com"
+                          value={tempEmail}
+                          onChange={(e) => setTempEmail(e.target.value)}
+                          className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                          required
+                        />
+                        <button 
+                          onClick={() => setEmail(tempEmail)}
+                          className="bg-[#09C274] text-white px-4 py-2 rounded-xl whitespace-nowrap"
+                        >
+                          Set Email
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={handleLogin}
+                      className="bg-[#09C274] text-white px-4 py-2 rounded"
                     >
-                      Set Email
+                      {isAuthenticated ? "Logged In" : "Login"}
                     </button>
                   </div>
                 </div>
