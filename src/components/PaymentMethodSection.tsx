@@ -37,7 +37,7 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: P
     'paymentMethods',
     async () => {
       const accessToken = await getAccessTokenSilently();
-      const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods?user_email=${email}`, {
+      const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods?user_email=${encodeURIComponent(email)}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },

@@ -40,7 +40,7 @@ const AddressSection = ({ onAddressSelect, onUserCreated, email }: AddressSectio
     ['addresses', email],
     async () => {
       const accessToken = await getAccessTokenSilently();
-      const response = await fetch(`${API_BASE_URL}/api/grocery/addresses?email=${email}`, {
+      const response = await fetch(`${API_BASE_URL}/api/grocery/addresses?email=${encodeURIComponent(email)}`, {
         headers: {
           Authorization: `Bearer ${accessToken}`,
         },
