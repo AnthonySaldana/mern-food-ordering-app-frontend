@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Address } from "@/types";
-
+import { useAuth0 } from '@auth0/auth0-react';
 // interface Address {
 //   latitude: number;
 //   longitude: number;
@@ -34,11 +34,17 @@ const AddressSection = ({ onAddressSelect, onUserCreated, email }: AddressSectio
   const [country, setCountry] = useState('');
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
+  const { getAccessTokenSilently } = useAuth0();
 
   const { data: addresses, isLoading, refetch } = useQuery(
     ['addresses', email],
     async () => {
-      const response = await fetch(`${API_BASE_URL}/api/grocery/addresses?email=${email}`);
+      const accessToken = await getAccessTokenSilently();
+      const response = await fetch(`${API_BASE_URL}/api/grocery/addresses?email=${encodeURIComponent(email)}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       return response.json();
     },
     {

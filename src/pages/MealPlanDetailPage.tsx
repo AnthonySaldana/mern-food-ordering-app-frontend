@@ -14,6 +14,7 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import QuoteDetails from "@/components/QuoteMealMe";
 import LoadingOverlay from "@/components/LoadingOverlay";
+import { useAuth0 } from "@auth0/auth0-react";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -68,6 +69,19 @@ const MealPlanDetailPage = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [tempEmail, setTempEmail] = useState<string>("");
+  const { loginWithRedirect, isAuthenticated, user } = useAuth0();
+
+  useEffect(() => {
+    if (isAuthenticated && user?.email) {
+      setEmail(user.email);
+    }
+  }, [isAuthenticated, user]);
+
+  const handleLogin = async () => {
+    if (!isAuthenticated) {
+      await loginWithRedirect();
+    }
+  };
 
   console.log(errorMessage, 'errorMessage found here');
 
@@ -771,19 +785,36 @@ const MealPlanDetailPage = () => {
                 <div className="block mb-2">
                   <h3 className="text-lg font-semibold mb-3">Email *</h3>
                   <div className="flex gap-2">
-                    <input
-                      type="email" 
-                      placeholder="your@email.com"
-                      value={tempEmail}
-                      onChange={(e) => setTempEmail(e.target.value)}
-                      className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                      required
-                    />
-                    <button 
-                      onClick={() => setEmail(tempEmail)}
-                      className="bg-[#09C274] text-white px-4 py-2 rounded-xl whitespace-nowrap"
+                    {isAuthenticated ? (
+                      <input
+                        type="email"
+                        value={email}
+                        disabled
+                        className="flex-1 px-4 py-3 rounded-xl border border-gray-200 bg-gray-100"
+                      />
+                    ) : (
+                      <>
+                        <input
+                          type="email" 
+                          placeholder="your@email.com"
+                          value={tempEmail}
+                          onChange={(e) => setTempEmail(e.target.value)}
+                          className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                          required
+                        />
+                        <button 
+                          onClick={() => setEmail(tempEmail)}
+                          className="bg-[#09C274] text-white px-4 py-2 rounded-xl whitespace-nowrap"
+                        >
+                          Set Email
+                        </button>
+                      </>
+                    )}
+                    <button
+                      onClick={handleLogin}
+                      className="bg-[#09C274] text-white px-4 py-2 rounded"
                     >
-                      Set Email
+                      {isAuthenticated ? "Logged In" : "Login"}
                     </button>
                   </div>
                 </div>
@@ -806,32 +837,6 @@ const MealPlanDetailPage = () => {
                 </div>
 
                 <div className="mt-6">
-                  {/* <p className="text-gray-600 mb-4">Saved addresses</p>
-                  <div className="flex flex-col divide-y">
-                    <label className="flex items-center justify-between py-4">
-                      <div>
-                        <span className="font-medium">68 5 89th st</span>
-                      </div>
-                      <input 
-                        type="radio" 
-                        name="deliveryAddress"
-                        value="68 5 89th st"
-                        className="h-5 w-5 text-[#ff6d3f]"
-                      />
-                    </label>
-                    <label className="flex items-center justify-between py-4">
-                      <div className="flex items-center">
-                        <span className="font-medium">New address</span>
-                      </div>
-                      <input
-                        type="radio"
-                        name="deliveryAddress" 
-                        value="new"
-                        className="h-5 w-5 text-[#ff6d3f]"
-                      />
-                    </label>
-                  </div> */}
-
                   <AddressSection 
                     email={email}
                     onAddressSelect={(address: Address) => setSelectedAddress(address)} 
@@ -873,115 +878,6 @@ const MealPlanDetailPage = () => {
                   >
                     {selectedAddress ? 'Search for stores' : 'Select address'}
                   </button>
-
-                  {/* <h2 className="text-lg font-semibold mb-4">Delivery Details</h2>
-                  <label className="block text-gray-600 mb-2">
-                    Email *
-                    <input
-                      type="email" 
-                      placeholder="your@email.com"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                      required
-                    />
-                  </label>
-                  <label className="block text-gray-600 mb-2">
-                    Street Number *
-                    <input
-                      type="text"
-                      placeholder="Street Number"
-                      value={streetNum}
-                      onChange={(e) => setStreetNum(e.target.value)}
-                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                      required
-                    />
-                  </label>
-                  <label className="block text-gray-600 mb-2">
-                    Street Name *
-                    <input
-                      type="text"
-                      placeholder="Street Name"
-                      value={streetName}
-                      onChange={(e) => setStreetName(e.target.value)}
-                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                      required
-                    />
-                  </label>
-                  <label className="block text-gray-600 mb-2">
-                    City *
-                    <input
-                      type="text"
-                      placeholder="City"
-                      value={city}
-                      required
-                      onChange={(e) => setCity(e.target.value)}
-                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                    />
-                  </label>
-                  <label className="block text-gray-600 mb-2">
-                    State (use state code like NY, CA, etc.) *
-                    <input
-                      type="text"
-                      placeholder="State"
-                      value={state}
-                      required
-                      onChange={(e) => setState(e.target.value)}
-                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                    />
-                  </label>
-                  <label className="block text-gray-600 mb-2">
-                    Zipcode *
-                    <input
-                      type="text"
-                      placeholder="Zipcode"
-                      value={zipcode}
-                      required
-                      onChange={(e) => setZipcode(e.target.value)}
-                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                    />
-                  </label>
-                  <label className="block text-gray-600 mb-2">
-                    Country (use country code like US, CA, etc.) *
-                    <input
-                      type="text"
-                      placeholder="Country"
-                      value={country}
-                      required
-                      onChange={(e) => setCountry(e.target.value)}
-                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                    />
-                  </label>
-                  <label className="block text-gray-600 mb-2">
-                    Tip Amount
-                    <div className="relative">
-                      <span className="absolute left-4 top-1/2 transform -translate-y-1/2">$</span>
-                      <input
-                        type="number"
-                        step=".50"
-                        min="0"
-                        placeholder="Tip Amount"
-                        value={tipAmount.toFixed(2)}
-                        onChange={(e) => setTipAmount(Number(parseFloat(e.target.value).toFixed(2)))}
-                        className="w-full mt-2 px-4 py-3 pl-8 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                      />
-                    </div>
-                  </label>
-                  <label className="block text-gray-600 mb-2">
-                    Special Instructions
-                    <textarea
-                      placeholder="Special Instructions (optional)"
-                      value={specialInstructions}
-                      onChange={(e) => setSpecialInstructions(e.target.value)}
-                      className="w-full mt-2 px-4 py-3 rounded-xl border border-gray-200 mb-3 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f] min-h-[100px] resize-y"
-                    />
-                  </label>
-                  <button 
-                    onClick={updateDeliveryDetails}
-                    className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium"
-                  >
-                    Update Delivery Details
-                  </button> */}
                 </div>
               </div>
 
@@ -1006,34 +902,7 @@ const MealPlanDetailPage = () => {
                   email={email}
                   onPaymentMethodSelect={(paymentMethodId) => setSelectedPaymentMethod(paymentMethodId)} 
                 />
-
-                {/* <button 
-                  onClick={handleCreateOrder}
-                  disabled={!selectedPaymentMethod}
-                  className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
-                    selectedPaymentMethod 
-                      ? 'bg-[#09C274] text-white' 
-                      : 'bg-gray-200 text-gray-500 cursor-not-allowed'
-                  }`}
-                >
-                  {selectedPaymentMethod ? 'Order this plan - $74.95' : 'Select a payment method to continue'}
-                </button> */}
               </>
-
-              {/* <div className="bg-[#F2F6FB] rounded-xl p-6">
-                <h3 className="text-lg font-semibold mb-3">Payment</h3>
-                <div className="flex flex-col gap-2">
-                  <label className="flex items-center">
-                    <input type="radio" name="paymentMethod" className="mr-2" />
-                    ApplePay <span className="text-sm text-gray-500 ml-2">Default</span>
-                  </label>
-                  <label className="flex items-center">
-                    <input type="radio" name="paymentMethod" className="mr-2" />
-                    Visa ending in 2828
-                  </label>
-                </div>
-              </div> */}
-
               <button 
                 onClick={() => setIsOrderPage(false)}
                 className="mt-4 bg-white border-2 border-[#09C274] text-[#09C274] px-4 py-3 rounded-xl w-full font-medium"
@@ -1350,23 +1219,6 @@ const MealPlanDetailPage = () => {
               </div>
             </div>
           </div>
-
-          {/* <div className="flex flex-col">
-            <div className="bg-[#F2F6FB] rounded-lg p-4 flex flex-col w-[240px] h-[150px]">
-              <div className="flex justify-between items-center mb-3">
-                <span className="text-sm font-medium text-gray-900">Sugars</span>
-                <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M13 4.5L8 2L3 4.5V11.5L8 14L13 11.5V4.5Z" stroke="#ff6d3f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M3 4.5L8 7L13 4.5" stroke="#ff6d3f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                  <path d="M8 14V7" stroke="#ff6d3f" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
-                </svg>
-              </div>
-              <div className="mt-auto">
-                <p className="text-xs text-[#7E847C]">Average</p>
-                <p className="font-semibold text-xs text-gray-900">- g/day</p>
-              </div>
-            </div>
-          </div> */}
         </div>
       </div>
 
