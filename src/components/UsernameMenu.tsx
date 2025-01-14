@@ -14,6 +14,7 @@ import { useGetMyUser } from "@/api/MyUserApi";
 const UsernameMenu = () => {
   const { user, logout } = useAuth0();
   const { currentUser, isLoading: isGetLoading } = useGetMyUser();
+  console.log(isGetLoading, 'Is user loading');
 
   const isAdmin = currentUser?.role === 'admin';
 
