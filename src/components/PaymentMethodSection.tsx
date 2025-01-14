@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
+import { useAuth0 } from '@auth0/auth0-react';
 
 interface PaymentMethod {
   id: string;
@@ -30,11 +31,17 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: P
   const [selectedPaymentMethod, setSelectedPaymentMethod] = useState<string | null>(null);
   const [isExpanded, setIsExpanded] = useState(false);
   // const [email, setEmail] = useState('');
+  const { getAccessTokenSilently } = useAuth0();
 
   const { data: paymentMethods = [], isLoading, refetch } = useQuery(
     'paymentMethods',
     async () => {
-      const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods?user_email=${email}`);
+      const accessToken = await getAccessTokenSilently();
+      const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods?user_email=${email}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
       if (response.status === 401) {
         toast("You need to login first");
         return [];
