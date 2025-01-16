@@ -20,6 +20,7 @@ const MenuItem = ({ menuItem }: Props) => {
       {/* <div className="cursor-pointer hover:bg-yellow-50" onClick={handleToggleAccordion}> */}
       <div className="cursor-pointer hover:bg-yellow-50">
         <CardContent className="flex flex-col items-start p-1">
+          <h3 className="text-sm text-left truncate max-w-[95px]">{menuItem.name}</h3>
           {menuItem.imageUrl && (
             <div className="relative mb-2" style={{ width: "100%", height: "5rem" }}>
               <img
@@ -29,7 +30,6 @@ const MenuItem = ({ menuItem }: Props) => {
               />
             </div>
           )}
-          <h3 className="text-sm text-left truncate max-w-[95px]">{menuItem.name}</h3>
           {/* <p className="text-sm text-left mt-1">${(menuItem.price / 100).toFixed(2)}</p> */}
         </CardContent>
       </div>

@@ -469,6 +469,7 @@ const MealPlanDetailPage = () => {
   };
 
   const handleProcessAndOrder = async (store: any) => {
+    console.log("store to process", store);
     setSelectedStore(store);
     setSelectedCategory(null); // Reset category selection when switching stores
   
@@ -525,12 +526,12 @@ const MealPlanDetailPage = () => {
             </svg>
             <p>Back</p>
           </div>
-          <div className="bg-white rounded-xl relative">
+          <div className="bg-white rounded-xl relative md:px-32 px-2">
             <div 
-              className="flex justify-between items-center cursor-pointer p-4 md:px-16" 
+              className="flex justify-between items-center cursor-pointer" 
               onClick={() => setIsMenuExpanded(!isMenuExpanded)}
             >
-              <p className="text-md font-bold">Plan Items ({plan.menuItems.length})</p>
+              <p className="text-md font-bold mb-4">Plan Items ({plan.menuItems.length})</p>
               <svg 
                 width="24" 
                 height="24" 
@@ -548,233 +549,13 @@ const MealPlanDetailPage = () => {
               </svg>
             </div>
             {isMenuExpanded && (
-              <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4 p-4 md:px-32">
+              <div className="grid grid-cols-3 md:grid-cols-3 xs:grid-cols-3 gap-4">
                 {plan.menuItems.map((menuItem) => (
                   <MenuItem
                     key={menuItem._id}
                     menuItem={menuItem}
                   />
                 ))}
-              </div>
-            )}
-          </div>
-
-          <div className="bg-white rounded-xl relative">
-            <div 
-              className="flex justify-between items-center cursor-pointer p-4 md:px-32" 
-              // onClick={() => setIsStoresExpanded(!isStoresExpanded)}
-            >
-              <p className="text-md font-bold">Available at Stores Nearby</p>
-              {/* <svg 
-                width="24" 
-                height="24" 
-                viewBox="0 0 24 24"
-                className={`transition-transform ${isStoresExpanded ? 'rotate-180' : ''}`}
-              >
-                <path 
-                  d="M19 9l-7 7-7-7" 
-                  stroke="currentColor" 
-                  strokeWidth="2" 
-                  strokeLinecap="round" 
-                  strokeLinejoin="round"
-                  fill="none"
-                />
-              </svg> */}
-            </div>
-            {isStoresExpanded && (
-              <div className="p-4 md:px-32">
-                <div className="space-y-4 mb-8 hidden">
-                  <p className="text-lg font-semibold mb-3">Search Options</p>
-                  <div className="flex flex-col gap-4">
-                    <label className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        checked={open} 
-                        onChange={(e) => setOpen(e.target.checked)}
-                        className="w-4 h-4 rounded border-gray-300 focus:ring-[#ff6d3f]"
-                      />
-                      <span className="text-gray-600">Open Now</span>
-                    </label>
-                    
-                    <label className="flex items-center gap-2">
-                      <input 
-                        type="checkbox" 
-                        checked={pickup} 
-                        onChange={(e) => setPickup(e.target.checked)}
-                        className="w-4 h-4 rounded border-gray-300 focus:ring-[#ff6d3f]"
-                      />
-                      <span className="text-gray-600">Pickup Available</span>
-                    </label>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-gray-600">Sort By</label>
-                      <select 
-                        value={sort} 
-                        onChange={(e) => setSort(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                      >
-                        <option value="relevance">Relevance</option>
-                        <option value="cheapest">Cheapest</option>
-                        <option value="fastest">Fastest</option>
-                        <option value="rating">Rating</option>
-                        <option value="distance">Distance</option>
-                      </select>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-gray-600">Search Focus</label>
-                      <select 
-                        value={searchFocus} 
-                        onChange={(e) => setSearchFocus(e.target.value)}
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                      >
-                        <option value="store">Store</option>
-                        <option value="item">Item</option>
-                      </select>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-gray-600">Search</label>
-                      <input 
-                        type="text" 
-                        value={query} 
-                        onChange={(e) => setQuery(e.target.value)}
-                        placeholder="Search stores or items..."
-                        className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                      />
-                    </div>
-                  </div>
-                </div>
-                {!areDeliveryDetailsComplete() ? (
-                  <p className="text-gray-600">Please complete delivery details to see available stores</p>
-                ) : !storeMatches?.stores?.length ? (
-                  <p className="text-gray-600">No stores found nearby</p>
-                ) : (
-                  <div className="space-y-6">
-                    <div className="overflow-x-auto">
-                      <p className="text-gray-600 mb-4">Select a nearby store to search for your meal plan</p>
-                      <div className="flex flex-row gap-4 pb-4" style={{minWidth: "min-content", height: "250px"}}>
-                        {storeMatches?.stores?.map((store: any) => (
-                          <div 
-                            key={store?._id || 'unknown'} 
-                            className={`flex-none w-80 p-4 rounded-lg cursor-pointer ${
-                              selectedStore?.id === store.id ? 'bg-[#09C274] text-white' : 'bg-[#F2F6FB]'
-                            }`}
-                          >
-                            <div>
-                              <h4 className="font-medium">{store?.name || 'Unknown Store'}</h4>
-                              <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
-                                {store?.address?.street_addr}, {store?.address?.city}
-                              </p>
-                            </div>
-                            <div className="mt-2">
-                              <p className="font-medium">
-                                {(store?.miles ?? 0).toFixed(1)} mi
-                              </p>
-                              <div className="flex items-center gap-1">
-                                <div className={`w-2 h-2 rounded-full ${store?.is_open ? 'bg-[#21ff00]' : 'bg-gray-500'}`}></div>
-                                <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
-                                  {store?.is_open ? 'Open' : 'Closed'}
-                                </p>
-                              </div>
-                            </div>
-                            {/* <button
-                              className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
-                              onClick={() => handleStoreSelection(store)}
-                            >
-                              Process Store Inventory
-                            </button>
-                            <button
-                              className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
-                              onClick={() => handleOrderPlan(store)}
-                            >
-                              Order Plan
-                            </button> */}
-                            <button
-                              className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
-                              onClick={() => handleProcessAndOrder(store)}
-                            >
-                              Order
-                            </button>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                    {selectedStore && (
-                      <div className="mt-6">
-                      {inventory?.quote && (
-                        <QuoteDetails quote={quote} />
-                      )}
-                        <h3 className="text-lg font-semibold mb-4">Categories</h3>
-                        <div className="grid grid-cols-2 gap-4">
-                          {inventory?.categories?.map((category: any) => (
-                            <button
-                              key={category.id}
-                              className={`p-4 rounded-lg text-left ${
-                                selectedCategory?.id === category.id 
-                                  ? 'bg-[#09C274] text-white'
-                                  : category.has_subcategories 
-                                    ? 'bg-[#F2F6FB]'
-                                    : 'bg-gray-300'
-                              }`}
-                              onClick={() => {
-                                if (category.has_subcategories) {
-                                  setSelectedCategory(category);
-                                  refetchInventory();
-                                }
-                              }}
-                            >
-                              <p className="font-medium">{category.name}</p>
-                              {/* <p className={`text-sm ${
-                                selectedCategory?.id === category.id 
-                                  ? 'text-white' 
-                                  : 'text-gray-600'
-                              }`}>
-                                {category.itemCount || 0} items
-                              </p> */}
-                            </button>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                    {!inventoryLoading && (
-                      <div className="mt-6">
-                        <h3 className="text-lg font-semibold mb-4">Available Items</h3>
-                        <div className="grid grid-cols-3 gap-4">
-                          {inventory?.categories?.map((category: any) => 
-                            category.items?.map((item: any) => (
-                              <div key={item.id} 
-                                className="bg-white rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
-                                onClick={() => addToShoppingList(item)}
-                              >
-                                {(item.imageUrl || item.image) && (
-                                  <img 
-                                    src={item.imageUrl || item.image}
-                                    alt={item.name}
-                                    className="w-full h-32 object-cover rounded-lg mb-2"
-                                  />
-                                )}
-                                <h4 className="font-medium">{item.name}</h4>
-                                <p className="text-sm text-gray-600">${item.price?.toFixed(2)}</p>
-                                {item.is_available ? (
-                                  <span className="text-[#09C274] text-sm">In Stock</span>
-                                ) : (
-                                  <span className="text-red-500 text-sm">Out of Stock</span>
-                                )}
-                              </div>
-                            ))
-                          )}
-                        </div>
-                      </div>
-                    )}
-
-                    {inventoryLoading && (
-                      <div className="mt-6 text-center">
-                        <p>Loading inventory...</p>
-                      </div>
-                    )}
-                  </div>
-                )}
               </div>
             )}
           </div>
@@ -881,6 +662,233 @@ const MealPlanDetailPage = () => {
                 </div>
               </div>
 
+              <div className="bg-[#F2F6FB] rounded-xl p-6 relative">
+                <div 
+                  className="flex justify-between items-center cursor-pointer" 
+                  // onClick={() => setIsStoresExpanded(!isStoresExpanded)}
+                >
+                  <p className="text-md font-bold">Choose from nearby stores</p>
+                </div>
+                {isStoresExpanded && (
+                  <div className="">
+                    <div className="space-y-4 mb-8 hidden">
+                      <p className="text-lg font-semibold mb-3">Search Options</p>
+                      <div className="flex flex-col gap-4">
+                        <label className="flex items-center gap-2">
+                          <input 
+                            type="checkbox" 
+                            checked={open} 
+                            onChange={(e) => setOpen(e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-300 focus:ring-[#ff6d3f]"
+                          />
+                          <span className="text-gray-600">Open Now</span>
+                        </label>
+                        
+                        <label className="flex items-center gap-2">
+                          <input 
+                            type="checkbox" 
+                            checked={pickup} 
+                            onChange={(e) => setPickup(e.target.checked)}
+                            className="w-4 h-4 rounded border-gray-300 focus:ring-[#ff6d3f]"
+                          />
+                          <span className="text-gray-600">Pickup Available</span>
+                        </label>
+
+                        <div className="flex flex-col gap-2">
+                          <label className="text-gray-600">Sort By</label>
+                          <select 
+                            value={sort} 
+                            onChange={(e) => setSort(e.target.value)}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                          >
+                            <option value="relevance">Relevance</option>
+                            <option value="cheapest">Cheapest</option>
+                            <option value="fastest">Fastest</option>
+                            <option value="rating">Rating</option>
+                            <option value="distance">Distance</option>
+                          </select>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          <label className="text-gray-600">Search Focus</label>
+                          <select 
+                            value={searchFocus} 
+                            onChange={(e) => setSearchFocus(e.target.value)}
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                          >
+                            <option value="store">Store</option>
+                            <option value="item">Item</option>
+                          </select>
+                        </div>
+
+                        <div className="flex flex-col gap-2">
+                          <label className="text-gray-600">Search</label>
+                          <input 
+                            type="text" 
+                            value={query} 
+                            onChange={(e) => setQuery(e.target.value)}
+                            placeholder="Search stores or items..."
+                            className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                    {!areDeliveryDetailsComplete() ? (
+                      <p className="text-gray-600">Please complete delivery details to see available stores</p>
+                    ) : !storeMatches?.stores?.length ? (
+                      <p className="text-gray-600">No stores found nearby</p>
+                    ) : (
+                      <div className="space-y-6">
+                        <div className="overflow-x-auto">
+                          <p className="text-gray-600 mb-4">You can select a store you prefer to check availability and receive your order from</p>
+                          <div className="flex flex-row gap-4 pb-4" style={{minWidth: "min-content", height: "120px"}}>
+                            {storeMatches?.stores?.map((store: any) => (
+                              <div 
+                                key={store?._id || 'unknown'} 
+                                className={`flex-none w-80 p-4 rounded-lg cursor-pointer flex flex-row items-center gap-4 justify-center ${
+                                  selectedStore?.id === store.id ? 'bg-white text-black' : 'bg-[#F2F6FB]'
+                                }`}
+                                onClick={() => handleProcessAndOrder(store)}
+                              >
+
+                                <div className={`${selectedStore?.id === store._id ? 'text-green-500' : 'text-blue-500'}`}>
+                                  {selectedStore?._id === store._id ? <svg width="30" height="30" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_758_39861)">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M7.4462 1.31423C8.6978 -0.438076 11.3021 -0.438076 12.5538 1.31423L12.7531 1.5932C12.9733 1.9016 13.3432 2.06673 13.7198 2.02488L14.608 1.92619C16.6069 1.7041 18.2959 3.39308 18.0738 5.39196L17.9752 6.28014C17.9333 6.6568 18.0984 7.02665 18.4068 7.24693L18.6858 7.4462C20.4381 8.6978 20.4381 11.3021 18.6858 12.5538L18.4068 12.7531C18.0984 12.9733 17.9333 13.3432 17.9752 13.7198L18.0738 14.608C18.2959 16.6069 16.6069 18.2959 14.608 18.0738L13.7198 17.9752C13.3432 17.9333 12.9733 18.0984 12.7531 18.4068L12.5538 18.6858C11.3021 20.4381 8.6979 20.4381 7.4462 18.6858L7.24693 18.4068C7.02665 18.0984 6.6568 17.9333 6.28013 17.9752L5.39196 18.0738C3.39308 18.2959 1.7041 16.6069 1.92619 14.608L2.02488 13.7198C2.06673 13.3432 1.9016 12.9733 1.5932 12.7531L1.31423 12.5538C-0.438076 11.3021 -0.438076 8.6979 1.31423 7.4462L1.5932 7.24693C1.9016 7.02665 2.06673 6.6568 2.02488 6.28013L1.92619 5.39196C1.7041 3.39308 3.39308 1.7041 5.39196 1.92619L6.28014 2.02488C6.6568 2.06673 7.02665 1.9016 7.24693 1.5932L7.4462 1.31423ZM13.8781 7.16803C14.2866 7.57658 14.2866 8.23897 13.8781 8.64748L9.88306 12.6425C9.36993 13.1558 8.53784 13.1558 8.02472 12.6425L6.12191 10.7397C5.71337 10.3312 5.71337 9.66881 6.12191 9.2603C6.53045 8.85179 7.19282 8.85179 7.60136 9.2603L8.95389 10.6128L12.3987 7.16803C12.8072 6.7595 13.4696 6.7595 13.8781 7.16803Z" fill="#09C274"/>
+                                    </g>
+                                    <defs>
+                                    <clipPath id="clip0_758_39861">
+                                    <rect width="20" height="20" fill="white"/>
+                                    </clipPath>
+                                    </defs>
+                                  </svg> : <svg width="30" height="30" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <g clip-path="url(#clip0_758_39867)">
+                                    <path fill-rule="evenodd" clip-rule="evenodd" d="M7.4462 1.31423C8.6978 -0.438076 11.3021 -0.438076 12.5538 1.31423L12.7531 1.5932C12.9733 1.9016 13.3432 2.06673 13.7198 2.02488L14.608 1.92619C16.6069 1.7041 18.2959 3.39308 18.0738 5.39196L17.9752 6.28014C17.9333 6.6568 18.0984 7.02665 18.4068 7.24693L18.6858 7.4462C20.4381 8.6978 20.4381 11.3021 18.6858 12.5538L18.4068 12.7531C18.0984 12.9733 17.9333 13.3432 17.9752 13.7198L18.0738 14.608C18.2959 16.6069 16.6069 18.2959 14.608 18.0738L13.7198 17.9752C13.3432 17.9333 12.9733 18.0984 12.7531 18.4068L12.5538 18.6858C11.3021 20.4381 8.6979 20.4381 7.4462 18.6858L7.24693 18.4068C7.02665 18.0984 6.6568 17.9333 6.28013 17.9752L5.39196 18.0738C3.39308 18.2959 1.7041 16.6069 1.92619 14.608L2.02488 13.7198C2.06673 13.3432 1.9016 12.9733 1.5932 12.7531L1.31423 12.5538C-0.438076 11.3021 -0.438076 8.6979 1.31423 7.4462L1.5932 7.24693C1.9016 7.02665 2.06673 6.6568 2.02488 6.28013L1.92619 5.39196C1.7041 3.39308 3.39308 1.7041 5.39196 1.92619L6.28014 2.02488C6.6568 2.06673 7.02665 1.9016 7.24693 1.5932L7.4462 1.31423ZM13.8781 7.16803C14.2866 7.57658 14.2866 8.23897 13.8781 8.64748L9.88306 12.6425C9.36993 13.1558 8.53784 13.1558 8.02472 12.6425L6.12191 10.7397C5.71337 10.3312 5.71337 9.66881 6.12191 9.2603C6.53045 8.85179 7.19282 8.85179 7.60136 9.2603L8.95389 10.6128L12.3987 7.16803C12.8072 6.7595 13.4696 6.7595 13.8781 7.16803Z" fill="#B8BEB6"/>
+                                    </g>
+                                    <defs>
+                                    <clipPath id="clip0_758_39867">
+                                    <rect width="20" height="20" fill="white"/>
+                                    </clipPath>
+                                    </defs>
+                                  </svg>}
+                                </div>
+
+                                <div>
+                                  <h4 className="font-medium">{store?.name || 'Unknown Store'}</h4>
+                                  <p className={`text-sm`}>
+                                    {store?.address?.street_addr}, {store?.address?.city}
+                                    <span className="text-sm text-gray-500">({(store?.miles ?? 0).toFixed(1)} mi)</span>
+                                  </p>
+                                </div>
+                                <div className="mt-2">
+                                  <div className="flex items-center gap-1">
+                                    {/* <div className={`w-2 h-2 rounded-full ${store?.is_open ? 'bg-[#21ff00]' : 'bg-gray-500'}`}></div> */}
+                                    <p className={`text-sm ${selectedStore?.id === store.id ? 'text-white' : 'text-gray-600'}`}>
+                                      {store?.is_open ? 'Open' : 'Closed'}
+                                    </p>
+                                  </div>
+                                </div>
+                                {/* <button
+                                  className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
+                                  onClick={() => handleStoreSelection(store)}
+                                >
+                                  Process Store Inventory
+                                </button>
+                                <button
+                                  className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
+                                  onClick={() => handleOrderPlan(store)}
+                                >
+                                  Order Plan
+                                </button> */}
+                                {/* <button
+                                  className="mt-2 bg-[#1C2537] text-white px-4 py-2 rounded-lg"
+                                  onClick={() => handleProcessAndOrder(store)}
+                                >
+                                  Order
+                                </button> */}
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                        {selectedStore && false && (
+                          <div className="mt-6">
+                          {inventory?.quote && (
+                            <QuoteDetails quote={quote} />
+                          )}
+                            <h3 className="text-lg font-semibold mb-4">Categories</h3>
+                            <div className="grid grid-cols-2 gap-4">
+                              {inventory?.categories?.map((category: any) => (
+                                <button
+                                  key={category.id}
+                                  className={`p-4 rounded-lg text-left ${
+                                    selectedCategory?.id === category.id 
+                                      ? 'bg-[#09C274] text-white'
+                                      : category.has_subcategories 
+                                        ? 'bg-[#F2F6FB]'
+                                        : 'bg-gray-300'
+                                  }`}
+                                  onClick={() => {
+                                    if (category.has_subcategories) {
+                                      setSelectedCategory(category);
+                                      refetchInventory();
+                                    }
+                                  }}
+                                >
+                                  <p className="font-medium">{category.name}</p>
+                                  {/* <p className={`text-sm ${
+                                    selectedCategory?.id === category.id 
+                                      ? 'text-white' 
+                                      : 'text-gray-600'
+                                  }`}>
+                                    {category.itemCount || 0} items
+                                  </p> */}
+                                </button>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        {!inventoryLoading && false && (
+                          <div className="mt-6">
+                            <h3 className="text-lg font-semibold mb-4">Available Items</h3>
+                            <div className="grid grid-cols-3 gap-4">
+                              {inventory?.categories?.map((category: any) => 
+                                category.items?.map((item: any) => (
+                                  <div key={item.id} 
+                                    className="bg-white rounded-lg p-4 shadow-sm cursor-pointer hover:shadow-md transition-shadow"
+                                    onClick={() => addToShoppingList(item)}
+                                  >
+                                    {(item.imageUrl || item.image) && (
+                                      <img 
+                                        src={item.imageUrl || item.image}
+                                        alt={item.name}
+                                        className="w-full h-32 object-cover rounded-lg mb-2"
+                                      />
+                                    )}
+                                    <h4 className="font-medium">{item.name}</h4>
+                                    <p className="text-sm text-gray-600">${item.price?.toFixed(2)}</p>
+                                    {item.is_available ? (
+                                      <span className="text-[#09C274] text-sm">In Stock</span>
+                                    ) : (
+                                      <span className="text-red-500 text-sm">Out of Stock</span>
+                                    )}
+                                  </div>
+                                ))
+                              )}
+                            </div>
+                          </div>
+                        )}
+
+                        {inventoryLoading && (
+                          <div className="mt-6 text-center">
+                            <p>Loading inventory...</p>
+                          </div>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div className="bg-[#F2F6FB] rounded-xl p-6">
                 <h3 className="text-lg font-semibold mb-3">Plan start</h3>
                 <p className="text-gray-600 mb-2">Which day of the week will you start your plan?</p>
@@ -945,7 +953,7 @@ const MealPlanDetailPage = () => {
                       </div>
                       <div className="flex items-center gap-4">
                         <span>${((item.product_marked_price * item.quantity) / 100).toFixed(2)}</span>
-                        <button 
+                        <button
                           onClick={() => removeFromShoppingList(item.product_id)}
                           className="text-red-500 hover:text-red-700"
                         >
@@ -991,7 +999,7 @@ const MealPlanDetailPage = () => {
             onClick={handleCreateOrder}
           >
             {shoppingList.length > 0 
-              ? `Review Order - $${(calculateTotal() / 100).toFixed(2)}`
+              ? `Confirm and place order`
               : 'Add items to cart'
             }
           </button>
@@ -1028,7 +1036,7 @@ const MealPlanDetailPage = () => {
       </div>
 
       <div className="hidden lg:flex lg:flex-row lg:gap-8">
-        <div className="w-2/3">
+        <div className="w-2/5">
           <div className="relative">
             <img
               // src={influencer.mealPlans[Number(planIndex)].imageUrl}
@@ -1048,7 +1056,7 @@ const MealPlanDetailPage = () => {
           </div>
         </div>
 
-        <div className="w-1/3 relative">
+        <div className="w-3/5 relative mt-[49px]">
           <div className="flex flex-row items-center justify-between mb-8">
             <div className="flex gap-4 items-center">
               {/* <div className="w-16 h-16 rounded-full overflow-hidden">
@@ -1072,42 +1080,46 @@ const MealPlanDetailPage = () => {
                 }
               </div>
             </div>
-            <button 
-              onClick={() => navigate(`/influencer/${influencerId}/mealplans`)}
-              className="flex items-center gap-2 border-2 border-[#09C274] text-[#09C274] px-4 py-2 rounded-full font-semibold hover:bg-[#09C274] hover:text-white transition-colors"
-            >
-              More Plans
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M18 18L6 6M6 6H18M6 6V18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
-            <button 
-              onClick={() => {
-                const params = new URLSearchParams(window.location.search);
-                if (!params.get('bypassRecipe')) {
-                  toast.info("Purchase this meal plan to view recipes");
-                } else {
-                  navigate(`/recipe/${influencerId}/mealplan/0`);
-                }
-              }}
-              className="flex items-center gap-2 border-2 border-[#09C274] text-[#09C274] px-4 py-2 rounded-full font-semibold hover:bg-[#09C274] hover:text-white transition-colors"
-            >
-              View Recipes
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="none">
-                <path d="M18 18L6 6M6 6H18M6 6V18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
-              </svg>
-            </button>
+            <div className="flex flex-row gap-4">
+              <button 
+                onClick={() => navigate(`/influencer/${influencerId}/mealplans`)}
+                className="flex items-center gap-2 border-2 border-[#09C274] text-[#09C274] px-4 py-2 rounded-full font-semibold hover:bg-[#09C274] hover:text-white transition-colors"
+              >
+                More Plans
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M3.1064 2.5173C2.61817 2.5173 2.22238 2.12151 2.22238 1.63328C2.22238 1.14506 2.61817 0.749268 3.1064 0.749268H16.3667C16.8549 0.749268 17.2507 1.14506 17.2507 1.63328V14.8935C17.2507 15.3818 16.8549 15.7776 16.3667 15.7776C15.8784 15.7776 15.4826 15.3818 15.4826 14.8935V3.76749L2.25813 16.992C1.9129 17.3372 1.35318 17.3372 1.00795 16.992C0.662716 16.6468 0.662716 16.087 1.00795 15.7418L14.2325 2.5173H3.1064Z" fill="#09C274"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M2.14035 1.63327C2.14035 1.09948 2.57308 0.666748 3.10688 0.666748H16.3671C16.9009 0.666748 17.3337 1.09948 17.3337 1.63327V14.8935C17.3337 15.4273 16.9009 15.8601 16.3671 15.8601C15.8333 15.8601 15.4006 15.4273 15.4006 14.8935V3.96667L2.31695 17.0503C1.9395 17.4278 1.32753 17.4278 0.950081 17.0503C0.572629 16.6729 0.572629 16.0609 0.950081 15.6835L14.0337 2.5998H3.10688C2.57308 2.5998 2.14035 2.16707 2.14035 1.63327ZM3.10688 0.831765C2.66422 0.831765 2.30537 1.19061 2.30537 1.63327C2.30537 2.07593 2.66422 2.43478 3.10688 2.43478H14.2329C14.2663 2.43478 14.2964 2.45488 14.3092 2.48572C14.3219 2.51655 14.3149 2.55204 14.2913 2.57563L1.06677 15.8001C0.753757 16.1131 0.753756 16.6206 1.06677 16.9336C1.37977 17.2467 1.88726 17.2467 2.20027 16.9336L15.4248 3.70914C15.4484 3.68554 15.4839 3.67848 15.5147 3.69125C15.5455 3.70402 15.5656 3.73411 15.5656 3.76748V14.8935C15.5656 15.3362 15.9245 15.695 16.3671 15.695C16.8098 15.695 17.1686 15.3362 17.1686 14.8935V1.63327C17.1686 1.19061 16.8098 0.831765 16.3671 0.831765H3.10688Z" fill="#09C274"/>
+                </svg>
+              </button>
+              <button 
+                onClick={() => {
+                  const params = new URLSearchParams(window.location.search);
+                  if (!params.get('bypassRecipe')) {
+                    toast.info("Purchase this meal plan to view recipes");
+                  } else {
+                    navigate(`/recipe/${influencerId}/mealplan/0`);
+                  }
+                }}
+                className="flex items-center gap-2 border-2 border-[#09C274] text-[#09C274] px-4 py-2 rounded-full font-semibold hover:bg-[#09C274] hover:text-white transition-colors"
+              >
+                View Recipes
+                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M3.1064 2.5173C2.61817 2.5173 2.22238 2.12151 2.22238 1.63328C2.22238 1.14506 2.61817 0.749268 3.1064 0.749268H16.3667C16.8549 0.749268 17.2507 1.14506 17.2507 1.63328V14.8935C17.2507 15.3818 16.8549 15.7776 16.3667 15.7776C15.8784 15.7776 15.4826 15.3818 15.4826 14.8935V3.76749L2.25813 16.992C1.9129 17.3372 1.35318 17.3372 1.00795 16.992C0.662716 16.6468 0.662716 16.087 1.00795 15.7418L14.2325 2.5173H3.1064Z" fill="#09C274"/>
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M2.14035 1.63327C2.14035 1.09948 2.57308 0.666748 3.10688 0.666748H16.3671C16.9009 0.666748 17.3337 1.09948 17.3337 1.63327V14.8935C17.3337 15.4273 16.9009 15.8601 16.3671 15.8601C15.8333 15.8601 15.4006 15.4273 15.4006 14.8935V3.96667L2.31695 17.0503C1.9395 17.4278 1.32753 17.4278 0.950081 17.0503C0.572629 16.6729 0.572629 16.0609 0.950081 15.6835L14.0337 2.5998H3.10688C2.57308 2.5998 2.14035 2.16707 2.14035 1.63327ZM3.10688 0.831765C2.66422 0.831765 2.30537 1.19061 2.30537 1.63327C2.30537 2.07593 2.66422 2.43478 3.10688 2.43478H14.2329C14.2663 2.43478 14.2964 2.45488 14.3092 2.48572C14.3219 2.51655 14.3149 2.55204 14.2913 2.57563L1.06677 15.8001C0.753757 16.1131 0.753756 16.6206 1.06677 16.9336C1.37977 17.2467 1.88726 17.2467 2.20027 16.9336L15.4248 3.70914C15.4484 3.68554 15.4839 3.67848 15.5147 3.69125C15.5455 3.70402 15.5656 3.73411 15.5656 3.76748V14.8935C15.5656 15.3362 15.9245 15.695 16.3671 15.695C16.8098 15.695 17.1686 15.3362 17.1686 14.8935V1.63327C17.1686 1.19061 16.8098 0.831765 16.3671 0.831765H3.10688Z" fill="#09C274"/>
+                </svg>
+              </button>
+            </div>
           </div>
 
-          <div className="space-y-6 absolute">
-            <div className="bg-[#4DE54A] rounded-xl p-6">
-              <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsBioExpanded(!isBioExpanded)}>
-                <p className="text-gray-700 font-bold">About {influencer.name}</p>
+          <div className="space-y-6 absolute w-full">
+            <div className="bg-[#4DE54A] rounded-xl p-6 min-h-[158px]">
+              <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsPlanExpanded(!isPlanExpanded)}>
+                <p className="text-gray-700 font-bold">About this plan</p>
                 <svg 
                   width="24" 
                   height="24" 
                   viewBox="0 0 24 24"
-                  className={`transition-transform ${isBioExpanded ? 'rotate-180' : ''}`}
+                  className={`transition-transform ${isPlanExpanded ? 'rotate-180' : ''}`}
                 >
                   <path 
                     d="M19 9l-7 7-7-7" 
@@ -1119,12 +1131,12 @@ const MealPlanDetailPage = () => {
                   />
                 </svg>
               </div>
-              {isBioExpanded ? (
+              {isPlanExpanded ? (
                 <p className="text-gray-700 mt-4">
-                  {influencer.bio}
+                  {influencer.mealPlans[Number(planIndex)].description}
                 </p>
               ) : <p className="text-gray-700 mt-4">
-                {influencer.bio.slice(0, 230)}...
+                {influencer.mealPlans[Number(planIndex)].description.slice(0, 230)}...
               </p> }
             </div>
           </div>
@@ -1132,13 +1144,13 @@ const MealPlanDetailPage = () => {
       </div>
 
       <div className="bg-[#F2F6FB] rounded-xl p-6 mt-16">
-        <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsPlanExpanded(!isPlanExpanded)}>
-          <p className="text-gray-700 font-bold">About this plan</p>
+        <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsBioExpanded(!isBioExpanded)}>
+          <p className="text-gray-700 font-bold">About {influencer.name}</p>
           <svg 
             width="24" 
             height="24" 
             viewBox="0 0 24 24"
-            className={`transition-transform ${isPlanExpanded ? 'rotate-180' : ''}`}
+            className={`transition-transform ${isBioExpanded ? 'rotate-180' : ''}`}
           >
             <path 
               d="M19 9l-7 7-7-7" 
@@ -1150,11 +1162,13 @@ const MealPlanDetailPage = () => {
             />
           </svg>
         </div>
-        {isPlanExpanded && (
+        {isBioExpanded ? (
           <p className="text-gray-700 mt-4">
-            {influencer.mealPlans[Number(planIndex)].description}
+            {influencer.bio}
           </p>
-        )}
+        ) : <p className="text-gray-700 mt-4">
+          {influencer.bio.slice(0, 230)}...
+        </p> }
       </div>
 
       <div className="bg-white rounded-xl p-6 pl-0 pr-0 overflow-x-auto">
@@ -1168,7 +1182,7 @@ const MealPlanDetailPage = () => {
                 </svg>
               </div>
               <div className="mt-auto">
-                <p className="text-xs text-[#7E847C]">Average</p>
+                <p className="text-xs text-[#E8ECED]">Average</p>
                 <p className="font-semibold text-xs text-white">{plan.totalCalories || "4,000"}kcal/day</p>
               </div>
             </div>
@@ -1251,9 +1265,15 @@ const MealPlanDetailPage = () => {
             <button 
               // onClick={handleCreateOrder}
               onClick={() => setIsOrderPage(true)}
-              className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium"
+              className="mt-4 bg-[#09C274] text-white px-4 py-3 rounded-xl w-full font-medium flex flex-row items-center justify-center gap-2 rounded-xl"
             >
-              Order this plan
+              <svg width="25" height="24" viewBox="0 0 25 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M3.55153 2.04491C3.1402 1.90029 2.68952 2.11651 2.54491 2.52783C2.40029 2.93916 2.61651 3.38984 3.02783 3.53445L3.30278 3.63112C4.00552 3.87819 4.46736 4.04193 4.8072 4.20867C5.12637 4.36528 5.26708 4.49205 5.35977 4.62769C5.45478 4.76673 5.52815 4.9577 5.56955 5.34017C5.61287 5.74039 5.61395 6.26165 5.61395 7.04054V9.77912H22.1656C22.5135 8.03435 22.6767 7.14801 22.2205 6.55503C21.7533 5.94758 20.1566 5.94758 18.3831 5.94758H7.18503C7.17799 5.66303 7.16464 5.40415 7.13931 5.17025C7.08276 4.64775 6.96022 4.17121 6.6634 3.73686C6.36427 3.29912 5.96653 3.01876 5.50272 2.79118C5.06894 2.57834 4.51776 2.38458 3.86879 2.15644L3.55153 2.04491Z" fill="white"/>
+                <path opacity="0.5" d="M21.614 12.4604L22.1401 9.90802L22.1659 9.77881H5.61426C5.61426 12.8752 5.68083 13.897 6.59282 14.859C7.50481 15.8209 8.97263 15.8209 11.9083 15.8209H17.4902C19.1334 15.8209 19.955 15.8209 20.5357 15.3476C21.1165 14.8743 21.2823 14.0696 21.614 12.4604Z" fill="white"/>
+                <path d="M8.24592 18.5791C9.11795 18.5791 9.82485 19.286 9.82485 20.158C9.82485 21.03 9.11795 21.737 8.24592 21.737C7.3739 21.737 6.66699 21.03 6.66699 20.158C6.66699 19.286 7.3739 18.5791 8.24592 18.5791Z" fill="white"/>
+                <path d="M17.7196 18.5791C18.5915 18.5791 19.2985 19.2859 19.2985 20.158C19.2985 21.03 18.5915 21.737 17.7196 21.737C16.8476 21.737 16.1406 21.03 16.1406 20.158C16.1406 19.2859 16.8476 18.5791 17.7196 18.5791Z" fill="white"/>
+              </svg>
+              Order plan!
             </button>
           </>
         </div>
