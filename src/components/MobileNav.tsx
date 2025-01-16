@@ -36,7 +36,11 @@ const MobileNav = () => {
             <MobileNavLinks />
           ) : (
             <Button
-              onClick={() => loginWithRedirect()}
+              onClick={() => loginWithRedirect({
+                appState: {
+                  returnTo: window.location.pathname,
+                },
+              })}
               className="flex-1 font-bold bg-[#50ad40]"
             >
               Log In
