@@ -2,7 +2,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 // import { Influencer, MenuItem as MenuItemType } from "@/types";
 import { Influencer, Address } from "@/types";
-import { Card } from "@/components/ui/card";
+// import { Card } from "@/components/ui/card";
 import MenuItem from "@/components/MenuItem";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
