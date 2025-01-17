@@ -1,4 +1,4 @@
-// import Footer from "@/components/Footer";
+import Footer from "@/components/Footer";
 import Header from "@/components/Header";
 import Hero from "@/components/Hero";
 
@@ -17,7 +17,7 @@ const Layout = ({ children, showHero = false }: Props) => {
         style={window.location.pathname.includes('/influencer/') && window.location.pathname.includes('/mealplans/') ? { padding: '0' } : undefined}>
         {children}
       </div>
-      {/* <Footer /> */}
+      <Footer />
     </div>
   );
 };
