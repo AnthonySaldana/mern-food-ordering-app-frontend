@@ -30,9 +30,9 @@ const InfluencerRecommendation = () => {
   };
 
   return (
-    <div className="bg-[#50ad40] p-4 rounded-lg flex flex-col items-start justify-start">
+    <div className="p-4 rounded-lg flex flex-col items-start justify-start">
       <span className="text-white">Is there a creator you’d like to see on Fitbite? Let us know below!</span>
-      <div className="flex items-center">
+      <div className="flex items-center bg-white rounded-lg w-full">
         <input
           type="text"
           placeholder="Enter creator name or handle"

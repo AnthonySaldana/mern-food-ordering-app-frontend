@@ -1010,7 +1010,7 @@ const MealPlanDetailPage = () => {
 
   return (
     <div className="flex flex-col gap-4 bg-white p-3 rounded-md mt-[80px] lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8">
-      <div className="block lg:hidden">
+      {/* <div className="block lg:hidden">
         <Card className="w-full h-[320px] relative" style={{boxShadow: 'none'}}>
           <img
             src={influencer.mealPlans[Number(planIndex)].imageUrl}
@@ -1033,10 +1033,10 @@ const MealPlanDetailPage = () => {
             </div>
           </div>
         </Card>
-      </div>
+      </div> */}
 
-      <div className="hidden lg:flex lg:flex-row lg:gap-8">
-        <div className="w-2/5">
+      <div className="lg:flex lg:flex-row lg:gap-8">
+        <div className="w-full lg:w-2/5">
           <div className="relative">
             <img
               // src={influencer.mealPlans[Number(planIndex)].imageUrl}
@@ -1056,7 +1056,7 @@ const MealPlanDetailPage = () => {
           </div>
         </div>
 
-        <div className="w-3/5 relative mt-[49px]">
+        <div className="lg:w-3/5 relative mt-[49px]">
           <div className="flex flex-row items-center justify-between mb-8">
             <div className="flex gap-4 items-center">
               {/* <div className="w-16 h-16 rounded-full overflow-hidden">
@@ -1111,7 +1111,7 @@ const MealPlanDetailPage = () => {
             </div>
           </div>
 
-          <div className="space-y-6 absolute w-full">
+          <div className="space-y-6 lg:absolute w-full">
             <div className="bg-[#4DE54A] rounded-xl p-6 min-h-[158px]">
               <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsPlanExpanded(!isPlanExpanded)}>
                 <p className="text-gray-700 font-bold">About this plan</p>
@@ -1143,7 +1143,7 @@ const MealPlanDetailPage = () => {
         </div>
       </div>
 
-      <div className="bg-[#F2F6FB] rounded-xl p-6 mt-16">
+      <div className="bg-[#F2F6FB] rounded-xl p-6 lg:mt-16">
         <div className="flex justify-between items-center cursor-pointer" onClick={() => setIsBioExpanded(!isBioExpanded)}>
           <p className="text-gray-700 font-bold">About {influencer.name}</p>
           <svg 
