@@ -7,6 +7,7 @@ import MenuItem from "@/components/MenuItem";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useSearchGroceryStores, useStoreInventory, useFitbiteInventory } from "@/api/GroceryApi";
+import { usePreProcessedMatches } from "@/api/MatchApi";
 import PaymentMethodSection from "@/components/PaymentMethodSection";
 import AddressSection from "@/components/AddressSection";
 // import { ShoppingListItemType } from '../types/grocery';
@@ -131,8 +132,11 @@ const MealPlanDetailPage = () => {
 
   const { data: fitbiteInventory, error: storeError } = useFitbiteInventory(
     selectedStore?._id, // Initial empty storeId
-    plan?.menuItems || [] // Initial empty menuItems
+    plan?.menuItems || [], // Initial empty menuItems
+    influencerId as string // Initial empty influencerId
   );
+
+  console.log(fitbiteInventory, 'fitbiteInventory')
 
   useEffect(() => {
     if (inventory && !selectedCategory) {
@@ -147,6 +151,26 @@ const MealPlanDetailPage = () => {
       toast.error(errorMessage); // Display the error using a toast notification
     }
   }, [storeError]);
+
+  const { data: preProcessedMatches, error: matchesError } = usePreProcessedMatches(
+    selectedStore?._id,
+    influencerId as string
+  );
+  
+  useEffect(() => {
+    if (matchesError) {
+      const errorMessage = "Failed to fetch pre-processed matches.";
+      setErrorMessage(errorMessage);
+      toast.error(errorMessage);
+    }
+  }, [matchesError]);
+  
+  useEffect(() => {
+    if (preProcessedMatches) {
+      console.log("Pre-processed matches fetched successfully:", preProcessedMatches);
+      // Handle success (e.g., update state or UI)
+    }
+  }, [preProcessedMatches]);
   
 
   // const handleStoreSelection = async (store: any) => {
@@ -426,7 +450,8 @@ const MealPlanDetailPage = () => {
       // const result = await fetchFitbiteInventory();
       const requestBody = {
         store_id: store._id,
-        items: plan.menuItems
+        items: plan.menuItems,
+        influencer_id: influencer._id
       };
 
       const response = await fetch(`${API_BASE_URL}/api/grocery/fitbite-inventory`, {
@@ -448,23 +473,54 @@ const MealPlanDetailPage = () => {
         console.log("Fitbite inventory fetched successfully:", result);
         // Handle success (e.g., navigate to a new page or show a success message)
         // setShoppingList(result.data);
-        setShoppingList(result.matches
-          .filter((item: any) => item.price && item.price > 0)
-          .map((item: any) => ({
-            product_id: item.product_id,
-            name: item.name,
-            quantity: 1,
-            product_marked_price: Math.round(item.price * 100), // Convert to cents
-            selected_options: [] // Add options if available from the API
-          })));
+        // setShoppingList(result.matches
+        //   .filter((item: any) => item.price && item.price > 0)
+        //   .map((item: any) => ({
+        //     product_id: item.product_id,
+        //     name: item.name,
+        //     quantity: 1,
+        //     product_marked_price: Math.round(item.price * 100), // Convert to cents
+        //     selected_options: [] // Add options if available from the API
+        //   })));
         
-        console.log(shoppingList, 'shoppingList')
+        // console.log(shoppingList, 'shoppingList')
+
+        // Wait 10 seconds before checking matches
+        await new Promise(resolve => setTimeout(resolve, 10000));
+
+        // Get matches for this store and influencer
+        const matchesResponse = await fetch(`${API_BASE_URL}/api/matches/pre-processed-matches?store_id=${store._id}&influencer_id=${influencer._id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (!matchesResponse.ok) {
+          throw new Error('Failed to fetch matches');
+        }
+
+        const matchesResult = await matchesResponse.json();
+        
+        if (matchesResult?.matches) {
+          // Convert matches to shopping list format
+          const shoppingListItems = matchesResult.matches.map((match: any) => ({
+            product_id: match._id,
+            name: match.name,
+            quantity: match.adjusted_quantity,
+            product_marked_price: Math.round(match.price * 100), // Convert to cents
+            selected_options: []
+          }));
+
+          setShoppingList(shoppingListItems);
+          console.log("Shopping list updated with matches:", shoppingListItems);
+        }
       }
     } catch (error) {
       console.error("Error fetching fitbite inventory:", error);
       toast.error("Failed to fetch fitbite inventory");
     } finally {
-      setIsLoading(false);
+      // setIsLoading(false);
     }
   };
 
