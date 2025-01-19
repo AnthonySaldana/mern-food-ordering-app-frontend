@@ -471,49 +471,54 @@ const MealPlanDetailPage = () => {
 
       if (result) {
         console.log("Fitbite inventory fetched successfully:", result);
-        // Handle success (e.g., navigate to a new page or show a success message)
-        // setShoppingList(result.data);
-        // setShoppingList(result.matches
-        //   .filter((item: any) => item.price && item.price > 0)
-        //   .map((item: any) => ({
-        //     product_id: item.product_id,
-        //     name: item.name,
-        //     quantity: 1,
-        //     product_marked_price: Math.round(item.price * 100), // Convert to cents
-        //     selected_options: [] // Add options if available from the API
-        //   })));
-        
-        // console.log(shoppingList, 'shoppingList')
 
         // Wait 10 seconds before checking matches
-        await new Promise(resolve => setTimeout(resolve, 10000));
+        // await new Promise(resolve => setTimeout(resolve, 10000));
 
-        // Get matches for this store and influencer
-        const matchesResponse = await fetch(`${API_BASE_URL}/api/matches/pre-processed-matches?store_id=${store._id}&influencer_id=${influencer._id}`, {
-          method: 'GET',
-          headers: {
-            'Content-Type': 'application/json',
-          },
-        });
+        let matchesResult;
+        let attempts = 0;
+        const maxAttempts = 10;
 
-        if (!matchesResponse.ok) {
-          throw new Error('Failed to fetch matches');
+        while (attempts < maxAttempts) {
+          toast("We are matching your items, please wait...");
+
+          // Get matches for this store and influencer
+          const matchesResponse = await fetch(`${API_BASE_URL}/api/matches/pre-processed-matches?store_id=${store._id}&influencer_id=${influencer._id}`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          });
+
+          // if (!matchesResponse.ok) {
+          //   throw new Error('Failed to fetch matches');
+          // }
+
+          matchesResult = await matchesResponse.json();
+          
+          if (matchesResult?.matches && matchesResult.matches.length > 0) {
+            // Convert matches to shopping list format
+            const shoppingListItems = matchesResult.matches.map((match: any) => ({
+              product_id: match._id,
+              name: match.name,
+              quantity: match.adjusted_quantity,
+              product_marked_price: Math.round(match.price * 100), // Convert to cents
+              selected_options: []
+            }));
+
+            setShoppingList(shoppingListItems);
+            console.log("Shopping list updated with matches:", shoppingListItems);
+            break;
+          }
+
+          attempts++;
+          if (attempts < maxAttempts) {
+            await new Promise(resolve => setTimeout(resolve, 15000));
+          }
         }
 
-        const matchesResult = await matchesResponse.json();
-        
-        if (matchesResult?.matches) {
-          // Convert matches to shopping list format
-          const shoppingListItems = matchesResult.matches.map((match: any) => ({
-            product_id: match._id,
-            name: match.name,
-            quantity: match.adjusted_quantity,
-            product_marked_price: Math.round(match.price * 100), // Convert to cents
-            selected_options: []
-          }));
-
-          setShoppingList(shoppingListItems);
-          console.log("Shopping list updated with matches:", shoppingListItems);
+        if (!matchesResult?.matches || matchesResult.matches.length === 0) {
+          toast.error("Could not find matches for your items. Please try again.");
         }
       }
     } catch (error) {
