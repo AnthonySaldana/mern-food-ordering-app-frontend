@@ -162,18 +162,21 @@ export const useStoreInventory = (params: {
   );
 };
 
-export const useFitbiteInventory = (storeId: string, mealItems: any[]) => {
+export const useFitbiteInventory = (storeId: string, mealItems: any[], influencerId: string) => {
   return useQuery(
-    ['fitbiteInventory', storeId, mealItems],
+    ['fitbiteInventory', storeId, mealItems, influencerId],
     async () => {
       const queryParams = new URLSearchParams({
         store_id: storeId,
-        items: JSON.stringify(mealItems)
+        items: JSON.stringify(mealItems),
+        influencer_id: influencerId
       });
 
       const response = await fetch(
         `${API_BASE_URL}/api/grocery/fitbite-inventory?${queryParams}`
       );
+
+      console.log(response, 'response from fitbite inventory')
 
       if (!response.ok) {
         throw new Error('Failed to fetch fitbite inventory');
