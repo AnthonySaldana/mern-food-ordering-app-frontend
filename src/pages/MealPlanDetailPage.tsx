@@ -70,7 +70,7 @@ const MealPlanDetailPage = () => {
   const [quote, setQuote] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
-  const [tempEmail, setTempEmail] = useState<string>("");
+  // const [tempEmail, setTempEmail] = useState<string>("");
   const { loginWithRedirect, isAuthenticated, user } = useAuth0();
 
   const { pathname } = useLocation();
