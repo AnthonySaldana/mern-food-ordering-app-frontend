@@ -16,6 +16,7 @@ import { toast } from "sonner";
 import QuoteDetails from "@/components/QuoteMealMe";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { useAuth0 } from "@auth0/auth0-react";
+import { useLocation } from "react-router-dom";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -72,6 +73,8 @@ const MealPlanDetailPage = () => {
   const [tempEmail, setTempEmail] = useState<string>("");
   const { loginWithRedirect, isAuthenticated, user } = useAuth0();
 
+  const { pathname } = useLocation();
+
   useEffect(() => {
     if (isAuthenticated && user?.email) {
       setEmail(user.email);
@@ -80,7 +83,24 @@ const MealPlanDetailPage = () => {
 
   const handleLogin = async () => {
     if (!isAuthenticated) {
-      await loginWithRedirect();
+      await loginWithRedirect({
+        appState: {
+          returnTo: pathname,
+        },
+      });
+    }
+  };
+
+  const handleCreateAccount = async () => {
+    if (!isAuthenticated) {
+      await loginWithRedirect({
+        appState: {
+          returnTo: pathname,
+        },
+        authorizationParams: {
+          screen_hint: 'signup',
+        },
+      });
     }
   };
 
@@ -486,7 +506,7 @@ const MealPlanDetailPage = () => {
 
         let matchesResult;
         let attempts = 0;
-        const maxAttempts = 10;
+        const maxAttempts = 20;
 
         while (attempts < maxAttempts) {
           toast("We are matching your items, please wait...");
@@ -634,40 +654,36 @@ const MealPlanDetailPage = () => {
             <div className="space-y-4">
               <div className="bg-[#F2F6FB] rounded-xl p-6">
                 <div className="block mb-2">
-                  <h3 className="text-lg font-semibold mb-3">Email *</h3>
-                  <div className="flex gap-2">
-                    {isAuthenticated ? (
+                  {isAuthenticated ? (
+                    <>
+                      <h3 className="text-lg font-semibold mb-3">Email</h3>
                       <input
                         type="email"
                         value={email}
                         disabled
-                        className="flex-1 px-4 py-3 rounded-xl border border-gray-200 bg-gray-100"
+                        className="w-full px-4 py-3 rounded-xl border border-gray-200 bg-gray-100"
                       />
-                    ) : (
-                      <>
-                        <input
-                          type="email" 
-                          placeholder="your@email.com"
-                          value={tempEmail}
-                          onChange={(e) => setTempEmail(e.target.value)}
-                          className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-[#ff6d3f]"
-                          required
-                        />
-                        <button 
-                          onClick={() => setEmail(tempEmail)}
-                          className="bg-[#09C274] text-white px-4 py-2 rounded-xl whitespace-nowrap"
+                    </>
+                  ) : (
+                    <div className="flex flex-col gap-4">
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleLogin}
+                          className="flex-1 bg-[#09C274] text-white px-4 py-3 rounded-xl font-medium"
                         >
-                          Set Email
+                          Login
                         </button>
-                      </>
-                    )}
-                    <button
-                      onClick={handleLogin}
-                      className="bg-[#09C274] text-white px-4 py-2 rounded"
-                    >
-                      {isAuthenticated ? "Logged In" : "Login"}
-                    </button>
-                  </div>
+                      </div>
+                      <div className="flex gap-2">
+                        <button
+                          onClick={handleCreateAccount}
+                          className="flex-1 bg-[#09C274] text-white px-4 py-3 rounded-xl font-medium"
+                        >
+                          Create Account
+                        </button>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <h3 className="text-lg font-semibold mt-4">Delivery</h3>
                 <div className="flex flex-col divide-y">
