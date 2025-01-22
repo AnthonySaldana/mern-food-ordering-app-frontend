@@ -171,6 +171,15 @@ const MealPlanDetailPage = () => {
       // Handle success (e.g., update state or UI)
     }
   }, [preProcessedMatches]);
+
+  useEffect(() => {
+    if (storeMatches?.stores?.length) {
+      const storesSection = document.getElementById('stores-section');
+      if (storesSection) {
+        storesSection.scrollIntoView({ behavior: 'smooth' });
+      }
+    }
+  }, [storeMatches]);
   
 
   // const handleStoreSelection = async (store: any) => {
@@ -723,7 +732,7 @@ const MealPlanDetailPage = () => {
                 </div>
               </div>
 
-              <div className="bg-[#F2F6FB] rounded-xl p-6 relative">
+              <div className="bg-[#F2F6FB] rounded-xl p-6 relative" id="stores-section">
                 <div 
                   className="flex justify-between items-center cursor-pointer" 
                   // onClick={() => setIsStoresExpanded(!isStoresExpanded)}
