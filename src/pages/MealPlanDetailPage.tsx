@@ -542,7 +542,7 @@ const MealPlanDetailPage = () => {
 
           attempts++;
           if (attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 15000));
+            await new Promise(resolve => setTimeout(resolve, 20000));
           }
         }
 
