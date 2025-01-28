@@ -6,8 +6,8 @@ import { Toaster } from "@/components/ui/sonner";
 import { Recipe } from "@/types";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-const fetchRecipes = async (): Promise<Recipe[]> => {
-  const response = await fetch(`${API_BASE_URL}/api/recipe`);
+const fetchRecipes = async (influencerId: string): Promise<Recipe[]> => {
+  const response = await fetch(`${API_BASE_URL}/api/recipe/${influencerId}`);
   if (!response.ok) {
     throw new Error("Failed to fetch recipes");
   }
@@ -19,8 +19,11 @@ const MealPlanDetailPage = () => {
   console.log(influencerId, planIndex, 'influencerId and planIndex');
 
   const { data: recipes, isLoading: isLoadingRecipes, error: recipesError } = useQuery(
-    "fetchRecipes",
-    fetchRecipes
+    ["fetchRecipes", influencerId],
+    () => fetchRecipes(influencerId!),
+    {
+      enabled: !!influencerId
+    }
   );
 
   if (isLoadingRecipes) {

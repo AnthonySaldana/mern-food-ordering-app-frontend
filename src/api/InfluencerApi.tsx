@@ -271,7 +271,9 @@ export const useCreateRecipe = () => {
       calories: Number(jsonData.calories),
       carbs: Number(jsonData.carbs),
       fat: Number(jsonData.fat), 
-      protein: Number(jsonData.protein)
+      protein: Number(jsonData.protein),
+      influencer_id: jsonData.influencer_id,
+      meal_plan_id: jsonData.meal_plan_id
     };
 
     const response = await fetch(`${API_BASE_URL}/api/recipe`, {
@@ -295,9 +297,9 @@ export const useCreateRecipe = () => {
   return { createRecipe, isLoading };
 };
 
-export const useGetRecipes = () => {
+export const useGetRecipes = (influencerId?: string) => {
   const getRecipesRequest = async (): Promise<Recipe[]> => {
-    const response = await fetch(`${API_BASE_URL}/api/recipe`);
+    const response = await fetch(`${API_BASE_URL}/api/recipe/${influencerId}`);
 
     if (!response.ok) {
       throw new Error("Failed to fetch recipes");
@@ -306,7 +308,13 @@ export const useGetRecipes = () => {
     return response.json();
   };
 
-  const { data: recipes, isLoading } = useQuery("fetchRecipes", getRecipesRequest);
+  const { data: recipes, isLoading } = useQuery(
+    ["fetchRecipes", influencerId], 
+    getRecipesRequest,
+    {
+      enabled: !!influencerId
+    }
+  );
 
   return { recipes, isLoading };
 };
