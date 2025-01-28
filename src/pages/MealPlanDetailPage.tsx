@@ -33,6 +33,13 @@ interface ShoppingListItem {
   name: string;
   quantity: number;
   product_marked_price: number;
+  matched_items?: Array<{
+    name: string;
+    unit_of_measurement: string;
+    unit_size: number;
+    adjusted_quantity: number;
+    price: number;
+  }>;
   selected_options?: Array<{
     option_id: string;
     quantity: number;
@@ -532,6 +539,7 @@ const MealPlanDetailPage = () => {
               name: match.name,
               quantity: match.adjusted_quantity,
               product_marked_price: Math.round(match.price * 100), // Convert to cents
+              matched_items: match.matched_items,
               selected_options: []
             }));
 
@@ -1030,23 +1038,33 @@ const MealPlanDetailPage = () => {
                 </div>
                 <div className="space-y-2">
                   {shoppingList.map((item: any) => (
-                    <div key={item.product_id} className="flex justify-between items-center">
-                      <div className="flex items-center gap-2">
-                        <button onClick={() => updateItemQuantity(item.product_id, -1)}>-</button>
-                        <span className="bg-gray-100 px-2 py-1 rounded">{item.quantity}</span>
-                        <button onClick={() => updateItemQuantity(item.product_id, 1)}>+</button>
-                        <span>{item.name}</span>
-                      </div>
-                      <div className="flex items-center gap-4">
-                        <span>${((item.product_marked_price * item.quantity) / 100).toFixed(2)}</span>
+                    <div key={item._id} className="flex flex-col gap-2 border-b border-gray-200 py-2">
+                      <div className="flex justify-between items-center">
+                        <span className="font-medium">{item.name}</span>
                         <button
-                          onClick={() => removeFromShoppingList(item.product_id)}
+                          onClick={() => removeFromShoppingList(item._id)}
                           className="text-red-500 hover:text-red-700"
                         >
                           <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
                           </svg>
                         </button>
+                      </div>
+                      
+                      <div className="pl-4 max-h-[100px] overflow-y-auto">
+                        {console.log(item, 'item')}
+                        {console.log(item?.matched_items, 'matched items')}
+                        {item?.matched_items?.map((match: any) => (
+                          <div key={match._id} className="flex justify-between items-center py-1">
+                            <div className="flex items-center gap-2">
+                              <button onClick={() => updateItemQuantity(match._id, -1)}>-</button>
+                              <span className="bg-gray-100 px-2 py-1 rounded">{match.adjusted_quantity}</span>
+                              <button onClick={() => updateItemQuantity(match._id, 1)}>+</button>
+                              <span className="text-sm">{match.name}</span>
+                            </div>
+                            <span className="text-sm">${(match.price * match.adjusted_quantity).toFixed(2)}</span>
+                          </div>
+                        ))}
                       </div>
                     </div>
                   ))}
