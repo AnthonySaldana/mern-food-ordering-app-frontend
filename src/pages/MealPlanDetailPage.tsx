@@ -17,6 +17,8 @@ import QuoteDetails from "@/components/QuoteMealMe";
 import LoadingOverlay from "@/components/LoadingOverlay";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom";
+import ShoppingListComponent from "@/components/ShoppingListItem";
+import { ShoppingListItem } from "@/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -28,25 +30,25 @@ const fetchInfluencerById = async (id: string): Promise<Influencer> => {
   return response.json();
 };
 
-interface ShoppingListItem {
-  product_id: string;
-  name: string;
-  quantity: number;
-  product_marked_price: number;
-  matched_items?: Array<{
-    name: string;
-    unit_of_measurement: string;
-    unit_size: number;
-    adjusted_quantity: number;
-    price: number;
-  }>;
-  selected_options?: Array<{
-    option_id: string;
-    quantity: number;
-    marked_price?: number;
-    notes?: string;
-  }>;
-}
+// interface ShoppingListItem {
+//   product_id: string;
+//   name: string;
+//   quantity: number;
+//   product_marked_price: number;
+//   matched_items?: Array<{
+//     name: string;
+//     unit_of_measurement: string;
+//     unit_size: number;
+//     adjusted_quantity: number;
+//     price: number;
+//   }>;
+//   selected_options?: Array<{
+//     option_id: string;
+//     quantity: number;
+//     marked_price?: number;
+//     notes?: string;
+//   }>;
+// }
 
 const MealPlanDetailPage = () => {
   const isStoresExpanded = true;
@@ -351,9 +353,17 @@ const MealPlanDetailPage = () => {
       }
 
       const newItem: ShoppingListItem = {
+        _id: item.id,
         product_id: item.id,
         name: item.name,
         quantity: 1,
+        macros: {
+          protein: item.macros?.protein,
+          carbs: item.macros?.carbs,
+          fat: item.macros?.fat
+        },
+        unit_of_measurement: item.unit_of_measurement,
+        unit_size: item.unit_size,
         product_marked_price: Math.round(item.price * 100), // Convert to cents
         selected_options: [] // Add options if available from the API
       };
@@ -364,32 +374,6 @@ const MealPlanDetailPage = () => {
 
   const removeFromShoppingList = (productId: string) => {
     setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
-  };
-
-  const calculateSubtotal = () => {
-    return shoppingList.reduce((total, item) => {
-      const itemTotal = (item.product_marked_price * item.quantity);
-      return total + itemTotal;
-    }, 0);
-  };
-
-  const calculateTax = (subtotal: number) => {
-    const TAX_RATE = 0.08; // 8% tax rate - adjust as needed
-    return Math.round(subtotal * TAX_RATE);
-  };
-
-  const calculateShipping = () => {
-    // You can implement dynamic shipping logic here
-    const BASE_SHIPPING = 2000; // $5.00 in cents
-    return BASE_SHIPPING;
-  };
-
-  const calculateTotal = () => {
-    const subtotal = calculateSubtotal();
-    const tax = calculateTax(subtotal);
-    const shipping = calculateShipping();
-    const total = subtotal + tax + shipping + (tipAmount * 100);
-    return total;
   };
 
   const handleCreateOrder = async () => {
@@ -422,7 +406,7 @@ const MealPlanDetailPage = () => {
       delivery_details: deliveryDetails,
       payment_details: {
         payment_method_id: selectedPaymentMethod,
-        payment_amount: calculateTotal()
+        // payment_amount: calculateTotal() # todo fix order total
       },
       place_order: true,
       final_quote: false,
@@ -540,6 +524,13 @@ const MealPlanDetailPage = () => {
               quantity: match.adjusted_quantity,
               product_marked_price: Math.round(match.price * 100), // Convert to cents
               matched_items: match.matched_items,
+              unit_of_measurement: match.unit_of_measurement,
+              unit_size: match.unit_size,
+              macros: {
+                protein: match.macros?.protein,
+                carbs: match.macros?.carbs,
+                fat: match.macros?.fat
+              },
               selected_options: []
             }));
 
@@ -1029,70 +1020,12 @@ const MealPlanDetailPage = () => {
               </div>
             </div>
           </div>
-          <div className="flex flex-col gap-2">
-            {shoppingList?.length > 0 && (
-              <div className="mb-6">
-                <h3 className="font-medium mb-3">Shopping List</h3>
-                <div className="flex justify-between items-center mb-3">
-                  <h3 className="font-medium">Cart ({shoppingList.length})</h3>
-                </div>
-                <div className="space-y-2">
-                  {shoppingList.map((item: any) => (
-                    <div key={item._id} className="flex flex-col gap-2 border-b border-gray-200 py-2">
-                      <div className="flex justify-between items-center">
-                        <span className="font-medium">{item.name}</span>
-                        <button
-                          onClick={() => removeFromShoppingList(item._id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M12 4L4 12M4 4L12 12" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
-                          </svg>
-                        </button>
-                      </div>
-                      
-                      <div className="pl-4 max-h-[100px] overflow-y-auto">
-                        {console.log(item, 'item')}
-                        {console.log(item?.matched_items, 'matched items')}
-                        {item?.matched_items?.map((match: any) => (
-                          <div key={match._id} className="flex justify-between items-center py-1">
-                            <div className="flex items-center gap-2">
-                              <button onClick={() => updateItemQuantity(match._id, -1)}>-</button>
-                              <span className="bg-gray-100 px-2 py-1 rounded">{match.adjusted_quantity}</span>
-                              <button onClick={() => updateItemQuantity(match._id, 1)}>+</button>
-                              <span className="text-sm">{match.name}</span>
-                            </div>
-                            <span className="text-sm">${(match.price * match.adjusted_quantity).toFixed(2)}</span>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-            <div className="flex justify-between text-sm">
-              <span>Subtotal</span>
-              <span>${(calculateSubtotal() / 100).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>Estimated Taxes</span>
-              <span>${(calculateTax(calculateSubtotal()) / 100).toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>Tip</span>
-              <span>${tipAmount.toFixed(2)}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span>Creator Fee</span>
-              <span>${(calculateShipping() / 100).toFixed(2)}</span>
-            </div>
-            <div className="h-[1px] bg-gray-200 my-2"></div>
-            <div className="flex justify-between font-medium">
-              <span>Total</span>
-              <span>${(calculateTotal() / 100).toFixed(2)}</span>
-            </div>
-          </div>
+          <ShoppingListComponent 
+            shoppingList={shoppingList} 
+            onRemoveItem={removeFromShoppingList} 
+            onUpdateQuantity={updateItemQuantity}
+            tipAmount={tipAmount}
+          />
           <button 
             className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
               shoppingList.length > 0 
