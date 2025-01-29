@@ -362,6 +362,8 @@ const MealPlanDetailPage = () => {
           carbs: item.macros?.carbs,
           fat: item.macros?.fat
         },
+        unit_of_measurement: item.unit_of_measurement,
+        unit_size: item.unit_size,
         product_marked_price: Math.round(item.price * 100), // Convert to cents
         selected_options: [] // Add options if available from the API
       };
@@ -404,7 +406,7 @@ const MealPlanDetailPage = () => {
       delivery_details: deliveryDetails,
       payment_details: {
         payment_method_id: selectedPaymentMethod,
-        payment_amount: calculateTotal()
+        // payment_amount: calculateTotal() # todo fix order total
       },
       place_order: true,
       final_quote: false,
