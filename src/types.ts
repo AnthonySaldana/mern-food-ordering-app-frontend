@@ -129,3 +129,33 @@ export type Address = {
   latitude: number;
   longitude: number;
 };
+
+export type ShoppingListItem = {
+  _id: string;
+  product_id: string;
+  name: string;
+  quantity: number;
+  product_marked_price: number;
+  unit_of_measurement: string;
+  unit_size: number;
+  macros: {
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+  matched_items?: Array<{
+    _id: string;
+    name: string;
+    unit_of_measurement: string;
+    unit_size: number;
+    adjusted_quantity: number;
+    price: number;
+    image: string;
+  }>;
+  selected_options?: Array<{
+    option_id: string;
+    quantity: number;
+    marked_price?: number;
+    notes?: string;
+  }>;
+}
