@@ -376,7 +376,7 @@ const MealPlanDetailPage = () => {
     setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
   };
 
-  const handleCreateOrder = async () => {
+  const handleCreateOrder = async (total: number) => {
     if (!selectedStore || !location) {
       console.error("Store or location not selected");
       return;
@@ -406,7 +406,7 @@ const MealPlanDetailPage = () => {
       delivery_details: deliveryDetails,
       payment_details: {
         payment_method_id: selectedPaymentMethod,
-        // payment_amount: calculateTotal() # todo fix order total
+        payment_amount: total
       },
       place_order: true,
       final_quote: false,
@@ -1025,8 +1025,9 @@ const MealPlanDetailPage = () => {
             onRemoveItem={removeFromShoppingList} 
             onUpdateQuantity={updateItemQuantity}
             tipAmount={tipAmount}
+            handleCreateOrder={(total: number) => handleCreateOrder(total)}
           />
-          <button 
+          {/* <button 
             className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
               shoppingList.length > 0 
                 ? 'bg-[#09C274] text-white hover:bg-[#07b369] transition-colors' 
@@ -1039,7 +1040,7 @@ const MealPlanDetailPage = () => {
               ? `Confirm and place order`
               : 'Add items to cart'
             }
-          </button>
+          </button> */}
         </div>
       </div>
     );
