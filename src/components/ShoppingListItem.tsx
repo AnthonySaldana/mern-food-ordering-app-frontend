@@ -4,21 +4,31 @@ import { ShoppingListItem } from '@/types';
 interface ShoppingListProps {
   shoppingList: ShoppingListItem[];
   onRemoveItem: (id: string) => void;
-  onUpdateQuantity: (matchId: string, change: number) => void;
   tipAmount: number;
   handleCreateOrder: (total: number) => void;
 }
 
-const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, tipAmount, handleCreateOrder }: ShoppingListProps) => {
+const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCreateOrder }: ShoppingListProps) => {
   const [activeMatchedItems, setActiveMatchedItems] = useState<{[key: string]: string}>({});
   const [selectedItem, setSelectedItem] = useState<ShoppingListItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [quantities, setQuantities] = useState<{[key: string]: number}>({});
 
   const handleMatchedItemClick = (shoppingItemId: string, matchedItemId: string) => {
     setActiveMatchedItems(prev => ({
       ...prev,
       [shoppingItemId]: matchedItemId
     }));
+
+    // Find the next unmatched item
+    const currentIndex = shoppingList.findIndex(item => item.product_id === shoppingItemId);
+    const nextUnmatchedItem = shoppingList.slice(currentIndex + 1).find(item => !activeMatchedItems[item.product_id]);
+
+    if (nextUnmatchedItem) {
+      setSelectedItem(nextUnmatchedItem);
+    } else {
+      setShowPopup(false);
+    }
   };
 
   const handleItemClick = (item: ShoppingListItem) => {
@@ -26,12 +36,24 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, t
     setShowPopup(true);
   };
 
+  const handleUpdateQuantity = (matchId: string, change: number) => {
+    setQuantities(prev => {
+      const currentQty = prev[matchId] || 1;
+      const newQty = Math.max(1, currentQty + change);
+      return {
+        ...prev,
+        [matchId]: newQty
+      };
+    });
+  };
+
   const calculateSubtotal = () => {
     return shoppingList.reduce((total, item) => {
       const activeMatchId = activeMatchedItems[item.product_id];
       const activeMatch = item.matched_items?.find(match => match._id === activeMatchId);
       if (activeMatch) {
-        const itemTotal = activeMatch.price * activeMatch.adjusted_quantity;
+        const quantity = quantities[activeMatch._id] || 1;
+        const itemTotal = activeMatch.price * quantity;
         return total + (itemTotal * 100);
       }
       return total;
@@ -54,6 +76,34 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, t
     const shipping = calculateShipping();
     const total = subtotal + tax + shipping + (tipAmount * 100);
     return total;
+  };
+
+  const getCurrentItemIndex = () => {
+    if (!selectedItem) return 0;
+    console.log('selectedItem', selectedItem);
+    console.log('shoppingList', shoppingList);
+    return shoppingList.findIndex(item => item.product_id === selectedItem.product_id) + 1;
+  };
+
+  const handlePrevItem = () => {
+    console.log('selectedItem', selectedItem);
+    if (!selectedItem) return;
+    const currentIndex = shoppingList.findIndex(item => item.product_id === selectedItem.product_id);
+    console.log('currentIndex', currentIndex);
+    if (currentIndex > 0) {
+      setSelectedItem(shoppingList[currentIndex - 1]);
+    }
+  };
+
+  const handleNextItem = () => {
+    console.log('selectedItem', selectedItem);
+    if (!selectedItem) return;
+    const currentIndex = shoppingList.findIndex(item => item.product_id === selectedItem.product_id);
+    console.log('currentIndex', currentIndex);
+    console.log('shoppingList.length', shoppingList.length);
+    if (currentIndex < shoppingList.length - 1) {
+      setSelectedItem(shoppingList[currentIndex + 1]);
+    }
   };
 
   return (
@@ -95,17 +145,17 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, t
                     <button
                         onClick={(e) => {
                         e.stopPropagation();
-                        onUpdateQuantity(item._id, Math.max(0, (item.quantity || 1) - 1));
+                        handleUpdateQuantity(activeMatch._id, -1);
                         }}
                         className="text-gray-400 hover:text-gray-600"
                     >
                         −
                     </button>
-                    <span>{item.quantity || 1}</span>
+                    <span>{quantities[activeMatch._id] || 1}</span>
                     <button
                         onClick={(e) => {
                         e.stopPropagation();
-                        onUpdateQuantity(item._id, (item.quantity || 1) + 1);
+                        handleUpdateQuantity(activeMatch._id, 1);
                         }}
                         className="text-gray-400 hover:text-gray-600"
                     >
@@ -135,12 +185,32 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, t
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-[800px]">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">Replace Item</h3>
-              <button onClick={() => setShowPopup(false)} className="text-gray-500">
+              <button 
+                onClick={handlePrevItem}
+                disabled={getCurrentItemIndex() === 1}
+                className="text-gray-500 disabled:opacity-50"
+              >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
+              <h3 className="text-lg font-medium">Find item match {getCurrentItemIndex()}/{shoppingList.length}</h3>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleNextItem}
+                  disabled={getCurrentItemIndex() === shoppingList.length}
+                  className="text-gray-500 disabled:opacity-50"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                <button onClick={() => setShowPopup(false)} className="text-gray-500">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </button>
+              </div>
             </div>
             <div className="flex justify-between items-center mb-4 bg-gray-50 p-3 rounded-lg">
               <span>{selectedItem.name} {selectedItem.unit_size} {selectedItem.unit_of_measurement}</span>
@@ -184,24 +254,24 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, t
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          onUpdateQuantity(match._id, -1);
+                          handleUpdateQuantity(match._id, -1);
                         }}
                         className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
                       >
                         -
                       </button>
-                      <span className="w-8 text-center">{match.adjusted_quantity}</span>
+                      <span className="w-8 text-center">{quantities[match._id] || 1}</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onUpdateQuantity(match._id, 1);
+                          handleUpdateQuantity(match._id, 1);
                         }}
                         className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
                       >
                         +
                       </button>
                     </div>
-                    <span className="text-sm font-medium w-20 text-right">${(match.price * match.adjusted_quantity).toFixed(2)}</span>
+                    <span className="text-sm font-medium w-20 text-right">${(match.price * (quantities[match._id] || 1)).toFixed(2)}</span>
                     <button 
                       className={`px-3 py-1 rounded-full text-sm min-w-[100px] ${
                         activeMatchedItems[selectedItem.product_id] === match._id 

@@ -314,15 +314,16 @@ const MealPlanDetailPage = () => {
     }
   };
 
-  const updateItemQuantity = (productId: string, quantityChange: number) => {
-    setShoppingList(prevList => {
-      return prevList.map(item => 
-        item.product_id === productId 
-          ? { ...item, quantity: Math.max(1, item.quantity + quantityChange) } // Ensure quantity doesn't go below 1
-          : item
-      );
-    });
-  };
+  // const updateItemQuantity = (productId: string, quantityChange: number) => {
+  //   console.log(productId, quantityChange, "productId, quantityChange");
+  //   setShoppingList(prevList => {
+  //     return prevList.map(item => 
+  //       item.product_id === productId 
+  //         ? { ...item, quantity: Math.max(1, item.quantity + quantityChange) } // Ensure quantity doesn't go below 1
+  //         : item
+  //     );
+  //   });
+  // };
 
   if (!plan) {
     return <div>No meal plan found</div>;
@@ -607,7 +608,7 @@ const MealPlanDetailPage = () => {
     return (
       <div className="flex flex-col lg:flex-row mt-[40px]">
         {isLoading && <LoadingOverlay />}
-        <div className="flex lg:w-3/4 flex-col gap-4 bg-white p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
+        <div className="flex lg:w-2/3 flex-col gap-4 bg-white p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
           <div className="flex flex-row items-center gap-2 md:px-32 cursor-pointer" onClick={() => setIsOrderPage(false)}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8936 3.5173C16.3818 3.5173 16.7776 3.12151 16.7776 2.63328C16.7776 2.14506 16.3818 1.74927 15.8936 1.74927H2.63334C2.14511 1.74927 1.74933 2.14506 1.74933 2.63328V15.8935C1.74933 16.3818 2.14511 16.7776 2.63334 16.7776C3.12157 16.7776 3.51736 16.3818 3.51736 15.8935V4.76749L16.7419 17.992C17.0871 18.3372 17.6468 18.3372 17.9921 17.992C18.3373 17.6468 18.3373 17.087 17.9921 16.7418L4.76755 3.5173H15.8936Z" fill="black"/>
@@ -1006,7 +1007,7 @@ const MealPlanDetailPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 bg-white p-4 rounded-md lg:w-1/4 lg:px-2 px-16">
+        <div className="flex flex-col gap-4 bg-white p-4 rounded-md lg:w-1/3 lg:px-2 px-16">
           <div className="mb-2 left-0 right-0">
             <div className="flex flex-col items-start gap-2 flex justify-start">
               <h2 className="text-lg font-bold">{plan.name}</h2>
@@ -1023,7 +1024,7 @@ const MealPlanDetailPage = () => {
           <ShoppingListComponent 
             shoppingList={shoppingList} 
             onRemoveItem={removeFromShoppingList} 
-            onUpdateQuantity={updateItemQuantity}
+            // onUpdateQuantity={updateItemQuantity}
             tipAmount={tipAmount}
             handleCreateOrder={(total: number) => handleCreateOrder(total)}
           />
