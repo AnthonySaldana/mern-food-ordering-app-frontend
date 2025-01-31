@@ -4,15 +4,15 @@ import { ShoppingListItem } from '@/types';
 interface ShoppingListProps {
   shoppingList: ShoppingListItem[];
   onRemoveItem: (id: string) => void;
-  onUpdateQuantity: (matchId: string, change: number) => void;
   tipAmount: number;
   handleCreateOrder: (total: number) => void;
 }
 
-const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, tipAmount, handleCreateOrder }: ShoppingListProps) => {
+const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCreateOrder }: ShoppingListProps) => {
   const [activeMatchedItems, setActiveMatchedItems] = useState<{[key: string]: string}>({});
   const [selectedItem, setSelectedItem] = useState<ShoppingListItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
+  const [quantities, setQuantities] = useState<{[key: string]: number}>({});
 
   const handleMatchedItemClick = (shoppingItemId: string, matchedItemId: string) => {
     setActiveMatchedItems(prev => ({
@@ -26,12 +26,24 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, t
     setShowPopup(true);
   };
 
+  const handleUpdateQuantity = (matchId: string, change: number) => {
+    setQuantities(prev => {
+      const currentQty = prev[matchId] || 1;
+      const newQty = Math.max(1, currentQty + change);
+      return {
+        ...prev,
+        [matchId]: newQty
+      };
+    });
+  };
+
   const calculateSubtotal = () => {
     return shoppingList.reduce((total, item) => {
       const activeMatchId = activeMatchedItems[item.product_id];
       const activeMatch = item.matched_items?.find(match => match._id === activeMatchId);
       if (activeMatch) {
-        const itemTotal = activeMatch.price * activeMatch.adjusted_quantity;
+        const quantity = quantities[activeMatch._id] || 1;
+        const itemTotal = activeMatch.price * quantity;
         return total + (itemTotal * 100);
       }
       return total;
@@ -95,17 +107,17 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, t
                     <button
                         onClick={(e) => {
                         e.stopPropagation();
-                        onUpdateQuantity(item._id, Math.max(0, (item.quantity || 1) - 1));
+                        handleUpdateQuantity(activeMatch._id, -1);
                         }}
                         className="text-gray-400 hover:text-gray-600"
                     >
                         −
                     </button>
-                    <span>{item.quantity || 1}</span>
+                    <span>{quantities[activeMatch._id] || 1}</span>
                     <button
                         onClick={(e) => {
                         e.stopPropagation();
-                        onUpdateQuantity(item._id, (item.quantity || 1) + 1);
+                        handleUpdateQuantity(activeMatch._id, 1);
                         }}
                         className="text-gray-400 hover:text-gray-600"
                     >
@@ -184,24 +196,24 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, onUpdateQuantity, t
                       <button 
                         onClick={(e) => {
                           e.stopPropagation();
-                          onUpdateQuantity(match._id, -1);
+                          handleUpdateQuantity(match._id, -1);
                         }}
                         className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
                       >
                         -
                       </button>
-                      <span className="w-8 text-center">{match.adjusted_quantity}</span>
+                      <span className="w-8 text-center">{quantities[match._id] || 1}</span>
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          onUpdateQuantity(match._id, 1);
+                          handleUpdateQuantity(match._id, 1);
                         }}
                         className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
                       >
                         +
                       </button>
                     </div>
-                    <span className="text-sm font-medium w-20 text-right">${(match.price * match.adjusted_quantity).toFixed(2)}</span>
+                    <span className="text-sm font-medium w-20 text-right">${(match.price * (quantities[match._id] || 1)).toFixed(2)}</span>
                     <button 
                       className={`px-3 py-1 rounded-full text-sm min-w-[100px] ${
                         activeMatchedItems[selectedItem.product_id] === match._id 
