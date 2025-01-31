@@ -1007,7 +1007,7 @@ const MealPlanDetailPage = () => {
         </div>
 
         <div className="flex flex-col gap-4 bg-white p-4 rounded-md lg:w-1/4 lg:px-2 px-16">
-          <div className="mb-6 -bottom-[61px] left-0 right-0">
+          <div className="mb-2 left-0 right-0">
             <div className="flex flex-col items-start gap-2 flex justify-start">
               <h2 className="text-lg font-bold">{plan.name}</h2>
               <div className="flex items-center gap-2">
