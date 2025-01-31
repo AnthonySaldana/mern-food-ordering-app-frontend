@@ -19,6 +19,16 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
       ...prev,
       [shoppingItemId]: matchedItemId
     }));
+
+    // Find the next unmatched item
+    const currentIndex = shoppingList.findIndex(item => item.product_id === shoppingItemId);
+    const nextUnmatchedItem = shoppingList.slice(currentIndex + 1).find(item => !activeMatchedItems[item.product_id]);
+
+    if (nextUnmatchedItem) {
+      setSelectedItem(nextUnmatchedItem);
+    } else {
+      setShowPopup(false);
+    }
   };
 
   const handleItemClick = (item: ShoppingListItem) => {
@@ -66,6 +76,34 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
     const shipping = calculateShipping();
     const total = subtotal + tax + shipping + (tipAmount * 100);
     return total;
+  };
+
+  const getCurrentItemIndex = () => {
+    if (!selectedItem) return 0;
+    console.log('selectedItem', selectedItem);
+    console.log('shoppingList', shoppingList);
+    return shoppingList.findIndex(item => item.product_id === selectedItem.product_id) + 1;
+  };
+
+  const handlePrevItem = () => {
+    console.log('selectedItem', selectedItem);
+    if (!selectedItem) return;
+    const currentIndex = shoppingList.findIndex(item => item.product_id === selectedItem.product_id);
+    console.log('currentIndex', currentIndex);
+    if (currentIndex > 0) {
+      setSelectedItem(shoppingList[currentIndex - 1]);
+    }
+  };
+
+  const handleNextItem = () => {
+    console.log('selectedItem', selectedItem);
+    if (!selectedItem) return;
+    const currentIndex = shoppingList.findIndex(item => item.product_id === selectedItem.product_id);
+    console.log('currentIndex', currentIndex);
+    console.log('shoppingList.length', shoppingList.length);
+    if (currentIndex < shoppingList.length - 1) {
+      setSelectedItem(shoppingList[currentIndex + 1]);
+    }
   };
 
   return (
@@ -147,12 +185,32 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-[800px]">
             <div className="flex justify-between items-center mb-4">
-              <h3 className="text-lg font-medium">Replace Item</h3>
-              <button onClick={() => setShowPopup(false)} className="text-gray-500">
+              <button 
+                onClick={handlePrevItem}
+                disabled={getCurrentItemIndex() === 1}
+                className="text-gray-500 disabled:opacity-50"
+              >
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M15 18L9 12L15 6" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                 </svg>
               </button>
+              <h3 className="text-lg font-medium">Find item match {getCurrentItemIndex()}/{shoppingList.length}</h3>
+              <div className="flex items-center gap-2">
+                <button 
+                  onClick={handleNextItem}
+                  disabled={getCurrentItemIndex() === shoppingList.length}
+                  className="text-gray-500 disabled:opacity-50"
+                >
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M9 6L15 12L9 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  </svg>
+                </button>
+                <button onClick={() => setShowPopup(false)} className="text-gray-500">
+                  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                  </svg>
+                </button>
+              </div>
             </div>
             <div className="flex justify-between items-center mb-4 bg-gray-50 p-3 rounded-lg">
               <span>{selectedItem.name} {selectedItem.unit_size} {selectedItem.unit_of_measurement}</span>
