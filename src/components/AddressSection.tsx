@@ -195,7 +195,7 @@ const AddressSection = ({ onAddressSelect, onUserCreated, email }: AddressSectio
               />
             </div>
             <div>
-              <Label htmlFor="country">Country</Label>
+              <Label htmlFor="country">Country <small>(country code)</small></Label>
               <Input
                 id="country"
                 value={country}
