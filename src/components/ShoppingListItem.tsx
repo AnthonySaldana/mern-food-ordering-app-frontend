@@ -13,6 +13,7 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
   const [selectedItem, setSelectedItem] = useState<ShoppingListItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [quantities, setQuantities] = useState<{[key: string]: number}>({});
+  const [imagePopup, setImagePopup] = useState<{ visible: boolean, item: ShoppingListItem | null }>({ visible: false, item: null });
 
   const handleMatchedItemClick = (shoppingItemId: string, matchedItemId: string) => {
     setActiveMatchedItems(prev => ({
@@ -106,6 +107,14 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
     }
   };
 
+  const handleImageClick = (item: ShoppingListItem) => {
+    setImagePopup({ visible: true, item });
+  };
+
+  const closeImagePopup = () => {
+    setImagePopup({ visible: false, item: null });
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <div className="mb-6 bg-[#F2F6FB] rounded-lg p-4">
@@ -125,7 +134,15 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
                 >
                     {activeMatch ? (
                       <>
-                        <img src={activeMatch.image} alt={activeMatch.name} className="w-[40px] h-[40px] rounded-md" />
+                        <img 
+                          src={activeMatch.image} 
+                          alt={activeMatch.name} 
+                          className="w-[40px] h-[40px] rounded-md cursor-pointer" 
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleImageClick(item);
+                          }}
+                        />
                         <div className="flex flex-col">
                           <span className="font-medium">{activeMatch.name}</span>
                           <span className="text-sm text-gray-500">{activeMatch.unit_size} {activeMatch.unit_of_measurement}</span>
@@ -285,6 +302,24 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
                 </div>
               ))}
             </div>
+          </div>
+        </div>
+      )}
+
+      {imagePopup.visible && imagePopup.item && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
+          <div className="bg-white rounded-lg p-6 w-full max-w-[500px]">
+            <div className="flex justify-between items-center mb-4">
+              <h3 className="text-lg font-medium">{imagePopup.item.name}</h3>
+              <button onClick={closeImagePopup} className="text-gray-500">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M18 6L6 18M6 6L18 18" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
+              </button>
+            </div>
+            <img src={imagePopup.item.matched_items?.[0]?.image} alt={imagePopup.item.name} className="w-full h-auto rounded-md mb-4" />
+            <p className="text-sm text-gray-500">Size: {imagePopup.item.unit_size} {imagePopup.item.unit_of_measurement}</p>
+            {/* <p className="text-sm text-gray-500">Description: {imagePopup.item.description || 'No description available'}</p> */}
           </div>
         </div>
       )}
