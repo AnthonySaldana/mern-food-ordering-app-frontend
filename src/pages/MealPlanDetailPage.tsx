@@ -450,37 +450,37 @@ const MealPlanDetailPage = () => {
 
     saveShoppingListConfig();
 
-    // try {
-    //   const response = await fetch(`${API_BASE_URL}/api/grocery/create-order`, {
-    //     method: "POST",
-    //     headers: {
-    //       "Content-Type": "application/json"
-    //     },
-    //     body: JSON.stringify(orderData)
-    //   });
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/grocery/create-order`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(orderData)
+      });
 
-    //   if (!response.ok) {
-    //     const errorData = await response.json();
-    //     setErrorMessage(errorData.message || "Failed to create order");
-    //     toast.error(errorData.message || "Failed to create order");
-    //     return;
-    //   }
+      if (!response.ok) {
+        const errorData = await response.json();
+        setErrorMessage(errorData.message || "Failed to create order");
+        toast.error(errorData.message || "Failed to create order");
+        return;
+      }
 
-    //   const data = await response.json();
+      const data = await response.json();
 
-    //   if (data.order_placed && data.tracking_link) {
-    //     // Open the tracking link in a new tab
-    //     window.open(data.tracking_link, '_blank');
-    //   } else {
-    //     // Handle the case where the order was not placed successfully
-    //     toast.error("Order could not be placed. Please try again.");
-    //   }
-    //   console.log("Order created successfully:", data);
-    // } catch (error) {
-    //   console.error("Error creating order:", error);
-    //   setErrorMessage("Error creating order");
-    //   toast.error("Error creating order");
-    // }
+      if (data.order_placed && data.tracking_link) {
+        // Open the tracking link in a new tab
+        window.open(data.tracking_link, '_blank');
+      } else {
+        // Handle the case where the order was not placed successfully
+        toast.error("Order could not be placed. Please try again.");
+      }
+      console.log("Order created successfully:", data);
+    } catch (error) {
+      console.error("Error creating order:", error);
+      setErrorMessage("Error creating order");
+      toast.error("Error creating order");
+    }
   };
 
   const areDeliveryDetailsComplete = () => {
