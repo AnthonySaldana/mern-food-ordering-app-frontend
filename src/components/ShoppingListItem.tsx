@@ -3,7 +3,7 @@ import { ShoppingListItem } from '@/types';
 
 interface ShoppingListProps {
   shoppingList: ShoppingListItem[];
-  onRemoveItem: (id: string) => void;
+//   onRemoveItem: (id: string) => void;
   tipAmount: number;
   handleCreateOrder: (total: number) => void;
   initialMatchedItems: any;
@@ -13,7 +13,7 @@ interface ShoppingListProps {
 //   saveShoppingListConfig: any;
 }
 
-const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCreateOrder,
+const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     initialMatchedItems, setInitialMatchedItems, initialQuantities, setInitialQuantities }: ShoppingListProps) => {
   const [activeMatchedItems, setActiveMatchedItems] = useState<{[key: string]: string}>(initialMatchedItems);
   const [selectedItem, setSelectedItem] = useState<ShoppingListItem | null>(null);
@@ -125,6 +125,14 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
     setImagePopup({ visible: false, item: null });
   };
 
+  const handleRemoveMatchedItem = (itemId: string) => {
+    setActiveMatchedItems(prev => {
+      const updated = { ...prev };
+      delete updated[itemId];
+      return updated;
+    });
+  };
+
   return (
     <div className="flex flex-col gap-2">
       <div className="mb-6 bg-[#F2F6FB] rounded-lg p-4">
@@ -178,8 +186,12 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
                         <span>Total: ${activeMatch.price * (quantities[activeMatch._id] || 1)}</span>
                     <button
                         onClick={(e) => {
-                        e.stopPropagation();
-                        handleUpdateQuantity(activeMatch._id, -1);
+                          e.stopPropagation();
+                          if (quantities[activeMatch._id] === 1) {
+                            handleRemoveMatchedItem(item.product_id);
+                          } else {
+                            handleUpdateQuantity(activeMatch._id, -1);
+                          }
                         }}
                         className="text-gray-400 hover:text-gray-600"
                     >
@@ -198,7 +210,7 @@ const ShoppingListComponent = ({ shoppingList, onRemoveItem, tipAmount, handleCr
                     <button
                     onClick={(e) => {
                         e.stopPropagation();
-                        onRemoveItem(item._id);
+                        handleRemoveMatchedItem(item.product_id);
                     }}
                     className="text-red-500 hover:text-red-700"
                     >

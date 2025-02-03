@@ -405,9 +405,9 @@ const MealPlanDetailPage = () => {
     });
   };
 
-  const removeFromShoppingList = (productId: string) => {
-    setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
-  };
+  // const removeFromShoppingList = (productId: string) => {
+  //   setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
+  // };
 
   const handleCreateOrder = async (total: number) => {
     if (!selectedStore || !location) {
@@ -1092,7 +1092,7 @@ const MealPlanDetailPage = () => {
           {shoppingList?.length > 0 && <MatchingTutorial />}
           <ShoppingListComponent 
             shoppingList={shoppingList} 
-            onRemoveItem={removeFromShoppingList} 
+            // onRemoveItem={removeFromShoppingList} 
             // onUpdateQuantity={updateItemQuantity}
             tipAmount={tipAmount}
             handleCreateOrder={(total: number) => handleCreateOrder(total)}
