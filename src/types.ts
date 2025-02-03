@@ -145,6 +145,7 @@ export type ShoppingListItem = {
   };
   matched_items?: Array<{
     _id: string;
+    product_id: string;
     name: string;
     unit_of_measurement: string;
     unit_size: number;

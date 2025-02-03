@@ -14,7 +14,7 @@ const MatchingTutorial = () => {
 
   return (
     <div className="fixed inset-0 bg-black/50 flex justify-center items-center z-[1000]">
-      <div className="bg-white p-6 rounded-lg max-w-[800px] w-[90%]">
+      <div className="bg-white p-12 rounded-xl max-w-[800px] w-[90%]">
         <div className="flex items-center mb-4 relative">
           <h2 className="m-0 text-lg font-bold w-full text-center">Just a heads up!</h2>
           <button 
@@ -51,7 +51,7 @@ const MatchingTutorial = () => {
 
         <button
           onClick={handleClose}
-          className="w-full py-3 bg-[#00A67E] text-white border-none rounded cursor-pointer text-base"
+          className="w-full py-3 bg-[#00A67E] text-white border-none rounded-full cursor-pointer text-base max-w-[100px] mx-auto block"
         >
           Ok
         </button>
