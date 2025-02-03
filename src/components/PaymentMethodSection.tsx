@@ -92,6 +92,31 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: P
     onPaymentMethodSelect(paymentMethodId);
   };
 
+  const handleDeletePaymentMethod = async (paymentMethodId: string) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/grocery/payment-methods/delete`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          payment_method_id: paymentMethodId,
+          user_email: email,
+        }),
+      });
+
+      if (response.ok) {
+        toast.success('Payment method deleted successfully');
+        refetch(); // Refresh the list of payment methods
+      } else {
+        toast.error('Failed to delete payment method');
+      }
+    } catch (error) {
+      console.error('Error deleting payment method:', error);
+      toast.error('Error deleting payment method');
+    }
+  };
+
   return (
     <div className="mt-6 bg-[#F2F6FB] rounded-xl p-6">
       <h3 className="text-lg font-semibold">Payment</h3>
@@ -119,6 +144,15 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: P
                       •••• {method.last4} | Expires {method.exp_month}/{method.exp_year}
                     </p>
                   </div>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDeletePaymentMethod(method.id);
+                    }}
+                    className="text-red-500 hover:text-red-700"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
             ))}

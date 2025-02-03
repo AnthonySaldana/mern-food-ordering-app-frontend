@@ -80,6 +80,8 @@ const MealPlanDetailPage = () => {
   const [quote, setQuote] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
+  const [activeMatchedItems, setActiveMatchedItems] = useState<any>({});
+  const [quantities, setQuantities] = useState<any>({});
   // const [tempEmail, setTempEmail] = useState<string>("");
   const { loginWithRedirect, isAuthenticated, user } = useAuth0();
 
@@ -210,6 +212,35 @@ const MealPlanDetailPage = () => {
       }
     }
   }, [storeMatches]);
+
+  useEffect(() => {
+    const fetchSavedConfig = async () => {
+      if (!isAuthenticated || !user) return;
+
+      try {
+        const response = await fetch(`${API_BASE_URL}/api/shoppingList/get?userId=${user.sub}&influencerId=${influencerId}&storeId=${selectedStore?._id}`);
+        if (response.ok) {
+          const config = await response.json();
+          setShoppingList(config.shoppingList);
+          setActiveMatchedItems(config.shoppingList.reduce((acc: any, item: any) => {
+            // Check if inventoryItem and matchedItem exist
+            if (item.inventoryItem && item.matchedItem) {
+              acc[item.product_id] = item.matchedItem.matched_item_id;
+            }
+            return acc;
+          }, {}));
+          setQuantities(config.shoppingList.reduce((acc: any, item: any) => {
+            acc[item.product_id] = item.quantity;
+            return acc;
+          }, {}));
+        }
+      } catch (error) {
+        console.error("Failed to fetch saved configuration", error);
+      }
+    };
+
+    fetchSavedConfig();
+  }, [isAuthenticated, user, influencerId, selectedStore]);
   
 
   // const handleStoreSelection = async (store: any) => {
@@ -374,9 +405,9 @@ const MealPlanDetailPage = () => {
     });
   };
 
-  const removeFromShoppingList = (productId: string) => {
-    setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
-  };
+  // const removeFromShoppingList = (productId: string) => {
+  //   setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
+  // };
 
   const handleCreateOrder = async (total: number) => {
     if (!selectedStore || !location) {
@@ -416,6 +447,8 @@ const MealPlanDetailPage = () => {
       meal_plan_name: plan.name,
       plan_start_day: selectedStartDay
     };
+
+    saveShoppingListConfig();
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/grocery/create-order`, {
@@ -602,6 +635,40 @@ const MealPlanDetailPage = () => {
       console.error('Error processing inventory and creating order:', error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const saveShoppingListConfig = async () => {
+    if (!isAuthenticated || !user) return;
+
+    const config = {
+      userId: user.sub,
+      influencerId,
+      storeId: selectedStore?._id,
+      shoppingList: shoppingList.map(item => ({
+        product_id: item.product_id,
+        matched_item_id: activeMatchedItems[item.product_id],
+        quantity: quantities[item.product_id] || 1,
+      })),
+    };
+
+    try {
+      const response = await fetch(`${API_BASE_URL}/api/shoppingList/save`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(config),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to save shopping list configuration");
+      }
+
+      toast("Shopping list configuration saved successfully!");
+    } catch (error) {
+      console.error(error);
+      toast("Failed to save shopping list configuration");
     }
   };
 
@@ -1025,10 +1092,15 @@ const MealPlanDetailPage = () => {
           {shoppingList?.length > 0 && <MatchingTutorial />}
           <ShoppingListComponent 
             shoppingList={shoppingList} 
-            onRemoveItem={removeFromShoppingList} 
+            // onRemoveItem={removeFromShoppingList} 
             // onUpdateQuantity={updateItemQuantity}
             tipAmount={tipAmount}
             handleCreateOrder={(total: number) => handleCreateOrder(total)}
+            initialMatchedItems={activeMatchedItems}
+            setInitialMatchedItems={setActiveMatchedItems}
+            initialQuantities={quantities}
+            setInitialQuantities={setQuantities}
+            // saveShoppingListConfig={saveShoppingListConfig}
           />
           {/* <button 
             className={`mt-4 px-4 py-3 rounded-xl w-full font-medium ${
