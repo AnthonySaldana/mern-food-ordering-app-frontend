@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 
 interface MatchedItemProps {
   targetItem: any;
@@ -6,16 +6,12 @@ interface MatchedItemProps {
 }
 
 const MatchedItem: React.FC<MatchedItemProps> = ({ targetItem, selectedItem }) => {
-  const [quantity, setQuantity] = useState(1);
+//   const [quantity, setQuantity] = useState(1);
 
-  const handleIncrease = () => setQuantity(quantity + 1);
-  const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
-
-  console.log(selectedItem, 'selectedItem');
-  console.log(targetItem, 'targetItem');
+//   const handleIncrease = () => setQuantity(quantity + 1);
+//   const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
   const activeMatch = selectedItem ? targetItem.matched_items.find((match: any) => match._id === selectedItem) : null;
-  console.log(activeMatch, 'activeMatch');
 
   if (!selectedItem) {
     return (
