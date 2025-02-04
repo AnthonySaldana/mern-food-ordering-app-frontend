@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { ShoppingListItem } from '@/types';
+import MatchedItem from './matchedItem';
 
 interface ShoppingListProps {
   shoppingList: ShoppingListItem[];
@@ -275,6 +276,13 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                 disabled
                 placeholder="Search"
                 className="w-full bg-transparent border-none outline-none text-gray-600 placeholder-gray-400"
+                />
+            </div>
+
+            <div className="flex flex-col gap-2 mb-4 mt-4">
+                <MatchedItem 
+                    targetItem={selectedItem}
+                    selectedItem={activeMatchedItems[selectedItem.product_id]}
                 />
             </div>
 

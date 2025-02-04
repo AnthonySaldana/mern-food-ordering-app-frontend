@@ -576,7 +576,7 @@ const MealPlanDetailPage = () => {
 
           attempts++;
           if (attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 20000));
+            await new Promise(resolve => setTimeout(resolve, 10000));
           }
         }
 
@@ -626,7 +626,7 @@ const MealPlanDetailPage = () => {
       console.log('Inventory processing job added to the queue');
   
       // Wait for 20 seconds before proceeding to order
-      await new Promise(resolve => setTimeout(resolve, 20000));
+      await new Promise(resolve => setTimeout(resolve, 10000));
   
       // Proceed to order
       await handleOrderPlan(store);
@@ -893,19 +893,19 @@ const MealPlanDetailPage = () => {
                       <p className="text-gray-600">No stores found nearby</p>
                     ) : (
                       <div className="space-y-6">
-                        <div className="overflow-x-auto">
+                        <div className="overflow-x-auto relative">
                           <p className="text-gray-600 mb-4">You can select a store you prefer to check availability and receive your order from</p>
-                          <div className="flex flex-row gap-4 pb-4" style={{minWidth: "min-content", height: "120px"}}>
-                            {storeMatches?.stores?.map((store: any) => (
+                          <div className="flex flex-row gap-4 pb-4" style={{ minWidth: "120px", height: "120px", overflowX: "scroll" }}>
+                            {storeMatches?.stores?.map((store: any, index: number) => (
                               <div 
-                                key={store?._id || 'unknown'} 
+                                key={store?._id || `unknown-${index}`} 
                                 className={`flex-none w-80 p-4 rounded-lg cursor-pointer flex flex-row items-center gap-4 justify-center ${
-                                  selectedStore?.id === store.id ? 'bg-white text-black' : 'bg-[#F2F6FB]'
+                                  selectedStore?._id === store._id ? 'bg-white text-black' : 'bg-white'
                                 }`}
                                 onClick={() => handleProcessAndOrder(store)}
+                                // style={{ width: 'calc(100% - 20%)' }} // Adjust width to show part of the next item
                               >
-
-                                <div className={`${selectedStore?.id === store._id ? 'text-green-500' : 'text-blue-500'}`}>
+                                <div className={`${selectedStore?._id === store._id ? 'text-green-500' : 'text-blue-500'}`}>
                                   {selectedStore?._id === store._id ? <svg width="30" height="30" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
                                     <g clip-path="url(#clip0_758_39861)">
                                     <path fill-rule="evenodd" clip-rule="evenodd" d="M7.4462 1.31423C8.6978 -0.438076 11.3021 -0.438076 12.5538 1.31423L12.7531 1.5932C12.9733 1.9016 13.3432 2.06673 13.7198 2.02488L14.608 1.92619C16.6069 1.7041 18.2959 3.39308 18.0738 5.39196L17.9752 6.28014C17.9333 6.6568 18.0984 7.02665 18.4068 7.24693L18.6858 7.4462C20.4381 8.6978 20.4381 11.3021 18.6858 12.5538L18.4068 12.7531C18.0984 12.9733 17.9333 13.3432 17.9752 13.7198L18.0738 14.608C18.2959 16.6069 16.6069 18.2959 14.608 18.0738L13.7198 17.9752C13.3432 17.9333 12.9733 18.0984 12.7531 18.4068L12.5538 18.6858C11.3021 20.4381 8.6979 20.4381 7.4462 18.6858L7.24693 18.4068C7.02665 18.0984 6.6568 17.9333 6.28013 17.9752L5.39196 18.0738C3.39308 18.2959 1.7041 16.6069 1.92619 14.608L2.02488 13.7198C2.06673 13.3432 1.9016 12.9733 1.5932 12.7531L1.31423 12.5538C-0.438076 11.3021 -0.438076 8.6979 1.31423 7.4462L1.5932 7.24693C1.9016 7.02665 2.06673 6.6568 2.02488 6.28013L1.92619 5.39196C1.7041 3.39308 3.39308 1.7041 5.39196 1.92619L6.28014 2.02488C6.6568 2.06673 7.02665 1.9016 7.24693 1.5932L7.4462 1.31423ZM13.8781 7.16803C14.2866 7.57658 14.2866 8.23897 13.8781 8.64748L9.88306 12.6425C9.36993 13.1558 8.53784 13.1558 8.02472 12.6425L6.12191 10.7397C5.71337 10.3312 5.71337 9.66881 6.12191 9.2603C6.53045 8.85179 7.19282 8.85179 7.60136 9.2603L8.95389 10.6128L12.3987 7.16803C12.8072 6.7595 13.4696 6.7595 13.8781 7.16803Z" fill="#09C274"/>
@@ -962,6 +962,11 @@ const MealPlanDetailPage = () => {
                                 </button> */}
                               </div>
                             ))}
+                          </div>
+                          <div className="absolute right-1 bottom-[40px] transform -translate-y-1/2 md:hidden bg-gray-600/20 rounded-full p-1">
+                            <svg width="24" height="24" fill="currentColor" className="text-gray-600">
+                              <path d="M8 5l8 7-8 7V5z" />
+                            </svg>
                           </div>
                         </div>
                         {selectedStore && false && (
