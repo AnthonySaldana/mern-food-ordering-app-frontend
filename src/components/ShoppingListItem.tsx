@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { ShoppingListItem } from '@/types';
 import MatchedItem from './matchedItem';
 
@@ -12,15 +12,20 @@ interface ShoppingListProps {
   initialQuantities: any;
   setInitialQuantities: any;
 //   saveShoppingListConfig: any;
+  selectedStoreId: string;
 }
 
 const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
-    initialMatchedItems, setInitialMatchedItems, initialQuantities, setInitialQuantities }: ShoppingListProps) => {
+    initialMatchedItems, setInitialMatchedItems, initialQuantities, setInitialQuantities, selectedStoreId }: ShoppingListProps) => {
   const [activeMatchedItems, setActiveMatchedItems] = useState<{[key: string]: string}>(initialMatchedItems);
   const [selectedItem, setSelectedItem] = useState<ShoppingListItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [imagePopup, setImagePopup] = useState<any>({ visible: false, item: null });
   const [quantities, setQuantities] = useState<{[key: string]: number}>(initialQuantities);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [searchResults, setSearchResults] = useState([]);
+
+  const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
   const handleMatchedItemClick = (shoppingItemId: string, matchedItemId: string) => {
     setActiveMatchedItems(prev => ({
@@ -35,7 +40,10 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     const nextUnmatchedItem = shoppingList.slice(currentIndex + 1).find(item => !activeMatchedItems[item.product_id]);
 
     if (nextUnmatchedItem) {
+      setSearchResults([]);
       setSelectedItem(nextUnmatchedItem);
+      setSearchQuery(nextUnmatchedItem.name);
+      handleSearchChange({ target: { value: nextUnmatchedItem.name } });
     } else {
       setShowPopup(false);
     }
@@ -43,6 +51,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
 
   const handleItemClick = (item: ShoppingListItem) => {
     setSelectedItem(item);
+    setSearchQuery(item.name);
     setShowPopup(true);
   };
 
@@ -104,6 +113,9 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     console.log('currentIndex', currentIndex);
     if (currentIndex > 0) {
       setSelectedItem(shoppingList[currentIndex - 1]);
+      setSearchResults([]);
+      setSearchQuery(shoppingList[currentIndex - 1].name);
+      handleSearchChange({ target: { value: shoppingList[currentIndex - 1].name } });
     }
   };
 
@@ -114,7 +126,10 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     console.log('currentIndex', currentIndex);
     console.log('shoppingList.length', shoppingList.length);
     if (currentIndex < shoppingList.length - 1) {
+      setSearchResults([]);
       setSelectedItem(shoppingList[currentIndex + 1]);
+      setSearchQuery(shoppingList[currentIndex + 1].name);
+      handleSearchChange({ target: { value: shoppingList[currentIndex + 1].name } });
     }
   };
 
@@ -132,6 +147,30 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
       delete updated[itemId];
       return updated;
     });
+  };
+
+  const handleSearchChange = (e: any) => {
+    const query = e.target.value;
+    setSearchQuery(query);
+
+    if (searchTimeout.current) {
+      clearTimeout(searchTimeout.current);
+    }
+
+    if (query.length > 3) { // Start searching after 3 characters
+      searchTimeout.current = setTimeout(async () => {
+        try {
+          const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+          const response = await fetch(`${API_BASE_URL}/api/inventory/search?query=${query}&store_id=${selectedStoreId}`);
+          const results = await response.json();
+          setSearchResults(results);
+        } catch (error) {
+          console.error('Error fetching search results:', error);
+        }
+      }, 1000); // 2 seconds delay
+    } else {
+      setSearchResults([]);
+    }
   };
 
   return (
@@ -272,8 +311,8 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
 
                 <input 
                 type="text" 
-                value={selectedItem.name}
-                disabled
+                value={searchQuery}
+                onChange={handleSearchChange}
                 placeholder="Search"
                 className="w-full bg-transparent border-none outline-none text-gray-600 placeholder-gray-400"
                 />
@@ -287,7 +326,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
             </div>
 
             <div className="max-h-[400px] overflow-y-auto">
-              {selectedItem.matched_items?.map((match) => (
+              {searchResults?.map((match: any) => (
                 <div 
                   key={match._id}
                   className={`flex justify-between items-center p-2 cursor-pointer border rounded-lg ${
