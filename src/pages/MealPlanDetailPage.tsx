@@ -31,26 +31,6 @@ const fetchInfluencerById = async (id: string): Promise<Influencer> => {
   return response.json();
 };
 
-// interface ShoppingListItem {
-//   product_id: string;
-//   name: string;
-//   quantity: number;
-//   product_marked_price: number;
-//   matched_items?: Array<{
-//     name: string;
-//     unit_of_measurement: string;
-//     unit_size: number;
-//     adjusted_quantity: number;
-//     price: number;
-//   }>;
-//   selected_options?: Array<{
-//     option_id: string;
-//     quantity: number;
-//     marked_price?: number;
-//     notes?: string;
-//   }>;
-// }
-
 const MealPlanDetailPage = () => {
   const isStoresExpanded = true;
   const { influencerId, planIndex } = useParams();
@@ -241,52 +221,6 @@ const MealPlanDetailPage = () => {
 
     fetchSavedConfig();
   }, [isAuthenticated, user, influencerId, selectedStore]);
-  
-
-  // const handleStoreSelection = async (store: any) => {
-  //   setSelectedStore(store);
-  //   setSelectedCategory(null); // Reset category selection when switching stores
-
-  //   try {
-  //     setIsLoading(true);
-  //     const response = await fetch(`${API_BASE_URL}/api/grocery/process-inventory`, {
-  //       method: 'POST',
-  //       headers: {
-  //         'Content-Type': 'application/json',
-  //       },
-  //       body: JSON.stringify({
-  //         store_id: store._id,
-  //         latitude: location?.latitude || 0,
-  //         longitude: location?.longitude || 0,
-  //         user_street_num: streetNum,
-  //         user_street_name: streetName,
-  //         user_city: city,
-  //         user_state: state,
-  //         user_zipcode: zipcode,
-  //         user_country: country
-  //       })
-  //     });
-
-  //     if (!response.ok) {
-  //       // setErrorMessage("This store is not available right now. Please select a different store.");
-  //       toast.error("This store is not available right now. Please select a different store.");
-  //       throw new Error('Failed to queue inventory processing');
-  //     }
-
-  //     toast.success("Inventory for this store is being processed. Please order in a minute.");
-
-  //     console.log('Inventory processing job added to the queue');
-  //   } catch (error) {
-  //     console.error('Error queuing inventory processing:', error);
-  //   } finally {
-  //     setIsLoading(false);
-  //   }
-  // };
-  // const { data: storeMatches } = useFindStoresForShoppingList({
-  //   menuItems: plan?.menuItems || [],
-  //   latitude: location?.latitude || 0,
-  //   longitude: location?.longitude || 0,
-  // });
 
   console.log(storeMatches, 'storeMatches found here');
 
@@ -311,22 +245,7 @@ const MealPlanDetailPage = () => {
       return null;
     }
   };
-  // useEffect(() => {
-  //   const updateLocation = async () => {
-  //     if (areDeliveryDetailsComplete()) {
-  //       const address = `${streetNum} ${streetName}, ${city} ${state} ${country}, ${zipcode}`;
-  //       const coordinates = await fetchCoordinates(address);
-  //       if (coordinates) {
-  //         setLocation({
-  //           latitude: coordinates.lat,
-  //           longitude: coordinates.lng
-  //         });
-  //       }
-  //     }
-  //   };
 
-  //   updateLocation();
-  // }, [streetNum, streetName, city, state, zipcode, country]);
   const updateDeliveryDetails = async () => {
     if (selectedAddress) {
       console.log(selectedAddress, 'selectedAddress in updateDeliveryDetails')
@@ -345,17 +264,6 @@ const MealPlanDetailPage = () => {
       }
     }
   };
-
-  // const updateItemQuantity = (productId: string, quantityChange: number) => {
-  //   console.log(productId, quantityChange, "productId, quantityChange");
-  //   setShoppingList(prevList => {
-  //     return prevList.map(item => 
-  //       item.product_id === productId 
-  //         ? { ...item, quantity: Math.max(1, item.quantity + quantityChange) } // Ensure quantity doesn't go below 1
-  //         : item
-  //     );
-  //   });
-  // };
 
   if (!plan) {
     return <div>No meal plan found</div>;
@@ -404,10 +312,6 @@ const MealPlanDetailPage = () => {
       return [...prevList, newItem];
     });
   };
-
-  // const removeFromShoppingList = (productId: string) => {
-  //   setShoppingList(prevList => prevList.filter(item => item.product_id !== productId));
-  // };
 
   const handleCreateOrder = async (total: number) => {
     if (!selectedStore || !location) {
@@ -1105,6 +1009,7 @@ const MealPlanDetailPage = () => {
             setInitialMatchedItems={setActiveMatchedItems}
             initialQuantities={quantities}
             setInitialQuantities={setQuantities}
+            selectedStoreId={selectedStore?._id}
             // saveShoppingListConfig={saveShoppingListConfig}
           />
           {/* <button 
