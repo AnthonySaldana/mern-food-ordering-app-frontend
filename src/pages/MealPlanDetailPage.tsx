@@ -313,7 +313,7 @@ const MealPlanDetailPage = () => {
     });
   };
 
-  const handleCreateOrder = async (total: number) => {
+  const handleCreateOrder = async (total: number, activeMatchedItems: any, quantities: any) => {
     if (!selectedStore || !location) {
       console.error("Store or location not selected");
       return;
@@ -333,13 +333,15 @@ const MealPlanDetailPage = () => {
       tip_amount: tipAmount
     };
 
+    console.log(activeMatchedItems, 'activeMatchedItems in order')
+    console.log(shoppingList, 'shoppingList in order')
+
     const orderData = {
       store_id: selectedStore._id,
       items: shoppingList.map(item => ({
-        product_id: item.product_id,
-        quantity: item.quantity, // Use updated quantity
-        instructions: "" // Add any special instructions if needed
-      })),
+        product_id: activeMatchedItems[item.product_id]?.product_id,
+        quantity: quantities[item.product_id] || 1,
+      })).filter(item => item.product_id),
       delivery_details: deliveryDetails,
       payment_details: {
         payment_method_id: selectedPaymentMethod,
@@ -1004,7 +1006,7 @@ const MealPlanDetailPage = () => {
             // onRemoveItem={removeFromShoppingList} 
             // onUpdateQuantity={updateItemQuantity}
             tipAmount={tipAmount}
-            handleCreateOrder={(total: number) => handleCreateOrder(total)}
+            handleCreateOrder={(total: number, activeMatchedItems: any, quantities: any) => handleCreateOrder(total, activeMatchedItems, quantities)}
             initialMatchedItems={activeMatchedItems}
             setInitialMatchedItems={setActiveMatchedItems}
             initialQuantities={quantities}

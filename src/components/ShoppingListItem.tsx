@@ -6,7 +6,7 @@ interface ShoppingListProps {
   shoppingList: ShoppingListItem[];
 //   onRemoveItem: (id: string) => void;
   tipAmount: number;
-  handleCreateOrder: (total: number) => void;
+  handleCreateOrder: (total: number, activeMatchedItems: any, quantities: any) => void;
   initialMatchedItems: any;
   setInitialMatchedItems: any;
   initialQuantities: any;
@@ -17,7 +17,7 @@ interface ShoppingListProps {
 
 const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     initialMatchedItems, setInitialMatchedItems, initialQuantities, setInitialQuantities, selectedStoreId }: ShoppingListProps) => {
-  const [activeMatchedItems, setActiveMatchedItems] = useState<{[key: string]: string}>(initialMatchedItems);
+  const [activeMatchedItems, setActiveMatchedItems] = useState<{[key: string]: any}>(initialMatchedItems);
   const [selectedItem, setSelectedItem] = useState<ShoppingListItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
   const [imagePopup, setImagePopup] = useState<any>({ visible: false, item: null });
@@ -27,10 +27,10 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
 
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
 
-  const handleMatchedItemClick = (shoppingItemId: string, matchedItemId: string) => {
+  const handleMatchedItemClick = (shoppingItemId: string, matchedItem: any) => {
     setActiveMatchedItems(prev => ({
       ...prev,
-      [shoppingItemId]: matchedItemId
+      [shoppingItemId]: matchedItem
     }));
 
     setInitialMatchedItems(activeMatchedItems);
@@ -53,6 +53,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     setSelectedItem(item);
     setSearchQuery(item.name);
     setShowPopup(true);
+    handleSearchChange({ target: { value: item.name } });
   };
 
   const handleUpdateQuantity = (matchId: string, change: number) => {
@@ -70,8 +71,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
 
   const calculateSubtotal = () => {
     return shoppingList.reduce((total, item) => {
-      const activeMatchId = activeMatchedItems[item.product_id];
-      const activeMatch = item.matched_items?.find(match => match._id === activeMatchId);
+      const activeMatch = activeMatchedItems[item.product_id];
       if (activeMatch) {
         const quantity = quantities[activeMatch._id] || 1;
         const itemTotal = activeMatch.price * quantity;
@@ -101,16 +101,12 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
 
   const getCurrentItemIndex = () => {
     if (!selectedItem) return 0;
-    console.log('selectedItem', selectedItem);
-    console.log('shoppingList', shoppingList);
     return shoppingList.findIndex(item => item.product_id === selectedItem.product_id) + 1;
   };
 
   const handlePrevItem = () => {
-    console.log('selectedItem', selectedItem);
     if (!selectedItem) return;
     const currentIndex = shoppingList.findIndex(item => item.product_id === selectedItem.product_id);
-    console.log('currentIndex', currentIndex);
     if (currentIndex > 0) {
       setSelectedItem(shoppingList[currentIndex - 1]);
       setSearchResults([]);
@@ -120,11 +116,8 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
   };
 
   const handleNextItem = () => {
-    console.log('selectedItem', selectedItem);
     if (!selectedItem) return;
     const currentIndex = shoppingList.findIndex(item => item.product_id === selectedItem.product_id);
-    console.log('currentIndex', currentIndex);
-    console.log('shoppingList.length', shoppingList.length);
     if (currentIndex < shoppingList.length - 1) {
       setSearchResults([]);
       setSelectedItem(shoppingList[currentIndex + 1]);
@@ -183,7 +176,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
         </div>
         <div className="space-y-2">
           {shoppingList.map((item) => {
-            const activeMatch = item.matched_items?.find(match => match._id === activeMatchedItems[item.product_id]);
+            const activeMatch = activeMatchedItems[item.product_id] || null;
             
             return (
               <div key={item._id} className="flex flex-col gap-2 py-2">
@@ -332,7 +325,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                   className={`flex justify-between items-center p-2 cursor-pointer border rounded-lg ${
                     activeMatchedItems[selectedItem.product_id] === match._id ? 'bg-[#09C274]/10 border-[#09C274]' : 'border-[transparent]'
                   }`}
-                  onClick={() => handleMatchedItemClick(selectedItem.product_id, match._id)}
+                  onClick={() => handleMatchedItemClick(selectedItem.product_id, match)}
                 >
                   <div className="flex items-center gap-4">
                     <img src={match.image} alt={match.name} className="w-[60px] h-[60px] rounded-md" />
@@ -433,7 +426,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
             : 'bg-gray-200 text-gray-500 cursor-not-allowed'
         }`}
         disabled={shoppingList.length === 0}
-        onClick={() => handleCreateOrder(calculateTotal())}
+        onClick={() => handleCreateOrder(calculateTotal(), activeMatchedItems, quantities)}
         >
         {shoppingList.length > 0 
             ? `Confirm and place order`
