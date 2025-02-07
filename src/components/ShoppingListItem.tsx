@@ -292,7 +292,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
               </div>
             </div>
             <div className="flex justify-between items-center mb-4 bg-gray-50 p-3 rounded-lg">
-              <span>{selectedItem.name} {selectedItem.unit_size} {selectedItem.unit_of_measurement}</span>
+              <span>{selectedItem.name} {/*selectedItem.unit_size} {selectedItem.unit_of_measurement*/}</span>
               <span className="bg-[#E9E6FF] text-gray-700 px-3 py-1 rounded-full text-sm font-medium">Total weight needed: {selectedItem.unit_size * 7} {selectedItem.unit_of_measurement}</span>
             </div>
 
