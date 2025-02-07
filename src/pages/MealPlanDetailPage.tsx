@@ -319,6 +319,8 @@ const MealPlanDetailPage = () => {
       return;
     }
 
+    const userName = user?.name || email; // Use user's name if available, otherwise fallback to email
+
     const deliveryDetails = {
       address: `${selectedAddress?.streetNum} ${selectedAddress?.streetName}, ${selectedAddress?.city} ${selectedAddress?.state} ${selectedAddress?.country}, ${selectedAddress?.zipcode}`,
       latitude: location.latitude,
@@ -332,9 +334,6 @@ const MealPlanDetailPage = () => {
       instructions: specialInstructions,
       tip_amount: tipAmount
     };
-
-    console.log(activeMatchedItems, 'activeMatchedItems in order')
-    console.log(shoppingList, 'shoppingList in order')
 
     const orderData = {
       store_id: selectedStore._id,
@@ -351,7 +350,8 @@ const MealPlanDetailPage = () => {
       final_quote: false,
       influencer_id: influencer._id,
       meal_plan_name: plan.name,
-      plan_start_day: selectedStartDay
+      plan_start_day: selectedStartDay,
+      username: userName // Add the username parameter
     };
 
     saveShoppingListConfig();
@@ -376,7 +376,7 @@ const MealPlanDetailPage = () => {
 
       if (data.order_placed && data.tracking_link) {
         // Open the tracking link in a new tab
-        window.open(data.tracking_link, '_blank');
+        window.open(data.tracking_link.replace('tracking.fitbite.app', 'tracking.mealme.ai'), '_blank');
       } else {
         // Handle the case where the order was not placed successfully
         toast.error("Order could not be placed. Please try again.");
