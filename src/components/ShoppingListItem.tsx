@@ -182,7 +182,6 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
               <div key={item._id} className="flex flex-col gap-2 py-2">
                 <div 
                   className="flex justify-between items-center cursor-pointer"
-                  onClick={() => handleItemClick(item)}
                 >
                     {activeMatch ? (
                       <>
@@ -204,7 +203,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                       <div className="flex flex-col w-full border rounded-lg p-2 border-[#09C274]">
                         <div className="flex items-center justify-between w-full">
                           <span className="font-medium opacity-60">{item.name}</span>
-                          <div className="flex items-center">
+                          <div className="flex items-center" onClick={() => handleItemClick(item)}>
                             <span className="text-xs text-[#09C274]">Match</span>
                             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
                                 <path fill-rule="evenodd" clip-rule="evenodd" d="M13.2074 3.16898C13.4327 2.94367 13.798 2.94367 14.0233 3.16898L16.331 5.47667C16.5563 5.70197 16.5563 6.06726 16.331 6.29256L14.0233 8.60025C13.798 8.82556 13.4327 8.82556 13.2074 8.60025C12.9821 8.37495 12.9821 8.00966 13.2074 7.78436L14.5303 6.46154H9.76923C8.81332 6.46154 8.03846 7.23643 8.03846 8.19231V8.96154C8.03846 9.28016 7.78016 9.53846 7.46154 9.53846C7.14291 9.53846 6.88462 9.28016 6.88462 8.96154V8.19231C6.88462 6.59919 8.17606 5.30769 9.76923 5.30769H14.5303L13.2074 3.98487C12.9821 3.75957 12.9821 3.39428 13.2074 3.16898ZM10.5385 8.38461C10.8571 8.38461 11.1154 8.64291 11.1154 8.96154V9.73077C11.1154 11.3239 9.82393 12.6154 8.23077 12.6154H3.46974L4.79256 13.9382C5.01786 14.1635 5.01786 14.5288 4.79256 14.7541C4.56726 14.9794 4.20197 14.9794 3.97667 14.7541L1.66898 12.4464C1.44367 12.2211 1.44367 11.8558 1.66898 11.6305L3.97667 9.32282C4.20197 9.09752 4.56726 9.09752 4.79256 9.32282C5.01786 9.54812 5.01786 9.91341 4.79256 10.1387L3.46974 11.4615H8.23077C9.18668 11.4615 9.96154 10.6867 9.96154 9.73077V8.96154C9.96154 8.64291 10.2198 8.38461 10.5385 8.38461Z" fill="#09C274"/>
@@ -216,7 +215,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                     )}
                   {activeMatch && (
                     <div className="flex items-center gap-2">
-                        <span>Total: ${activeMatch.price * (quantities[activeMatch._id] || 1)}</span>
+                        <span>Total: ${(activeMatch.price * (quantities[activeMatch._id] || 1)).toFixed(2)}</span>
                     <button
                         onClick={(e) => {
                           e.stopPropagation();
