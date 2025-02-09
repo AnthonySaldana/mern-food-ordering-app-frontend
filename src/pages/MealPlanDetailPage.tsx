@@ -62,6 +62,8 @@ const MealPlanDetailPage = () => {
   const [selectedAddress, setSelectedAddress] = useState<Address | null>(null);
   const [activeMatchedItems, setActiveMatchedItems] = useState<any>({});
   const [quantities, setQuantities] = useState<any>({});
+  const [trackingLink, setTrackingLink] = useState<string | null>(null);
+
   // const [tempEmail, setTempEmail] = useState<string>("");
   const { loginWithRedirect, isAuthenticated, user } = useAuth0();
 
@@ -332,7 +334,8 @@ const MealPlanDetailPage = () => {
       zipcode: selectedAddress?.zipcode,
       country: selectedAddress?.country,
       instructions: specialInstructions,
-      tip_amount: tipAmount
+      tip_amount: tipAmount,
+      user_email: user?.email || email
     };
 
     const orderData = {
@@ -376,14 +379,15 @@ const MealPlanDetailPage = () => {
       }
 
       const data = await response.json();
-
+      
       if (data.order_placed && data.tracking_link) {
-        // Open the tracking link in a new tab
-        window.open(data.tracking_link.replace('tracking.fitbite.app', 'tracking.mealme.ai'), '_blank');
+        // Set the tracking link state instead of opening a new window
+        setTrackingLink(data.tracking_link.replace('tracking.fitbite.app', 'tracking.mealme.ai'));
       } else {
         // Handle the case where the order was not placed successfully
         toast.error("Order could not be placed. Please try again.");
       }
+
       console.log("Order created successfully:", data);
     } catch (error) {
       console.error("Error creating order:", error);
@@ -586,6 +590,11 @@ const MealPlanDetailPage = () => {
       <div className="flex flex-col lg:flex-row mt-[40px]">
         {isLoading && <LoadingOverlay />}
         <div className="flex lg:w-2/3 flex-col gap-4 bg-white p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
+          {trackingLink && (
+            <div className="bg-green-100 p-4 rounded-md mb-4 md:mx-32 mx-2">
+              <p>Your order has been placed successfully! Track your order <a href={trackingLink} target="_blank" rel="noopener noreferrer" className="text-blue-500 underline">here</a>.</p>
+            </div>
+          )}
           <div className="flex flex-row items-center gap-2 md:px-32 cursor-pointer" onClick={() => setIsOrderPage(false)}>
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg">
               <path fill-rule="evenodd" clip-rule="evenodd" d="M15.8936 3.5173C16.3818 3.5173 16.7776 3.12151 16.7776 2.63328C16.7776 2.14506 16.3818 1.74927 15.8936 1.74927H2.63334C2.14511 1.74927 1.74933 2.14506 1.74933 2.63328V15.8935C1.74933 16.3818 2.14511 16.7776 2.63334 16.7776C3.12157 16.7776 3.51736 16.3818 3.51736 15.8935V4.76749L16.7419 17.992C17.0871 18.3372 17.6468 18.3372 17.9921 17.992C18.3373 17.6468 18.3373 17.087 17.9921 16.7418L4.76755 3.5173H15.8936Z" fill="black"/>
