@@ -338,6 +338,8 @@ const MealPlanDetailPage = () => {
       user_email: user?.email || email
     };
 
+    console.log(user, 'user')
+
     const orderData = {
       store_id: selectedStore._id,
       items: shoppingList.map(item => {
@@ -357,8 +359,11 @@ const MealPlanDetailPage = () => {
       influencer_id: influencer._id,
       meal_plan_name: plan.name,
       plan_start_day: selectedStartDay,
-      username: userName // Add the username parameter
+      username: userName, // Add the username parameter
+      userid: user?._id
     };
+
+    console.log(orderData, 'orderData')
 
     saveShoppingListConfig();
 
