@@ -337,10 +337,13 @@ const MealPlanDetailPage = () => {
 
     const orderData = {
       store_id: selectedStore._id,
-      items: shoppingList.map(item => ({
-        product_id: activeMatchedItems[item.product_id]?.product_id,
-        quantity: quantities[item.product_id] || 1,
-      })).filter(item => item.product_id),
+      items: shoppingList.map(item => {
+        const activeMatch = activeMatchedItems[item.product_id] || null;
+        return {
+          product_id: activeMatchedItems[item.product_id]?.product_id,
+          quantity: activeMatch ? quantities[activeMatch._id] : 1
+        };
+      }).filter(item => item.product_id),
       delivery_details: deliveryDetails,
       payment_details: {
         payment_method_id: selectedPaymentMethod,
