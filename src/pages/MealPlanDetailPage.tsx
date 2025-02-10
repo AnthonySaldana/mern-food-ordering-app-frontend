@@ -197,16 +197,17 @@ const MealPlanDetailPage = () => {
 
   useEffect(() => {
     const fetchSavedConfig = async () => {
-      if (!isAuthenticated || !user) return;
+      if (!isAuthenticated || !user || shoppingList.length === 0) return;
 
       try {
         const response = await fetch(`${API_BASE_URL}/api/shoppingList/get?userId=${user.sub}&influencerId=${influencerId}&storeId=${selectedStore?._id}`);
         if (response.ok) {
           const config = await response.json();
-          setShoppingList(config.shoppingList);
+          // setShoppingList(config.shoppingList);
+          console.log(config.shoppingList, 'config.shoppingList')
           setActiveMatchedItems(config.shoppingList.reduce((acc: any, item: any) => {
             // Check if inventoryItem and matchedItem exist
-            if (item.inventoryItem && item.matchedItem) {
+            if (item.matchedItem) {
               acc[item.product_id] = item.matchedItem.matched_item_id;
             }
             return acc;
@@ -222,7 +223,7 @@ const MealPlanDetailPage = () => {
     };
 
     fetchSavedConfig();
-  }, [isAuthenticated, user, influencerId, selectedStore]);
+  }, [isAuthenticated, user, influencerId, selectedStore, shoppingList]);
 
   console.log(storeMatches, 'storeMatches found here');
 
@@ -299,6 +300,7 @@ const MealPlanDetailPage = () => {
         _id: item.id,
         product_id: item.id,
         name: item.name,
+        searchTerm: item.searchTerm || item.name,
         quantity: 1,
         macros: {
           protein: item.macros?.protein,
@@ -474,6 +476,7 @@ const MealPlanDetailPage = () => {
             const shoppingListItems = matchesResult.matches.map((match: any) => ({
               product_id: match._id,
               name: match.name,
+              searchTerm: match.searchTerm,
               quantity: match.adjusted_quantity,
               product_marked_price: Math.round(match.price * 100), // Convert to cents
               matched_items: match.matched_items,
