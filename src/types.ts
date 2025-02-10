@@ -134,7 +134,7 @@ export type ShoppingListItem = {
   _id: string;
   product_id: string;
   name: string;
-  searchTerm?: string;
+  searchTerm: string;
   quantity: number;
   product_marked_price: number;
   unit_of_measurement: string;
