@@ -205,7 +205,9 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                     ) : (
                       <div className="flex flex-col w-full border rounded-lg p-2 border-[#09C274]">
                         <div className="flex items-center justify-between w-full">
-                          <span className="font-medium opacity-60">{item.name}</span>
+                          <div className="flex flex-col">
+                            <span className="font-medium opacity-60">{item.name} ({(item.unit_size * 7)} {item.unit_of_measurement})</span>
+                          </div>
                           <div className="flex items-center">
                             <span className="text-xs text-[#09C274]">Match</span>
                             <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg" className="ml-1">
