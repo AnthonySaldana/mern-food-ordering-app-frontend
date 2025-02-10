@@ -300,6 +300,7 @@ const MealPlanDetailPage = () => {
         _id: item.id,
         product_id: item.id,
         name: item.name,
+        searchTerm: item.searchTerm || item.name,
         quantity: 1,
         macros: {
           protein: item.macros?.protein,
