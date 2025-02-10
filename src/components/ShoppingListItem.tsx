@@ -183,9 +183,14 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
             return (
               <div key={item._id} className="flex flex-col gap-2 py-2">
                 <div 
-                  className="flex justify-between items-center cursor-pointer"
+                  className="flex flex-col justify-between items-center cursor-pointer"
                   onClick={() => handleItemClick(item)}
                 >
+                  { activeMatch ? <div className="flex items-center justify-between w-full flex-row w-full">
+                      <span className="font-medium truncate max-w-[200px]">{item.name}</span>
+                      <span>Total {item.unit_size} {item.unit_of_measurement}</span>
+                    </div> : null }
+                  <div className="flex flex-row items-center justify-between w-full flex-row w-full">
                     {activeMatch ? (
                       <>
                         <img 
@@ -220,7 +225,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                     )}
                   {activeMatch && (
                     <div className="flex items-center gap-2">
-                        <span>Total: ${(activeMatch.price * (quantities[activeMatch._id] || 1)).toFixed(2)}</span>
+                        <span>${(activeMatch.price * (quantities[activeMatch._id] || 1)).toFixed(2)}</span>
                     <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -257,6 +262,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                     </button>
                     </div>
                   )}
+                  </div>
                 </div>
               </div>
             );
@@ -331,7 +337,12 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                   }`}
                 >
                   <div className="flex items-center gap-4">
-                    <img src={match.image} alt={match.name} className="w-[60px] h-[60px] rounded-md" />
+                    <img 
+                      src={match.image} 
+                      alt={match.name} 
+                      className="w-[60px] h-[60px] rounded-md"
+                      onClick={() => setImagePopup({ visible: true, item: match })}
+                    />
                     <div className="flex flex-col">
                       <span className="text-sm font-medium truncate max-w-[200px] hover:whitespace-nowrap hover:max-w-full" title={match.name}>{match.name}</span>
                     </div>
@@ -395,8 +406,8 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                 </svg>
               </button>
             </div>
-            <img src={imagePopup.item.matchedItem?.image} alt={imagePopup.item.name} className="w-full h-auto rounded-md mb-4" />
-            <p className="text-sm text-gray-500">Size: {imagePopup.item.unit_size} {imagePopup.item.unit_of_measurement}</p>
+            <img src={imagePopup.item.matchedItem?.image || imagePopup.item.image} alt={imagePopup.item.name} className="w-full h-auto rounded-md mb-4" />
+            <p className="text-sm text-gray-500">Size: {imagePopup.item.matchedItem?.unit_size || imagePopup.item.unit_size} {imagePopup.item.matchedItem?.unit_of_measurement || imagePopup.item.unit_of_measurement}</p>
             {/* <p className="text-sm text-gray-500">Description: {imagePopup.item.description || 'No description available'}</p> */}
           </div>
         </div>

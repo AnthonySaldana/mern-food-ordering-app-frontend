@@ -20,7 +20,7 @@ const MatchedItem: React.FC<MatchedItemProps> = ({ targetItem, selectedItem }) =
           <span>No item selected</span>
           <div>
             <span>{targetItem.unit}</span>
-            <span> Total {targetItem.unit_size} {targetItem.unit_of_measurement}</span>
+            {/* <span> Total {targetItem.unit_size} {targetItem.unit_of_measurement}</span> */}
           </div>
         </div>
         <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
@@ -36,7 +36,7 @@ const MatchedItem: React.FC<MatchedItemProps> = ({ targetItem, selectedItem }) =
         <span>{targetItem?.name}</span>
         <div>
           <span>{targetItem.unit}</span>
-          <span> Total {targetItem.unit_size} {targetItem.unit_of_measurement}</span>
+          {/* <span> Total {targetItem.unit_size} {targetItem.unit_of_measurement}</span> */}
         </div>
       </div>
       <div style={{ display: 'flex', alignItems: 'center', marginTop: '10px' }}>
