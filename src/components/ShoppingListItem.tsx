@@ -42,19 +42,20 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     if (nextUnmatchedItem) {
       setSearchResults([]);
       setSelectedItem(nextUnmatchedItem);
-      setSearchQuery(nextUnmatchedItem.name);
-      handleSearchChange({ target: { value: nextUnmatchedItem.name } });
+      setSearchQuery(nextUnmatchedItem.searchTerm || nextUnmatchedItem.name);
+      handleSearchChange({ target: { value: nextUnmatchedItem.searchTerm || nextUnmatchedItem.name } });
     } else {
       setShowPopup(false);
     }
   };
 
   const handleItemClick = (item: ShoppingListItem) => {
+    console.log(item, 'item in handleItemClick')
     setSearchResults([]);
     setSelectedItem(item);
-    setSearchQuery(item.name);
+    setSearchQuery(item.searchTerm);
     setShowPopup(true);
-    handleSearchChange({ target: { value: item.name } });
+    handleSearchChange({ target: { value: item.searchTerm } });
   };
 
   const handleUpdateQuantity = (matchId: string, change: number) => {
