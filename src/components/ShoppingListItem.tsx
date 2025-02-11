@@ -211,7 +211,6 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                       <div className="flex flex-col w-full border rounded-lg p-2 border-[#09C274]">
                         <div className="flex items-center justify-between w-full">
                           <div className="flex flex-col">
-                            <span className="font-medium opacity-60">{item.name} ({(item.unit_size * 7)} {item.unit_of_measurement})</span>
                             <span className="font-medium opacity-60">{item.name} ({(item.unit_size * 7).toFixed(2)} {item.unit_of_measurement})</span>
                           </div>
                           <div className="flex items-center">
