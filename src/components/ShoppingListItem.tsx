@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { ShoppingListItem } from '@/types';
 import MatchedItem from './matchedItem';
 
@@ -13,10 +13,12 @@ interface ShoppingListProps {
   setInitialQuantities: any;
 //   saveShoppingListConfig: any;
   selectedStoreId: string;
+  selectedStore: any;
 }
 
 const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
-    initialMatchedItems, setInitialMatchedItems, initialQuantities, setInitialQuantities, selectedStoreId }: ShoppingListProps) => {
+    initialMatchedItems, setInitialMatchedItems, initialQuantities, setInitialQuantities, selectedStoreId, selectedStore }: ShoppingListProps) => {
+      console.log(setInitialMatchedItems, 'setInitialMatchedItems in ShoppingListComponent')
   const [activeMatchedItems, setActiveMatchedItems] = useState<{[key: string]: any}>(initialMatchedItems);
   const [selectedItem, setSelectedItem] = useState<ShoppingListItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -24,8 +26,42 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
   const [quantities, setQuantities] = useState<{[key: string]: number}>(initialQuantities);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
+  const deliveryFee = selectedStore?.quotes?.cheapest_delivery?.delivery_fee?.delivery_fee_flat / 100 || 0; // Convert cents to dollars
 
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const saveShoppingList = () => {
+    const listData = {
+      shoppingList,
+      activeMatchedItems,
+      quantities,
+    };
+    const influencerId = 'someInfluencerId'; // Replace with actual influencer ID
+    const key = `shoppingList_${influencerId}_${selectedStoreId}`;
+    localStorage.setItem(key, JSON.stringify(listData));
+    console.log('Shopping list saved');
+  };
+
+  // Function to load the shopping list from local storage
+  const loadShoppingList = () => {
+    const influencerId = 'someInfluencerId'; // Replace with actual influencer ID
+    const key = `shoppingList_${influencerId}_${selectedStoreId}`;
+    const savedList = localStorage.getItem(key);
+    console.log(savedList, 'savedList in load');
+    console.log(shoppingList, 'shoppingList in load');
+    if (savedList) {
+      const { shoppingList: savedShoppingList, activeMatchedItems, quantities } = JSON.parse(savedList);
+      console.log(activeMatchedItems, 'activeMatchedItems in load');
+      console.log(savedShoppingList, 'savedShoppingList in load');
+      setActiveMatchedItems(activeMatchedItems);
+      setQuantities(quantities);
+      console.log('Shopping list loaded');
+    }
+  };
+
+  useEffect(() => {
+    loadShoppingList();
+  }, [selectedStore]);
 
   const handleMatchedItemClick = (shoppingItemId: string, matchedItem: any) => {
     setActiveMatchedItems(prev => ({
@@ -33,7 +69,9 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
       [shoppingItemId]: matchedItem
     }));
 
-    setInitialMatchedItems(activeMatchedItems);
+    console.log(activeMatchedItems, 'activeMatchedItems in handleMatchedItemClick')
+
+    // setInitialMatchedItems(activeMatchedItems);
 
     // Find the next unmatched item
     const currentIndex = shoppingList.findIndex(item => item.product_id === shoppingItemId);
@@ -95,9 +133,10 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
 
   const calculateTotal = () => {
     const subtotal = calculateSubtotal();
+    // const deliveryFee = selectedStore.quotes.cheapest_delivery.delivery_fee.delivery_fee_flat / 100; // Convert cents to dollars
     const tax = calculateTax(subtotal);
     const shipping = calculateShipping();
-    const total = subtotal + tax + shipping + (tipAmount * 100);
+    const total = subtotal + tax + shipping + (tipAmount * 100) + deliveryFee;
     return total;
   };
 
@@ -418,6 +457,10 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
         <span>${(calculateSubtotal() / 100).toFixed(2)}</span>
       </div>
       <div className="flex justify-between text-sm">
+        <span>Delivery Fee</span>
+        <span>${(deliveryFee).toFixed(2)}</span>
+      </div>
+      <div className="flex justify-between text-sm">
         <span>Estimated Taxes</span>
         <span>${(calculateTax(calculateSubtotal()) / 100).toFixed(2)}</span>
       </div>
@@ -447,6 +490,12 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
             ? `Confirm and place order`
             : 'Add items to cart'
         }
+        </button>
+        <button 
+          className="mb-4 px-4 py-2 bg-[#09C274] text-white rounded-xl"
+          onClick={saveShoppingList}
+        >
+          Save Shopping List
         </button>
     </div>
   );
