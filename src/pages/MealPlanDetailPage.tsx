@@ -994,12 +994,12 @@ const MealPlanDetailPage = () => {
                 </div>
               </div>
 
-              <>
+              {email && (
                 <PaymentMethodSection 
                   email={email}
                   onPaymentMethodSelect={(paymentMethodId) => setSelectedPaymentMethod(paymentMethodId)} 
                 />
-              </>
+              )}
               <button 
                 onClick={() => setIsOrderPage(false)}
                 className="mt-4 bg-white border-2 border-[#09C274] text-[#09C274] px-4 py-3 rounded-xl w-full font-medium"
