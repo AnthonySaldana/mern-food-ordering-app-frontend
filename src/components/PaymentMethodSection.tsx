@@ -51,7 +51,7 @@ const PaymentMethodSection = ({ onPaymentMethodSelect, onUserCreated, email }: P
     if (email) {
       refetch();
     }
-  }, [email, refetch]);
+  }, [email]);
 
   const handleAddPaymentMethod = async (e: React.FormEvent) => {
     e.preventDefault();
