@@ -18,6 +18,7 @@ interface ShoppingListProps {
 
 const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     initialMatchedItems, setInitialMatchedItems, initialQuantities, setInitialQuantities, selectedStoreId, selectedStore }: ShoppingListProps) => {
+      console.log(setInitialMatchedItems, 'setInitialMatchedItems in ShoppingListComponent')
   const [activeMatchedItems, setActiveMatchedItems] = useState<{[key: string]: any}>(initialMatchedItems);
   const [selectedItem, setSelectedItem] = useState<ShoppingListItem | null>(null);
   const [showPopup, setShowPopup] = useState(false);
@@ -51,6 +52,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     if (savedList) {
       const { shoppingList: savedShoppingList, activeMatchedItems, quantities } = JSON.parse(savedList);
       console.log(activeMatchedItems, 'activeMatchedItems in load');
+      console.log(savedShoppingList, 'savedShoppingList in load');
       setActiveMatchedItems(activeMatchedItems);
       setQuantities(quantities);
       console.log('Shopping list loaded');
