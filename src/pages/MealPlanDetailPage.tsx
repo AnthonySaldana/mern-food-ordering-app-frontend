@@ -63,6 +63,8 @@ const MealPlanDetailPage = () => {
   const [activeMatchedItems, setActiveMatchedItems] = useState<any>({});
   const [quantities, setQuantities] = useState<any>({});
   const [trackingLink, setTrackingLink] = useState<string | null>(null);
+  const [isShoppingListReady, setIsShoppingListReady] = useState(false);
+
 
   // const [tempEmail, setTempEmail] = useState<string>("");
   const { loginWithRedirect, isAuthenticated, user } = useAuth0();
@@ -204,18 +206,22 @@ const MealPlanDetailPage = () => {
         if (response.ok) {
           const config = await response.json();
           // setShoppingList(config.shoppingList);
+          // setShoppingList(prevList => [
+          //   ...prevList,
+          //   ...config.shoppingList.filter((item: any) => item.matchedItem)
+          // ]);
           console.log(config.shoppingList, 'config.shoppingList')
-          setActiveMatchedItems(config.shoppingList.reduce((acc: any, item: any) => {
-            // Check if inventoryItem and matchedItem exist
-            if (item.matchedItem) {
-              acc[item.product_id] = item.matchedItem.matched_item_id;
-            }
-            return acc;
-          }, {}));
-          setQuantities(config.shoppingList.reduce((acc: any, item: any) => {
-            acc[item.product_id] = item.quantity;
-            return acc;
-          }, {}));
+          // setActiveMatchedItems(config.shoppingList.reduce((acc: any, item: any) => {
+          //   // Check if inventoryItem and matchedItem exist
+          //   if (item.matchedItem) {
+          //     acc[item.product_id] = item.matchedItem.matched_item_id;
+          //   }
+          //   return acc;
+          // }, {}));
+          // setQuantities(config.shoppingList.reduce((acc: any, item: any) => {
+          //   acc[item.product_id] = item.quantity;
+          //   return acc;
+          // }, {}));
         }
       } catch (error) {
         console.error("Failed to fetch saved configuration", error);
@@ -223,7 +229,7 @@ const MealPlanDetailPage = () => {
     };
 
     fetchSavedConfig();
-  }, [isAuthenticated, user, influencerId, selectedStore, shoppingList]);
+  }, [isAuthenticated, user, influencerId, selectedStore, isShoppingListReady]);
 
   console.log(storeMatches, 'storeMatches found here');
 
@@ -429,46 +435,22 @@ const MealPlanDetailPage = () => {
         influencer_id: influencer._id
       };
 
-      const response = await fetch(`${API_BASE_URL}/api/grocery/fitbite-inventory`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(requestBody)
-      });
+      let matchesResult;
+      let attempts = 0;
+      const maxAttempts = 20;
 
-      if (!response.ok) {
-        throw new Error('Failed to fetch fitbite inventory');
-      }
+      while (attempts < maxAttempts) {
+        toast("We are matching your items, please wait...");
 
-      const result = await response.json();
-      await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
+        // Get matches for this store and influencer
+        const matchesResponse = await fetch(`${API_BASE_URL}/api/matches/pre-processed-matches?store_id=${store._id}&influencer_id=${influencer._id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
 
-      if (result) {
-        console.log("Fitbite inventory fetched successfully:", result);
-
-        // Wait 10 seconds before checking matches
-        // await new Promise(resolve => setTimeout(resolve, 10000));
-
-        let matchesResult;
-        let attempts = 0;
-        const maxAttempts = 20;
-
-        while (attempts < maxAttempts) {
-          toast("We are matching your items, please wait...");
-
-          // Get matches for this store and influencer
-          const matchesResponse = await fetch(`${API_BASE_URL}/api/matches/pre-processed-matches?store_id=${store._id}&influencer_id=${influencer._id}`, {
-            method: 'GET',
-            headers: {
-              'Content-Type': 'application/json',
-            },
-          });
-
-          // if (!matchesResponse.ok) {
-          //   throw new Error('Failed to fetch matches');
-          // }
-
+        if (matchesResponse.ok) {
           matchesResult = await matchesResponse.json();
           
           if (matchesResult?.matches && matchesResult.matches.length > 0) {
@@ -491,17 +473,37 @@ const MealPlanDetailPage = () => {
             }));
 
             setShoppingList(shoppingListItems);
+            setIsShoppingListReady(true);
             console.log("Shopping list updated with matches:", shoppingListItems);
             break;
           }
-
-          attempts++;
-          if (attempts < maxAttempts) {
-            await new Promise(resolve => setTimeout(resolve, 10000));
-          }
         }
 
-        if (!matchesResult?.matches || matchesResult.matches.length === 0) {
+        attempts++;
+        if (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 10000));
+        }
+      }
+
+      if (!matchesResult?.matches || matchesResult.matches.length === 0) {
+        // Call fitbite-inventory endpoint if no matches found
+        const response = await fetch(`${API_BASE_URL}/api/grocery/fitbite-inventory`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify(requestBody)
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to fetch fitbite inventory');
+        }
+
+        const result = await response.json();
+        await new Promise(resolve => setTimeout(resolve, 500)); // Wait 500ms
+
+        if (result) {
+          console.log("Fitbite inventory fetched successfully:", result);
           toast.error("Could not find matches for your items. Please try again.");
         }
       }
@@ -514,7 +516,6 @@ const MealPlanDetailPage = () => {
   };
 
   const handleProcessAndOrder = async (store: any) => {
-    console.log("store to process", store);
     setSelectedStore(store);
     setSelectedCategory(null); // Reset category selection when switching stores
   
@@ -562,11 +563,14 @@ const MealPlanDetailPage = () => {
   const saveShoppingListConfig = async () => {
     if (!isAuthenticated || !user) return;
 
+    console.log(shoppingList, 'shoppingList in save')
+
     const config = {
       userId: user.sub,
       influencerId,
       storeId: selectedStore?._id,
       shoppingList: shoppingList.map(item => ({
+        match_id: item._id,
         product_id: item.product_id,
         matched_item_id: activeMatchedItems[item.product_id],
         quantity: quantities[item.product_id] || 1,
@@ -1022,7 +1026,8 @@ const MealPlanDetailPage = () => {
           </div>
           {shoppingList?.length > 0 && <MatchingTutorial />}
           <ShoppingListComponent 
-            shoppingList={shoppingList} 
+            shoppingList={shoppingList}
+            selectedStore={selectedStore}
             // onRemoveItem={removeFromShoppingList} 
             // onUpdateQuantity={updateItemQuantity}
             tipAmount={tipAmount}
