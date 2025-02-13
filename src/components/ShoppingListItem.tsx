@@ -222,12 +222,16 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
             return (
               <div key={item._id} className="flex flex-col gap-2 py-2">
                 <div 
-                  className="flex flex-col justify-between items-center cursor-pointer"
+                  className={`flex flex-col justify-between items-center cursor-pointer ${activeMatch ? 'border border-[#09C274] rounded-lg p-2' : ''}`}
                   onClick={() => handleItemClick(item)}
                 >
-                  { activeMatch ? <div className="flex items-center justify-between w-full flex-row w-full">
+                  { activeMatch ? <div className="flex items-center justify-between w-full flex-row w-full text-gray-500">
                       <span className="font-medium truncate max-w-[200px]">{item.name}</span>
-                      <span>Total {item.unit_size} {item.unit_of_measurement}</span>
+                      {item.unit_details.map((detail: any, index: any) => (
+                        <div key={index}>
+                          <span>{detail.unit_size} {detail.unit_of_measurement}</span>
+                        </div>
+                      ))}
                     </div> : null }
                   <div className="flex flex-row items-center justify-between w-full flex-row w-full">
                     {activeMatch ? (
@@ -250,7 +254,10 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                       <div className="flex flex-col w-full border rounded-lg p-2 border-[#09C274]">
                         <div className="flex items-center justify-between w-full">
                           <div className="flex flex-col">
-                            <span className="font-medium opacity-60">{item.name} ({(item.unit_size * 7).toFixed(2)} {item.unit_of_measurement})</span>
+                            <span className="font-medium opacity-60">{item.name} {item.unit_details?.map((detail, i) => (
+                              <span key={i} className="text-sm">{(detail.unit_size * 7).toFixed(0)}{detail.unit_of_measurement} </span>
+                            ))}
+                            </span>
                           </div>
                           <div className="flex items-center">
                             <span className="text-xs text-[#09C274]">Match</span>
@@ -264,7 +271,6 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                     )}
                   {activeMatch && (
                     <div className="flex items-center gap-2">
-                        <span>${(activeMatch.price * (quantities[activeMatch._id] || 1)).toFixed(2)}</span>
                     <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -288,6 +294,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                     >
                         +
                     </button>
+                    <span>${(activeMatch.price * (quantities[activeMatch._id] || 1)).toFixed(2)}</span>
                     <button
                     onClick={(e) => {
                         e.stopPropagation();
@@ -342,7 +349,15 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
             </div>
             <div className="flex justify-between items-center mb-4 bg-gray-50 p-3 rounded-lg">
               <span>{selectedItem.name} {/*selectedItem.unit_size} {selectedItem.unit_of_measurement*/}</span>
-              <span className="bg-[#E9E6FF] text-gray-700 px-3 py-1 rounded-full text-sm font-medium">Total weight needed: {selectedItem.unit_size * 7} {selectedItem.unit_of_measurement}</span>
+              <span className="bg-[#E9E6FF] text-gray-700 px-3 py-1 rounded-full text-sm font-medium">
+                <span className="mr-2">Total weight needed: </span>
+                {selectedItem.unit_details?.map((detail: any, index: any) => (
+                  <span className="py-1 text-xs" key={index}>
+                    {(detail.unit_size * 7).toFixed(2)} {detail.unit_of_measurement}
+                    {index < selectedItem.unit_details.length - 1 && " / "}
+                  </span>
+                ))}
+              </span>
             </div>
 
             <div className="flex items-center gap-2 bg-transparent border border-gray-200 rounded-lg px-3 py-2">

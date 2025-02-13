@@ -315,6 +315,7 @@ const MealPlanDetailPage = () => {
         },
         unit_of_measurement: item.unit_of_measurement,
         unit_size: item.unit_size,
+        unit_details: item.unit_details,
         product_marked_price: Math.round(item.price * 100), // Convert to cents
         selected_options: [] // Add options if available from the API
       };
@@ -437,9 +438,9 @@ const MealPlanDetailPage = () => {
 
       let matchesResult;
       let attempts = 0;
-      const maxAttempts = 20;
+      const maxAttempts = 10;
 
-      while (attempts < maxAttempts) {
+      while (attempts < 1) {
         toast("We are matching your items, please wait...");
 
         // Get matches for this store and influencer
@@ -464,6 +465,7 @@ const MealPlanDetailPage = () => {
               matched_items: match.matched_items,
               unit_of_measurement: match.unit_of_measurement,
               unit_size: match.unit_size,
+              unit_details: match.unit_details,
               macros: {
                 protein: match.macros?.protein,
                 carbs: match.macros?.carbs,
@@ -505,6 +507,53 @@ const MealPlanDetailPage = () => {
         if (result) {
           console.log("Fitbite inventory fetched successfully:", result);
           toast.error("Could not find matches for your items. Please try again.");
+        }
+      }
+
+      while (attempts < maxAttempts) {
+        toast("We are matching your items, please wait...");
+
+        // Get matches for this store and influencer
+        const matchesResponse = await fetch(`${API_BASE_URL}/api/matches/pre-processed-matches?store_id=${store._id}&influencer_id=${influencer._id}`, {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+
+        if (matchesResponse.ok) {
+          matchesResult = await matchesResponse.json();
+          
+          if (matchesResult?.matches && matchesResult.matches.length > 0) {
+            // Convert matches to shopping list format
+            const shoppingListItems = matchesResult.matches.map((match: any) => ({
+              product_id: match._id,
+              name: match.name,
+              searchTerm: match.searchTerm,
+              quantity: match.adjusted_quantity,
+              product_marked_price: Math.round(match.price * 100), // Convert to cents
+              matched_items: match.matched_items,
+              unit_of_measurement: match.unit_of_measurement,
+              unit_size: match.unit_size,
+              unit_details: match.unit_details,
+              macros: {
+                protein: match.macros?.protein,
+                carbs: match.macros?.carbs,
+                fat: match.macros?.fat
+              },
+              selected_options: []
+            }));
+
+            setShoppingList(shoppingListItems);
+            setIsShoppingListReady(true);
+            console.log("Shopping list updated with matches:", shoppingListItems);
+            break;
+          }
+        }
+
+        attempts++;
+        if (attempts < maxAttempts) {
+          await new Promise(resolve => setTimeout(resolve, 10000));
         }
       }
     } catch (error) {
