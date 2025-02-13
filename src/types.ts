@@ -130,6 +130,11 @@ export type Address = {
   longitude: number;
 };
 
+export type UnitDetails = {
+  unit_of_measurement: string;
+  unit_size: number;
+};
+
 export type ShoppingListItem = {
   _id: string;
   product_id: string;
@@ -139,6 +144,7 @@ export type ShoppingListItem = {
   product_marked_price: number;
   unit_of_measurement: string;
   unit_size: number;
+  unit_details: UnitDetails[];
   macros: {
     protein: number;
     carbs: number;
