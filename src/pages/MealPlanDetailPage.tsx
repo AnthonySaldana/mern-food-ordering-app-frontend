@@ -74,6 +74,12 @@ const MealPlanDetailPage = () => {
   useEffect(() => {
     if (isAuthenticated && user?.email) {
       setEmail(user.email);
+      // Extract isOrderPage from the query parameters
+      const params = new URLSearchParams(window.location.search);
+      const isOrderPageParam = params.get('isOrderPage');
+      if (isOrderPageParam !== null) {
+        setIsOrderPage(isOrderPageParam === 'true');
+      }
     }
   }, [isAuthenticated, user]);
 
@@ -81,7 +87,7 @@ const MealPlanDetailPage = () => {
     if (!isAuthenticated) {
       await loginWithRedirect({
         appState: {
-          returnTo: pathname,
+          returnTo: pathname + `?isOrderPage=${isOrderPage}`,
         },
       });
     }
@@ -91,7 +97,7 @@ const MealPlanDetailPage = () => {
     if (!isAuthenticated) {
       await loginWithRedirect({
         appState: {
-          returnTo: pathname,
+          returnTo: pathname + `?isOrderPage=${isOrderPage}`,
         },
         authorizationParams: {
           screen_hint: 'signup',
