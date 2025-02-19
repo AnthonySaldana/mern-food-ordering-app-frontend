@@ -261,7 +261,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                                 className="px-2 py-1 text-black min-w-[100px] text-end"
                               >
                                 <span>
-                                  {detail.unit_size} {detail.unit_of_measurement}
+                                  {(detail.unit_size * 7).toFixed(1)} {detail.unit_of_measurement}
                                 </span>
                               </div>
                             )
@@ -392,7 +392,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                 <span className="mr-2">Total weight needed: </span>
                 {selectedItem.unit_details?.map((detail: any, index: any) => (
                   <span className="py-1 text-xs" key={index}>
-                    {(detail.unit_size * 7).toFixed(2)} {detail.unit_of_measurement}
+                    {(detail.unit_size * 7).toFixed(1)} {detail.unit_of_measurement}
                     {index < selectedItem.unit_details.length - 1 && " / "}
                   </span>
                 ))}
@@ -421,7 +421,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                 />
             </div>
 
-            <div className="max-h-[400px] overflow-y-auto">
+            <div className="max-h-[250px] overflow-y-auto">
               {searchResults?.map((match: any) => (
                 <div 
                   key={match._id}

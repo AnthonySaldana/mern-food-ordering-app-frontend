@@ -48,7 +48,7 @@ const OrderReviewPage = () => {
                   <span className="font-medium">{item.name}</span>
                   <span className="text-gray-600 ml-2">x{item.quantity}</span>
                 </div>
-                <span>${(item.price * item.quantity / 100).toFixed(2)}</span>
+                <span>${(item.price * item.quantity / 100).toFixed(1)}</span>
               </div>
             ))}
           </div>
@@ -69,19 +69,19 @@ const OrderReviewPage = () => {
             <div className="space-y-2">
               <div className="flex justify-between">
                 <span>Subtotal</span>
-                <span>${(orderDetails.subtotal / 100).toFixed(2)}</span>
+                <span>${(orderDetails.subtotal / 100).toFixed(1)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Delivery Fee</span>
-                <span>${(orderDetails.deliveryFee / 100).toFixed(2)}</span>
+                <span>${(orderDetails.deliveryFee / 100).toFixed(1)}</span>
               </div>
               <div className="flex justify-between">
                 <span>Tax</span>
-                <span>${(orderDetails.tax / 100).toFixed(2)}</span>
+                <span>${(orderDetails.tax / 100).toFixed(1)}</span>
               </div>
               <div className="flex justify-between font-semibold">
                 <span>Total</span>
-                <span>${(orderDetails.total / 100).toFixed(2)}</span>
+                <span>${(orderDetails.total / 100).toFixed(1)}</span>
               </div>
             </div>
           </div>
