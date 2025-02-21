@@ -422,62 +422,66 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
             </div>
 
             <div className="max-h-[250px] overflow-y-auto">
-              {searchResults?.map((match: any) => (
-                <div 
-                  key={match._id}
-                  className={`flex justify-between items-center p-2 cursor-pointer border rounded-lg ${
-                    activeMatchedItems[selectedItem.product_id] === match._id ? 'bg-[#09C274]/10 border-[#09C274]' : 'border-[transparent]'
-                  }`}
-                >
-                  <div className="flex items-center gap-4">
-                    <img 
-                      src={match.image} 
-                      alt={match.name} 
-                      className="w-[60px] h-[60px] rounded-md"
-                      onClick={() => setImagePopup({ visible: true, item: match })}
-                    />
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium truncate max-w-[200px] hover:whitespace-nowrap hover:max-w-full" title={match.name}>{match.name}</span>
-                    </div>
-                  </div>
-
-                  <div className="flex items-center gap-4">
-                    <span className="text-xs text-gray-500">{match.unit_size} {match.unit_of_measurement}</span>
-                    <div className="flex items-center gap-2">
-                      <button 
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleUpdateQuantity(match._id, -1);
-                        }}
-                        className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
-                      >
-                        -
-                      </button>
-                      <span className="w-8 text-center">{quantities[match._id] || 1}</span>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleUpdateQuantity(match._id, 1);
-                        }}
-                        className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
-                      >
-                        +
-                      </button>
-                    </div>
-                    <span className="text-sm font-medium w-20 text-right">${(match.price * (quantities[match._id] || 1)).toFixed(2)}</span>
-                    <button 
-                      className={`px-3 py-1 rounded-full text-sm min-w-[100px] ${
-                        activeMatchedItems[selectedItem.product_id] === match._id 
-                          ? 'bg-[#09C274] text-white'
-                          : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+              {searchResults?.map((match: any) => {
+                console.log(match, 'match found here');
+                const activeMatch = selectedItem?.matched_items?.find((item: any) => item._id === match._id);
+                return (
+                    <div 
+                      key={match._id}
+                      className={`flex justify-between items-center p-2 cursor-pointer border rounded-lg ${
+                        activeMatch ? 'bg-[#09C274]/10 border-[#09C274]' : 'border-[transparent]'
                       }`}
-                      onClick={() => handleMatchedItemClick(selectedItem.product_id, match)}
                     >
-                      {activeMatchedItems[selectedItem.product_id] === match._id ? 'Matched' : 'Match'}
-                    </button>
-                  </div>
-                </div>
-              ))}
+                      <div className="flex items-center gap-4">
+                        <img 
+                          src={match.image} 
+                          alt={match.name} 
+                          className="w-[60px] h-[60px] rounded-md"
+                          onClick={() => setImagePopup({ visible: true, item: match })}
+                        />
+                        <div className="flex flex-col">
+                          <span className="text-sm font-medium truncate max-w-[200px] hover:whitespace-nowrap hover:max-w-full" title={match.name}>{match.name}</span>
+                        </div>
+                      </div>
+
+                      <div className="flex items-center gap-4">
+                        <span className="text-xs text-gray-500">{match.unit_size} {match.unit_of_measurement}</span>
+                        <div className="flex items-center gap-2">
+                          <button 
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUpdateQuantity(match._id, -1);
+                            }}
+                            className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
+                          >
+                            -
+                          </button>
+                          <span className="w-8 text-center">{quantities[match._id] || 1}</span>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleUpdateQuantity(match._id, 1);
+                            }}
+                            className="w-6 h-6 flex items-center justify-center rounded-full border border-gray-300 hover:bg-gray-100"
+                          >
+                            +
+                          </button>
+                        </div>
+                        <span className="text-sm font-medium w-20 text-right">${(match.price * (quantities[match._id] || 1)).toFixed(2)}</span>
+                        <button 
+                          className={`px-3 py-1 rounded-full text-sm min-w-[100px] ${
+                            activeMatch
+                              ? 'bg-[#09C274] text-white'
+                              : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
+                          }`}
+                          onClick={() => handleMatchedItemClick(selectedItem.product_id, match)}
+                        >
+                          {activeMatch ? 'Swap' : 'Match'}
+                        </button>
+                      </div>
+                    </div>
+                  );
+                })}
             </div>
           </div>
         </div>
