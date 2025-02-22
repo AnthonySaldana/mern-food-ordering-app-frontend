@@ -11,7 +11,7 @@ const MatchedItem: React.FC<MatchedItemProps> = ({ targetItem, selectedItem }) =
 //   const handleIncrease = () => setQuantity(quantity + 1);
 //   const handleDecrease = () => setQuantity(quantity > 1 ? quantity - 1 : 1);
 
-  const activeMatch = selectedItem ? targetItem.matched_items.find((match: any) => match._id === selectedItem) : null;
+  const activeMatch = selectedItem; //selectedItem ? targetItem.matched_items.find((match: any) => match._id === selectedItem) : null;
 
   if (!selectedItem) {
     return (
@@ -33,7 +33,7 @@ const MatchedItem: React.FC<MatchedItemProps> = ({ targetItem, selectedItem }) =
   return (
     <div style={{ border: '1px solid lightgreen', padding: '10px', borderRadius: '8px' }}>
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span>{targetItem?.name}</span>
+        {/* <span>{targetItem?.name}</span> */}
         <div>
           <span>{targetItem.unit}</span>
           {/* <span> Total {targetItem.unit_size} {targetItem.unit_of_measurement}</span> */}
