@@ -423,8 +423,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
 
             <div className="max-h-[250px] overflow-y-auto">
               {searchResults?.map((match: any) => {
-                console.log(match, 'match found here');
-                const activeMatch = selectedItem?.matched_items?.find((item: any) => item._id === match._id);
+                const activeMatch = activeMatchedItems[selectedItem.product_id]?._id === match._id;
                 return (
                     <div 
                       key={match._id}
