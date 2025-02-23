@@ -3,6 +3,7 @@ import { Influencer, MealPlan } from "@/types";
 import { useAuth0 } from "@auth0/auth0-react";
 import { useMutation, useQuery } from "react-query";
 import { toast } from "sonner";
+import { Recipe } from "@/types";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -253,4 +254,67 @@ export const useUpdateMyInfluencerMealPlan = () => {
   }
 
   return { updateMealPlan, isLoading };
+};
+
+export const useCreateRecipe = () => {
+  const { getAccessTokenSilently } = useAuth0();
+
+  const createRecipeRequest = async (recipeFormData: FormData): Promise<Recipe> => {
+    const accessToken = await getAccessTokenSilently();
+
+    // Convert FormData to JSON object
+    const jsonData = Object.fromEntries(recipeFormData.entries());
+
+    // Convert numeric strings to numbers
+    const parsedData = {
+      ...jsonData,
+      calories: Number(jsonData.calories),
+      carbs: Number(jsonData.carbs),
+      fat: Number(jsonData.fat), 
+      protein: Number(jsonData.protein),
+      influencer_id: jsonData.influencer_id,
+      meal_plan_id: jsonData.meal_plan_id
+    };
+
+    const response = await fetch(`${API_BASE_URL}/api/recipe`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${accessToken}`,
+        "Content-Type": "application/json"
+      },
+      body: JSON.stringify(parsedData),
+    });
+
+    if (!response.ok) {
+      throw new Error("Failed to create recipe");
+    }
+
+    return response.json();
+  };
+
+  const { mutate: createRecipe, isLoading } = useMutation(createRecipeRequest);
+
+  return { createRecipe, isLoading };
+};
+
+export const useGetRecipes = (influencerId?: string) => {
+  const getRecipesRequest = async (): Promise<Recipe[]> => {
+    const response = await fetch(`${API_BASE_URL}/api/recipe/${influencerId}`);
+
+    if (!response.ok) {
+      throw new Error("Failed to fetch recipes");
+    }
+
+    return response.json();
+  };
+
+  const { data: recipes, isLoading } = useQuery(
+    ["fetchRecipes", influencerId], 
+    getRecipesRequest,
+    {
+      enabled: !!influencerId
+    }
+  );
+
+  return { recipes, isLoading };
 };

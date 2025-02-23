@@ -63,6 +63,8 @@ const formSchema = z
             }),
             imageUrl: z.string().optional(),
             imageFile: z.instanceof(File, { message: "Image is required" }).optional(),
+            positiveDescriptors: z.string().optional(),
+            negativeDescriptors: z.string().optional(),
           })
         ),
       })
@@ -95,7 +97,7 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
       estimatedDeliveryTime: 0,
       socialMediaHandles: [{ platform: "", handle: "" }],
       cuisines: [],
-      mealPlans: [{ name: "", description: "", totalCalories: 0, imageUrl: "", imageFile: undefined, menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined }] }],
+      mealPlans: [{ name: "", description: "", totalCalories: 0, imageUrl: "", imageFile: undefined, menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined, positiveDescriptors: "", negativeDescriptors: "" }] }],
       imageUrl: "",
       imageFile: undefined,
     },
@@ -185,6 +187,12 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
           }
           if (item.macros?.fat) {
             formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][fat]`, item.macros.fat.toString());
+          }
+          if (item.positiveDescriptors) {
+            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][positiveDescriptors]`, item.positiveDescriptors);
+          }
+          if (item.negativeDescriptors) {
+            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][negativeDescriptors]`, item.negativeDescriptors);
           }
         });
       });

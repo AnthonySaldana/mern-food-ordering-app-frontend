@@ -5,6 +5,7 @@ export type User = {
   addressLine1: string;
   city: string;
   country: string;
+  role: string;
 };
 
 export type MenuItem = {
@@ -20,6 +21,8 @@ export type MenuItem = {
     carbs: number;
     fat: number;
   };
+  positiveDescriptors?: string;
+  negativeDescriptors?: string;
 };
 
 export type Restaurant = {
@@ -103,3 +106,64 @@ export type MealPlan = {
   deliveryOptions: string[];
   startDayOptions: string[];
 };
+
+export type Recipe = {
+  _id: string;
+  name: string;
+  calories: number;
+  carbs: number;
+  fat: number;
+  protein: number;
+  ingredients: string;
+  instructions: string;
+  imageFile: string;
+};
+
+export type Address = {
+  streetNum: string;
+  streetName: string;
+  city: string;
+  state: string;
+  zipcode: string;
+  country: string;
+  latitude: number;
+  longitude: number;
+};
+
+export type UnitDetails = {
+  unit_of_measurement: string;
+  unit_size: number;
+};
+
+export type ShoppingListItem = {
+  _id: string;
+  product_id: string;
+  name: string;
+  searchTerm: string;
+  quantity: number;
+  product_marked_price: number;
+  unit_of_measurement: string;
+  unit_size: number;
+  unit_details: UnitDetails[];
+  macros: {
+    protein: number;
+    carbs: number;
+    fat: number;
+  };
+  matched_items?: Array<{
+    _id: string;
+    product_id: string;
+    name: string;
+    unit_of_measurement: string;
+    unit_size: number;
+    adjusted_quantity: number;
+    price: number;
+    image: string;
+  }>;
+  selected_options?: Array<{
+    option_id: string;
+    quantity: number;
+    marked_price?: number;
+    notes?: string;
+  }>;
+}

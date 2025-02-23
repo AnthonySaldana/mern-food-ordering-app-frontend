@@ -9,9 +9,14 @@ import { useAuth0 } from "@auth0/auth0-react";
 import { Link } from "react-router-dom";
 import { Separator } from "./ui/separator";
 import { Button } from "./ui/button";
+import { useGetMyUser } from "@/api/MyUserApi";
 
 const UsernameMenu = () => {
   const { user, logout } = useAuth0();
+  const { currentUser, isLoading: isGetLoading } = useGetMyUser();
+  console.log(isGetLoading, 'Is user loading');
+
+  const isAdmin = currentUser?.role === 'admin';
 
   return (
     <DropdownMenu>
@@ -20,14 +25,16 @@ const UsernameMenu = () => {
         {user?.email}
       </DropdownMenuTrigger>
       <DropdownMenuContent>
-        <DropdownMenuItem>
-          <Link
-            to="/manage-restaurant"
-            className="font-bold hover:text-[#50ad40]"
-          >
-            Manage Influencer
-          </Link>
-        </DropdownMenuItem>
+        {isAdmin && (
+          <DropdownMenuItem>
+            <Link
+              to="/manage-restaurant"
+              className="font-bold hover:text-[#50ad40]"
+            >
+              Manage Influencer
+            </Link>
+          </DropdownMenuItem>
+        )}
         <DropdownMenuItem>
           <Link to="/user-profile" className="font-bold hover:text-[#50ad40]">
             User Profile
@@ -36,7 +43,13 @@ const UsernameMenu = () => {
         <Separator />
         <DropdownMenuItem>
           <Button
-            onClick={() => logout()}
+            onClick={() =>
+              logout({
+                logoutParams: {
+                  returnTo: window.location.origin
+                }
+              })
+            }
             className="flex flex-1 font-bold bg-[#50ad40]"
           >
             Log Out

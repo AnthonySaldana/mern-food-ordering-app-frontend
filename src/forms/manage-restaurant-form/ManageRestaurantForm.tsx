@@ -49,6 +49,8 @@ const formSchema = z
     ),
     imageUrl: z.string().optional(),
     imageFile: z.instanceof(File, { message: "image is required" }).optional(),
+    positiveDescriptors: z.string().optional(),
+    negativeDescriptors: z.string().optional(),
   })
   .refine((data) => data.imageUrl || data.imageFile, {
     message: "Either image URL or image File must be provided",
@@ -124,6 +126,12 @@ const ManageRestaurantForm = ({ onSave, isLoading, restaurant }: Props) => {
 
     if (formDataJson.imageFile) {
       formData.append(`imageFile`, formDataJson.imageFile);
+    }
+    if (formDataJson.positiveDescriptors) {
+      formData.append(`positiveDescriptors`, formDataJson.positiveDescriptors);
+    }
+    if (formDataJson.negativeDescriptors) {
+      formData.append(`negativeDescriptors`, formDataJson.negativeDescriptors);
     }
 
     onSave(formData);
