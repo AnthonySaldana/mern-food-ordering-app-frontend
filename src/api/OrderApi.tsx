@@ -5,13 +5,13 @@ import { toast } from "sonner";
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
-export const useGetMyOrders = () => {
+export const useGetMyOrders = (influencerId?: string) => {
   const { getAccessTokenSilently } = useAuth0();
-
+  
   const getMyOrdersRequest = async (): Promise<Order[]> => {
     const accessToken = await getAccessTokenSilently();
 
-    const response = await fetch(`${API_BASE_URL}/api/order`, {
+    const response = await fetch(`${API_BASE_URL}/api/order?influencerId=${influencerId}`, {
       headers: {
         Authorization: `Bearer ${accessToken}`,
       },
@@ -26,10 +26,7 @@ export const useGetMyOrders = () => {
 
   const { data: orders, isLoading } = useQuery(
     "fetchMyOrders",
-    getMyOrdersRequest,
-    {
-      refetchInterval: 5000,
-    }
+    getMyOrdersRequest
   );
 
   return { orders, isLoading };

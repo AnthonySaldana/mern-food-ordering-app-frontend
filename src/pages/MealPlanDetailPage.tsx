@@ -10,6 +10,7 @@ import { useSearchGroceryStores, useStoreInventory, useFitbiteInventory } from "
 import { usePreProcessedMatches } from "@/api/MatchApi";
 import PaymentMethodSection from "@/components/PaymentMethodSection";
 import AddressSection from "@/components/AddressSection";
+import { useGetMyOrders } from "@/api/OrderApi";
 // import { ShoppingListItemType } from '../types/grocery';
 import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
@@ -64,11 +65,7 @@ const MealPlanDetailPage = () => {
   const [quantities, setQuantities] = useState<any>({});
   const [trackingLink, setTrackingLink] = useState<string | null>(null);
   const [isShoppingListReady, setIsShoppingListReady] = useState(false);
-
-
-  // const [tempEmail, setTempEmail] = useState<string>("");
   const { loginWithRedirect, isAuthenticated, user } = useAuth0();
-
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -133,6 +130,9 @@ const MealPlanDetailPage = () => {
     search_focus: searchFocus,
     query
   });
+
+  const { orders, isLoading: isLoadingOrders } = useGetMyOrders(influencerId as string);
+  console.log(isLoadingOrders, 'isLoadingOrders')
 
   // useEffect(() => {
   //   // Re-call the search stores endpoint when options change
@@ -1196,23 +1196,20 @@ const MealPlanDetailPage = () => {
                   <path fill-rule="evenodd" clip-rule="evenodd" d="M2.14035 1.63327C2.14035 1.09948 2.57308 0.666748 3.10688 0.666748H16.3671C16.9009 0.666748 17.3337 1.09948 17.3337 1.63327V14.8935C17.3337 15.4273 16.9009 15.8601 16.3671 15.8601C15.8333 15.8601 15.4006 15.4273 15.4006 14.8935V3.96667L2.31695 17.0503C1.9395 17.4278 1.32753 17.4278 0.950081 17.0503C0.572629 16.6729 0.572629 16.0609 0.950081 15.6835L14.0337 2.5998H3.10688C2.57308 2.5998 2.14035 2.16707 2.14035 1.63327ZM3.10688 0.831765C2.66422 0.831765 2.30537 1.19061 2.30537 1.63327C2.30537 2.07593 2.66422 2.43478 3.10688 2.43478H14.2329C14.2663 2.43478 14.2964 2.45488 14.3092 2.48572C14.3219 2.51655 14.3149 2.55204 14.2913 2.57563L1.06677 15.8001C0.753757 16.1131 0.753756 16.6206 1.06677 16.9336C1.37977 17.2467 1.88726 17.2467 2.20027 16.9336L15.4248 3.70914C15.4484 3.68554 15.4839 3.67848 15.5147 3.69125C15.5455 3.70402 15.5656 3.73411 15.5656 3.76748V14.8935C15.5656 15.3362 15.9245 15.695 16.3671 15.695C16.8098 15.695 17.1686 15.3362 17.1686 14.8935V1.63327C17.1686 1.19061 16.8098 0.831765 16.3671 0.831765H3.10688Z" fill="#09C274"/>
                 </svg>
               </button>
-              <button 
-                onClick={() => {
-                  const params = new URLSearchParams(window.location.search);
-                  if (!params.get('bypassRecipe')) {
-                    toast.info("Purchase this meal plan to view recipes");
-                  } else {
+              {orders && orders.length > 0 && (
+                <button 
+                  onClick={() => {
                     navigate(`/recipe/${influencerId}/mealplan/0`);
-                  }
-                }}
-                className="flex items-center gap-2 border-2 border-[#09C274] text-[#09C274] px-4 py-2 rounded-full font-semibold hover:bg-[#09C274] hover:text-white transition-colors"
-              >
-                View Recipes
-                <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M3.1064 2.5173C2.61817 2.5173 2.22238 2.12151 2.22238 1.63328C2.22238 1.14506 2.61817 0.749268 3.1064 0.749268H16.3667C16.8549 0.749268 17.2507 1.14506 17.2507 1.63328V14.8935C17.2507 15.3818 16.8549 15.7776 16.3667 15.7776C15.8784 15.7776 15.4826 15.3818 15.4826 14.8935V3.76749L2.25813 16.992C1.9129 17.3372 1.35318 17.3372 1.00795 16.992C0.662716 16.6468 0.662716 16.087 1.00795 15.7418L14.2325 2.5173H3.1064Z" fill="#09C274"/>
-                  <path fill-rule="evenodd" clip-rule="evenodd" d="M2.14035 1.63327C2.14035 1.09948 2.57308 0.666748 3.10688 0.666748H16.3671C16.9009 0.666748 17.3337 1.09948 17.3337 1.63327V14.8935C17.3337 15.4273 16.9009 15.8601 16.3671 15.8601C15.8333 15.8601 15.4006 15.4273 15.4006 14.8935V3.96667L2.31695 17.0503C1.9395 17.4278 1.32753 17.4278 0.950081 17.0503C0.572629 16.6729 0.572629 16.0609 0.950081 15.6835L14.0337 2.5998H3.10688C2.57308 2.5998 2.14035 2.16707 2.14035 1.63327ZM3.10688 0.831765C2.66422 0.831765 2.30537 1.19061 2.30537 1.63327C2.30537 2.07593 2.66422 2.43478 3.10688 2.43478H14.2329C14.2663 2.43478 14.2964 2.45488 14.3092 2.48572C14.3219 2.51655 14.3149 2.55204 14.2913 2.57563L1.06677 15.8001C0.753757 16.1131 0.753756 16.6206 1.06677 16.9336C1.37977 17.2467 1.88726 17.2467 2.20027 16.9336L15.4248 3.70914C15.4484 3.68554 15.4839 3.67848 15.5147 3.69125C15.5455 3.70402 15.5656 3.73411 15.5656 3.76748V14.8935C15.5656 15.3362 15.9245 15.695 16.3671 15.695C16.8098 15.695 17.1686 15.3362 17.1686 14.8935V1.63327C17.1686 1.19061 16.8098 0.831765 16.3671 0.831765H3.10688Z" fill="#09C274"/>
-                </svg>
-              </button>
+                  }}
+                  className="flex items-center gap-2 border-2 border-[#09C274] text-[#09C274] px-4 py-2 rounded-full font-semibold hover:bg-[#09C274] hover:text-white transition-colors"
+                >
+                  View Recipes
+                  <svg width="18" height="18" viewBox="0 0 18 18" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M3.1064 2.5173C2.61817 2.5173 2.22238 2.12151 2.22238 1.63328C2.22238 1.14506 2.61817 0.749268 3.1064 0.749268H16.3667C16.8549 0.749268 17.2507 1.14506 17.2507 1.63328V14.8935C17.2507 15.3818 16.8549 15.7776 16.3667 15.7776C15.8784 15.7776 15.4826 15.3818 15.4826 14.8935V3.76749L2.25813 16.992C1.9129 17.3372 1.35318 17.3372 1.00795 16.992C0.662716 16.6468 0.662716 16.087 1.00795 15.7418L14.2325 2.5173H3.1064Z" fill="#09C274"/>
+                    <path fill-rule="evenodd" clip-rule="evenodd" d="M2.14035 1.63327C2.14035 1.09948 2.57308 0.666748 3.10688 0.666748H16.3671C16.9009 0.666748 17.3337 1.09948 17.3337 1.63327V14.8935C17.3337 15.4273 16.9009 15.8601 16.3671 15.8601C15.8333 15.8601 15.4006 15.4273 15.4006 14.8935V3.96667L2.31695 17.0503C1.9395 17.4278 1.32753 17.4278 0.950081 17.0503C0.572629 16.6729 0.572629 16.0609 0.950081 15.6835L14.0337 2.5998H3.10688C2.57308 2.5998 2.14035 2.16707 2.14035 1.63327ZM3.10688 0.831765C2.66422 0.831765 2.30537 1.19061 2.30537 1.63327C2.30537 2.07593 2.66422 2.43478 3.10688 2.43478H14.2329C14.2663 2.43478 14.2964 2.45488 14.3092 2.48572C14.3219 2.51655 14.3149 2.55204 14.2913 2.57563L1.06677 15.8001C0.753757 16.1131 0.753756 16.6206 1.06677 16.9336C1.37977 17.2467 1.88726 17.2467 2.20027 16.9336L15.4248 3.70914C15.4484 3.68554 15.4839 3.67848 15.5147 3.69125C15.5455 3.70402 15.5656 3.73411 15.5656 3.76748V14.8935C15.5656 15.3362 15.9245 15.695 16.3671 15.695C16.8098 15.695 17.1686 15.3362 17.1686 14.8935V1.63327C17.1686 1.19061 16.8098 0.831765 16.3671 0.831765H3.10688Z" fill="#09C274"/>
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
 
