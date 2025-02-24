@@ -68,8 +68,6 @@ const MealPlanDetailPage = () => {
   const { loginWithRedirect, isAuthenticated, user } = useAuth0();
   const { pathname } = useLocation();
 
-  const [hasPreviousOrders, setHasPreviousOrders] = useState(false);
-
   useEffect(() => {
     if (isAuthenticated && user?.email) {
       setEmail(user.email);
