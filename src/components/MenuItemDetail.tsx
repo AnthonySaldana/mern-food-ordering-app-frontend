@@ -45,7 +45,7 @@ const MenuItem = ({ menuItem }: Props) => {
               <p>Fat: {menuItem?.fat}g</p>
             </div>
           </div>
-          {menuItem.imageFile && (
+          {menuItem.imageFile && menuItem.imageFile !== 'path_to_image' && (
             <img 
               src={menuItem.imageFile}
               alt={menuItem.name}
