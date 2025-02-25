@@ -26,10 +26,12 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
   const [quantities, setQuantities] = useState<{[key: string]: number}>(initialQuantities);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const deliveryFee = selectedStore?.quotes?.cheapest_delivery?.delivery_fee?.delivery_fee_flat / 100 || 0; // Convert cents to dollars
+  const deliveryFee = selectedStore?.quotes?.cheapest_delivery?.delivery_fee?.delivery_fee_flat / 100 || 600; // Convert cents to dollars
   const [activeUnit, setActiveUnit] = useState<{ [key: string]: number }>({});
 
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
+
+  const isDevOrStaging = window.location.hostname.startsWith('dev.') || window.location.hostname.startsWith('staging.') || window.location.hostname.startsWith('localhost');
 
   const handleToggleUnit = (itemId: string, index: number) => {
     setActiveUnit(prev => ({
@@ -515,7 +517,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
       </div>
       <div className="flex justify-between text-sm">
         <span>Delivery Fee</span>
-        <span>${(deliveryFee).toFixed(2)}</span>
+        <span>${(deliveryFee || 6).toFixed(2)}</span>
       </div>
       <div className="flex justify-between text-sm">
         <span>Estimated Taxes</span>
@@ -548,12 +550,14 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
             : 'Add items to cart'
         }
         </button>
-        <button 
-          className="mb-4 px-4 py-2 bg-[#09C274] text-white rounded-xl"
-          onClick={saveShoppingList}
-        >
-          Save Shopping List
-        </button>
+        {isDevOrStaging && (
+          <button 
+            className="mb-4 px-4 py-2 bg-[#09C274] text-white rounded-xl"
+            onClick={saveShoppingList}
+          >
+            Save Shopping List
+          </button>
+        )}
     </div>
   );
 };

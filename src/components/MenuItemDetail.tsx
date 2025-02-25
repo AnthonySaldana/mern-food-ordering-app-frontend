@@ -63,8 +63,12 @@ const MenuItem = ({ menuItem }: Props) => {
           <div className="flex flex-col">
             <p className="font-semibold">Ingredients:</p>
             <p className="mb-2">{menuItem?.ingredients}</p>
-            <p className="font-semibold">Instructions:</p>
-            <p className="text-sm">{menuItem?.instructions}</p>
+            {menuItem?.instructions && (
+              <>
+                <p className="font-semibold">Instructions:</p>
+                <p className="text-sm">{menuItem.instructions}</p>
+              </>
+            )}
           </div>
         </div>
       )}
