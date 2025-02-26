@@ -48,6 +48,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     };
     const influencerId = 'someInfluencerId'; // Replace with actual influencer ID
     const key = `shoppingList_${influencerId}_${selectedStoreId}`;
+    localStorage.removeItem(key);
     localStorage.setItem(key, JSON.stringify(listData));
     console.log('Shopping list saved');
   };
@@ -543,7 +544,10 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
             : 'bg-gray-200 text-gray-500 cursor-not-allowed'
         }`}
         disabled={shoppingList.length === 0}
-        onClick={() => handleCreateOrder(calculateTotal(), activeMatchedItems, quantities)}
+        onClick={async () => {
+          await saveShoppingList();
+          handleCreateOrder(calculateTotal(), activeMatchedItems, quantities);
+        }}
         >
         {shoppingList.length > 0 
             ? `Confirm and place order`
