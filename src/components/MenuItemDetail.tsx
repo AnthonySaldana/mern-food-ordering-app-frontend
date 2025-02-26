@@ -62,7 +62,7 @@ const MenuItem = ({ menuItem }: Props) => {
         <div className="p-4 border-t border-gray-200">
           <div className="flex flex-col">
             <p className="font-semibold">Ingredients:</p>
-            <p className="mb-2">{menuItem?.ingredients}</p>
+            <p className="mb-2 whitespace-pre-wrap">{menuItem?.ingredients}</p>
             {menuItem?.instructions && (
               <>
                 <p className="font-semibold">Instructions:</p>
