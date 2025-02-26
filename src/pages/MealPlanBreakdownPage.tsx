@@ -34,8 +34,41 @@ const MealPlanDetailPage = () => {
     return <div>Error fetching recipes</div>;
   }
 
+  // Calculate totals
+  const totals = recipes?.reduce((acc, recipe) => {
+    return {
+      calories: (acc.calories || 0) + (recipe.calories || 0),
+      protein: (acc.protein || 0) + (recipe.protein || 0),
+      carbs: (acc.carbs || 0) + (recipe.carbs || 0),
+      fat: (acc.fat || 0) + (recipe.fat || 0),
+    };
+  }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+
   return (
     <div className="flex flex-col gap-4 bg-white p-3 rounded-md lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8 max-w-[900px] mx-auto">
+      {/* Add Macros Summary */}
+      <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
+        <h2 className="text-lg font-bold mb-2">Daily Nutrition Summary</h2>
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <div className="text-center">
+            <p className="text-gray-600">Calories</p>
+            <p className="font-semibold">{totals?.calories.toFixed(0)} kcal</p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-600">Protein</p>
+            <p className="font-semibold">{totals?.protein.toFixed(1)}g</p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-600">Carbs</p>
+            <p className="font-semibold">{totals?.carbs.toFixed(1)}g</p>
+          </div>
+          <div className="text-center">
+            <p className="text-gray-600">Fat</p>
+            <p className="font-semibold">{totals?.fat.toFixed(1)}g</p>
+          </div>
+        </div>
+      </div>
+
       <div className="block px-4 lg:px-0">
         <div key={planIndex} className="mb-12">
           <p className="text-md font-bold">Here are the recipes!</p>
