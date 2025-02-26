@@ -385,7 +385,7 @@ const MealPlanDetailPage = () => {
 
     console.log(orderData, 'orderData')
 
-    saveShoppingListConfig();
+    await saveShoppingListConfig();
 
     try {
       const response = await fetch(`${API_BASE_URL}/api/grocery/create-order`, {
@@ -473,7 +473,7 @@ const MealPlanDetailPage = () => {
               searchTerm: match.searchTerm,
               quantity: match.adjusted_quantity,
               product_marked_price: Math.round(match.price * 100), // Convert to cents
-              matched_items: match.matched_items,
+              // matched_items: match.matched_items,
               unit_of_measurement: match.unit_of_measurement,
               unit_size: match.unit_size,
               unit_details: match.unit_details,
@@ -543,7 +543,7 @@ const MealPlanDetailPage = () => {
               searchTerm: match.searchTerm,
               quantity: match.adjusted_quantity,
               product_marked_price: Math.round(match.price * 100), // Convert to cents
-              matched_items: match.matched_items,
+              // matched_items: match.matched_items,
               unit_of_measurement: match.unit_of_measurement,
               unit_size: match.unit_size,
               unit_details: match.unit_details,
