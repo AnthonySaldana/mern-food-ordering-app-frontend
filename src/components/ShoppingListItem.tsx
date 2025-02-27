@@ -26,7 +26,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
   const [quantities, setQuantities] = useState<{[key: string]: number}>(initialQuantities);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const deliveryFee = selectedStore?.quotes?.cheapest_delivery?.delivery_fee?.delivery_fee_flat / 100 || 600; // Convert cents to dollars
+  const deliveryFee = selectedStore?.quotes?.cheapest_delivery?.delivery_fee?.delivery_fee_flat / 100 || 6;
   const [activeUnit, setActiveUnit] = useState<{ [key: string]: number }>({});
 
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
