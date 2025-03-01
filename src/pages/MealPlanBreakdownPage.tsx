@@ -3,7 +3,7 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import MenuItemDetail from "@/components/MenuItemDetail";
 import { Toaster } from "@/components/ui/sonner";
-import { Recipe } from "@/types";
+import { Recipe, Influencer } from "@/types";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchRecipes = async (influencerId: string): Promise<Recipe[]> => {
