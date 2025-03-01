@@ -3,13 +3,21 @@ import { useParams } from "react-router-dom";
 import { useQuery } from "react-query";
 import MenuItemDetail from "@/components/MenuItemDetail";
 import { Toaster } from "@/components/ui/sonner";
-import { Recipe } from "@/types";
+import { Recipe, Influencer } from "@/types";
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
 const fetchRecipes = async (influencerId: string): Promise<Recipe[]> => {
   const response = await fetch(`${API_BASE_URL}/api/recipe/${influencerId}`);
   if (!response.ok) {
     throw new Error("Failed to fetch recipes");
+  }
+  return response.json();
+};
+
+const fetchInfluencerById = async (id: string): Promise<Influencer> => {
+  const response = await fetch(`${API_BASE_URL}/api/influencer/${id}`);
+  if (!response.ok) {
+    throw new Error("Failed to fetch influencer");
   }
   return response.json();
 };
@@ -23,6 +31,14 @@ const MealPlanDetailPage = () => {
     () => fetchRecipes(influencerId!),
     {
       enabled: !!influencerId
+    }
+  );
+
+  const { data: influencer } = useQuery(
+    ["fetchInfluencer", influencerId],
+    () => fetchInfluencerById(influencerId as string),
+    {
+      enabled: !!influencerId,
     }
   );
 
@@ -47,6 +63,10 @@ const MealPlanDetailPage = () => {
   return (
     <div className="flex flex-col gap-4 bg-white p-3 rounded-md lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8 max-w-[900px] mx-auto">
       {/* Add Macros Summary */}
+      <div>
+        <h1 className="text-2xl font-bold">{influencer?.name}</h1>
+        <p className="text-sm text-gray-500">{influencer?.mealPlans[Number(planIndex) || 0]?.name}</p>
+      </div>
       <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
         <h2 className="text-lg font-bold mb-2">Daily Nutrition Summary</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
