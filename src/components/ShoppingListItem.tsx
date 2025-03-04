@@ -26,7 +26,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
   const [quantities, setQuantities] = useState<{[key: string]: number}>(initialQuantities);
   const [searchQuery, setSearchQuery] = useState('');
   const [searchResults, setSearchResults] = useState([]);
-  const deliveryFee = selectedStore?.quotes?.cheapest_delivery?.delivery_fee?.delivery_fee_flat / 100 || 6;
+  const deliveryFee = selectedStore?.quotes?.cheapest_delivery?.delivery_fee?.delivery_fee_flat / 100 || 600;
   const [activeUnit, setActiveUnit] = useState<{ [key: string]: number }>({});
 
   const searchTimeout = useRef<NodeJS.Timeout | null>(null);
@@ -295,7 +295,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                           <div className="flex flex-col">
                             <span className="font-medium opacity-60">{item.name} {item.unit_details?.map((detail, i) => (
                               <span key={i} className="text-sm">
-                                {(detail.unit_size * 7).toFixed(0)}{detail.unit_of_measurement}
+                                {(detail.unit_size * 7).toFixed(detail.unit_of_measurement === 'lbs' || detail.unit_of_measurement === 'lb' ? 1 : 0)}{detail.unit_of_measurement === 'grams' ? 'g' : detail.unit_of_measurement}
                                 {i < item.unit_details.length - 1 && ' / '}
                               </span>
                             ))}
@@ -518,7 +518,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
       </div>
       <div className="flex justify-between text-sm">
         <span>Delivery Fee</span>
-        <span>${(deliveryFee || 6).toFixed(2)}</span>
+        <span>${((deliveryFee || 600) / 100).toFixed(2)}</span>
       </div>
       <div className="flex justify-between text-sm">
         <span>Estimated Taxes</span>
