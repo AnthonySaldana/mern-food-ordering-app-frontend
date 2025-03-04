@@ -16,11 +16,11 @@ import { Toaster } from "@/components/ui/sonner";
 import { toast } from "sonner";
 import QuoteDetails from "@/components/QuoteMealMe";
 import LoadingOverlay from "@/components/LoadingOverlay";
-import { useAuth0 } from "@auth0/auth0-react";
 import { useLocation } from "react-router-dom";
 import ShoppingListComponent from "@/components/ShoppingListItem";
 import { ShoppingListItem } from "@/types";
 import MatchingTutorial from "@/components/matchingTutorial";
+import { useAuth0 } from '@auth0/auth0-react';
 
 const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 
@@ -65,7 +65,7 @@ const MealPlanDetailPage = () => {
   const [quantities, setQuantities] = useState<any>({});
   const [trackingLink, setTrackingLink] = useState<string | null>(null);
   const [isShoppingListReady, setIsShoppingListReady] = useState(false);
-  const { loginWithRedirect, isAuthenticated, user } = useAuth0();
+  const { loginWithRedirect, isAuthenticated, user, getAccessTokenSilently } = useAuth0();
   const { pathname } = useLocation();
 
   useEffect(() => {
@@ -236,6 +236,81 @@ const MealPlanDetailPage = () => {
 
     fetchSavedConfig();
   }, [isAuthenticated, user, influencerId, selectedStore, isShoppingListReady]);
+
+  const initiateStoreSelectionFlow = async (storeId: string) => {
+    try {
+      setIsLoading(true);
+      setIsOrderPage(true);
+
+      const accessToken = await getAccessTokenSilently();
+      const response = await fetch(`${API_BASE_URL}/api/grocery/addresses?email=${user?.email}`, {
+        headers: {
+          Authorization: `Bearer ${accessToken}`,
+        },
+      });
+      if (!response.ok) {
+        throw new Error('Failed to fetch addresses');
+      }
+      const addresses = await response.json();
+      console.log(addresses, 'addresses from address section')
+      const firstAddress = addresses[0];
+  
+      if (!firstAddress) {
+        toast.error("No delivery address found. Please add an address first.");
+        return;
+      }
+  
+      setSelectedAddress(firstAddress);
+  
+      const addressString = `${firstAddress.streetNum} ${firstAddress.streetName}, ${firstAddress.city} ${firstAddress.state} ${firstAddress.zipcode}, ${firstAddress.country}`;
+      const coordinates = await fetchCoordinates(addressString);
+      
+      if (coordinates) {
+        setLocation({
+          latitude: coordinates.lat,
+          longitude: coordinates.lng
+        });
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+  
+        // 4. Wait for store matches to be fetched
+        const storeMatchesResults = await refetchStoreMatches();
+
+        await new Promise(resolve => setTimeout(resolve, 1000));
+  
+        // 5. Find the store in the matches and proceed with order
+        const store = storeMatchesResults?.data?.stores?.find((s: any) => s._id === storeId);
+        if (store) {
+          await handleProcessAndOrder(store);
+        } else {
+          toast.error("Selected store not found in available stores");
+        }
+      }
+    } catch (error) {
+      console.error('Error in store selection flow:', error);
+      toast.error("Failed to initialize store selection");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (isAuthenticated && user?.email) {
+      setEmail(user.email);
+      const params = new URLSearchParams(window.location.search);
+      const isOrderPageParam = params.get('isOrderPage');
+      const storeIdParam = params.get('store_id');
+
+      if (isOrderPageParam !== null) {
+        setIsOrderPage(isOrderPageParam === 'true');
+      }
+
+      // If store_id is present, fetch store data and initiate order
+      if (storeIdParam) {
+        initiateStoreSelectionFlow(storeIdParam);
+      }
+    }
+  }, [isAuthenticated, user]);
 
   console.log(storeMatches, 'storeMatches found here');
 
