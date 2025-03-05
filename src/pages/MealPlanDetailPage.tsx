@@ -734,7 +734,7 @@ const MealPlanDetailPage = () => {
 
   if (isOrderPage) {
     return (
-      <div className="flex flex-col lg:flex-row mt-[40px]">
+      <div className="flex flex-col lg:flex-row">
         {isLoading && <LoadingOverlay />}
         <div className="flex lg:w-2/3 flex-col gap-4 bg-white p-3 rounded-md" style={{ borderRadius: '24px 24px 0 0' }}>
           {trackingLink && (
@@ -1145,7 +1145,7 @@ const MealPlanDetailPage = () => {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 bg-white p-4 rounded-md lg:w-1/3 lg:px-2 px-16">
+        <div className="flex flex-col gap-4 bg-white p-4 rounded-md lg:w-1/3 lg:px-2 px-8">
           <div className="mb-2 left-0 right-0">
             <div className="flex flex-col items-start gap-2 flex justify-start">
               <h2 className="text-lg font-bold">{plan.name}</h2>
@@ -1194,7 +1194,7 @@ const MealPlanDetailPage = () => {
   }
 
   return (
-    <div className="flex flex-col gap-4 bg-white p-3 rounded-md mt-[80px] lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8">
+    <div className="flex flex-col gap-4 bg-white p-3 rounded-md lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8">
       {/* <div className="block lg:hidden">
         <Card className="w-full h-[320px] relative" style={{boxShadow: 'none'}}>
           <img
