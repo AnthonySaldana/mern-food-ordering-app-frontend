@@ -203,39 +203,39 @@ const MealPlanDetailPage = () => {
     }
   }, [storeMatches]);
 
-  useEffect(() => {
-    const fetchSavedConfig = async () => {
-      if (!isAuthenticated || !user || shoppingList.length === 0) return;
+  // useEffect(() => {
+  //   const fetchSavedConfig = async () => {
+  //     if (!isAuthenticated || !user || shoppingList.length === 0) return;
 
-      try {
-        const response = await fetch(`${API_BASE_URL}/api/shoppingList/get?userId=${user.sub}&influencerId=${influencerId}&storeId=${selectedStore?._id}`);
-        if (response.ok) {
-          const config = await response.json();
-          // setShoppingList(config.shoppingList);
-          // setShoppingList(prevList => [
-          //   ...prevList,
-          //   ...config.shoppingList.filter((item: any) => item.matchedItem)
-          // ]);
-          console.log(config.shoppingList, 'config.shoppingList')
-          // setActiveMatchedItems(config.shoppingList.reduce((acc: any, item: any) => {
-          //   // Check if inventoryItem and matchedItem exist
-          //   if (item.matchedItem) {
-          //     acc[item.product_id] = item.matchedItem.matched_item_id;
-          //   }
-          //   return acc;
-          // }, {}));
-          // setQuantities(config.shoppingList.reduce((acc: any, item: any) => {
-          //   acc[item.product_id] = item.quantity;
-          //   return acc;
-          // }, {}));
-        }
-      } catch (error) {
-        console.error("Failed to fetch saved configuration", error);
-      }
-    };
+  //     try {
+  //       const response = await fetch(`${API_BASE_URL}/api/shoppingList/get?email=${user.email}&influencerId=${influencerId}&storeId=${selectedStore?._id}`);
+  //       if (response.ok) {
+  //         const config = await response.json();
+  //         // setShoppingList(config.shoppingList);
+  //         // setShoppingList(prevList => [
+  //         //   ...prevList,
+  //         //   ...config.shoppingList.filter((item: any) => item.matchedItem)
+  //         // ]);
+  //         console.log(config.shoppingList, 'config.shoppingList')
+  //         // setActiveMatchedItems(config.shoppingList.reduce((acc: any, item: any) => {
+  //         //   // Check if inventoryItem and matchedItem exist
+  //         //   if (item.matchedItem) {
+  //         //     acc[item.product_id] = item.matchedItem.matched_item_id;
+  //         //   }
+  //         //   return acc;
+  //         // }, {}));
+  //         // setQuantities(config.shoppingList.reduce((acc: any, item: any) => {
+  //         //   acc[item.product_id] = item.quantity;
+  //         //   return acc;
+  //         // }, {}));
+  //       }
+  //     } catch (error) {
+  //       console.error("Failed to fetch saved configuration", error);
+  //     }
+  //   };
 
-    fetchSavedConfig();
-  }, [isAuthenticated, user, influencerId, selectedStore, isShoppingListReady]);
+  //   fetchSavedConfig();
+  // }, [isAuthenticated, user, influencerId, selectedStore, isShoppingListReady]);
 
   const initiateStoreSelectionFlow = async (storeId: string) => {
     try {
@@ -696,12 +696,10 @@ const MealPlanDetailPage = () => {
   };
 
   const saveShoppingListConfig = async () => {
-    if (!isAuthenticated || !user) return;
-
-    console.log(shoppingList, 'shoppingList in save')
+    if (!isAuthenticated || !user?.email) return;
 
     const config = {
-      userId: user.sub,
+      email: user.email,
       influencerId,
       storeId: selectedStore?._id,
       shoppingList: shoppingList.map(item => ({
@@ -1159,7 +1157,7 @@ const MealPlanDetailPage = () => {
               </div>
             </div>
           </div>
-          {shoppingList?.length > 0 && <MatchingTutorial />}
+          {shoppingList?.length > 0 && user?.email && influencerId && <MatchingTutorial />}
           <ShoppingListComponent 
             shoppingList={shoppingList}
             selectedStore={selectedStore}
@@ -1172,6 +1170,8 @@ const MealPlanDetailPage = () => {
             initialQuantities={quantities}
             setInitialQuantities={setQuantities}
             selectedStoreId={selectedStore?._id}
+            email={user?.email || ''}
+            influencerId={influencerId || ''}
             // saveShoppingListConfig={saveShoppingListConfig}
           />
           {/* <button 
