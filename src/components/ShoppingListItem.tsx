@@ -14,10 +14,12 @@ interface ShoppingListProps {
 //   saveShoppingListConfig: any;
   selectedStoreId: string;
   selectedStore: any;
+  influencerId: string;
+  email: string;
 }
 
 const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
-    initialMatchedItems, setInitialMatchedItems, initialQuantities, setInitialQuantities, selectedStoreId, selectedStore }: ShoppingListProps) => {
+    initialMatchedItems, setInitialMatchedItems, initialQuantities, setInitialQuantities, selectedStoreId, selectedStore, influencerId, email }: ShoppingListProps) => {
       console.log(setInitialMatchedItems, 'setInitialMatchedItems in ShoppingListComponent')
   const [activeMatchedItems, setActiveMatchedItems] = useState<{[key: string]: any}>(initialMatchedItems);
   const [selectedItem, setSelectedItem] = useState<ShoppingListItem | null>(null);
@@ -40,45 +42,84 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     }));
   };  
 
-  const saveShoppingList = () => {
-    const listData = {
-      shoppingList,
-      activeMatchedItems,
-      quantities,
-    };
-    const influencerId = 'someInfluencerId'; // Replace with actual influencer ID
-    const key = `shoppingList_${influencerId}_${selectedStoreId}`;
-    localStorage.removeItem(key);
-    localStorage.setItem(key, JSON.stringify(listData));
-    console.log('Shopping list saved');
+  const saveShoppingList = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+      const listData = {
+        email: email,
+        influencerId: influencerId,
+        storeId: selectedStoreId,
+        // shoppingList: shoppingList.map(item => ({
+        //   product_id: item.product_id,
+        //   matched_item_id: activeMatchedItems[item.product_id]?._id,
+        //   quantity: quantities[activeMatchedItems[item.product_id]?._id] || 1
+        // })),
+        shoppingList,
+        activeMatchedItems,
+        quantities,
+      };
+
+      const response = await fetch(`${API_BASE_URL}/api/shoppingList/save`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(listData)
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to save shopping list');
+      }
+
+      console.log('Shopping list saved to database');
+    } catch (error) {
+      console.error('Error saving shopping list:', error);
+    }
   };
 
-  // Function to load the shopping list from local storage
-  const loadShoppingList = () => {
-    const influencerId = 'someInfluencerId'; // Replace with actual influencer ID
-    const key = `shoppingList_${influencerId}_${selectedStoreId}`;
-    const savedList = localStorage.getItem(key);
-    console.log(savedList, 'savedList in load');
-    console.log(shoppingList, 'shoppingList in load');
-    if (savedList) {
-      const { shoppingList: savedShoppingList, activeMatchedItems, quantities } = JSON.parse(savedList);
-      console.log(activeMatchedItems, 'activeMatchedItems in load');
-      console.log(savedShoppingList, 'savedShoppingList in load');
-      setActiveMatchedItems(activeMatchedItems);
-      setQuantities(quantities);
-      console.log('Shopping list loaded');
+  const loadShoppingList = async () => {
+    try {
+      const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
+
+      const response = await fetch(
+        `${API_BASE_URL}/api/shoppingList/get?email=${email}&influencerId=${influencerId}&storeId=${selectedStoreId}`
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to load shopping list');
+      }
+
+      const data = await response.json();
+      
+      if (data) {
+        // Set matched items directly from data.activeMatchedItems
+        if (data.activeMatchedItems) {
+          setActiveMatchedItems(data.activeMatchedItems);
+        }
+
+        // Set quantities directly from data.quantities 
+        if (data.quantities) {
+          setQuantities(data.quantities);
+        }
+
+        console.log('Shopping list loaded from database');
+      }
+    } catch (error) {
+      console.error('Error loading shopping list:', error);
     }
   };
 
   useEffect(() => {
     loadShoppingList();
-  }, [selectedStore]);
+  }, [selectedStore, selectedStoreId]);
 
-  const handleMatchedItemClick = (shoppingItemId: string, matchedItem: any) => {
+  const handleMatchedItemClick = async (shoppingItemId: string, matchedItem: any) => {
     setActiveMatchedItems(prev => ({
       ...prev,
       [shoppingItemId]: matchedItem
     }));
+
+    await saveShoppingList();
 
     console.log(activeMatchedItems, 'activeMatchedItems in handleMatchedItemClick')
 
@@ -107,7 +148,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     handleSearchChange({ target: { value: item.searchTerm } });
   };
 
-  const handleUpdateQuantity = (matchId: string, change: number) => {
+  const handleUpdateQuantity = async (matchId: string, change: number) => {
     setQuantities(prev => {
       const currentQty = prev[matchId] || 1;
       const newQty = Math.max(1, currentQty + change);
@@ -116,6 +157,8 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
         [matchId]: newQty
       };
     });
+
+    await saveShoppingList();
 
     setInitialQuantities(quantities);
   };
@@ -236,24 +279,31 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                   className={`flex flex-col justify-between items-center cursor-pointer ${activeMatch ? 'border border-[#09C274] rounded-lg p-2' : ''}`}
                   onClick={() => handleItemClick(item)}
                 >
-                  { activeMatch ? <div className="flex items-center justify-between w-full flex-row w-full text-gray-500">
-                      <span className="font-medium truncate max-w-[200px]">{item.name}</span>
+                  { activeMatch ? <div className="flex flex-col md:flex-row items-center justify-between w-full flex-row w-full text-gray-500 mb-8">
+                      <span className="font-medium truncate max-w-[200px] md:max-w-full">{item.name}</span>
                       <div className="flex flex-row items-center gap-2">
                         <div className="flex flex-row items-center gap-2 bg-white rounded-lg">
-                          {item.unit_details.map((detail: any, index: any) => (
-                            <div 
-                              key={index}
-                              className={`cursor-pointer min-w-[50px] px-2 py-1 text-center rounded ${activeUnit[item.product_id] === index ? 'bg-[#D9D6FF] text-white' : 'hover:bg-gray-100'}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                handleToggleUnit(item.product_id, index);
-                              }}
-                            >
-                              <span>
-                                {detail.unit_of_measurement}
-                              </span>
-                            </div>
-                          ))}
+                          {item.unit_details.map((detail: any, index: any) => {
+                            // Auto-trigger first toggle if not already set
+                            if (index === 0 && activeUnit[item.product_id] === undefined) {
+                              handleToggleUnit(item.product_id, 0);
+                            }
+                            return (
+                              <div 
+                                key={index}
+                                className={`cursor-pointer min-w-[50px] px-2 py-1 text-center rounded ${activeUnit[item.product_id] === index ? 'bg-[#D9D6FF] text-white' : 'hover:bg-gray-100'}`}
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  handleToggleUnit(item.product_id, index);
+                                }}
+                              >
+                                <span>
+                                  {detail.unit_of_measurement}
+                                </span>
+                              </div>
+                            );
+                          })}
+                        </div>
                         </div>
                         <div className="flex flex-row items-center gap-2">
                           Total:
@@ -269,23 +319,22 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                               </div>
                             )
                           ))}
-                        </div>
                       </div>
                     </div> : null }
-                  <div className="flex flex-row items-center justify-between w-full flex-row w-full">
+                  <div className="flex flex-col md:flex-row items-center justify-between w-full flex-row w-full">
                     {activeMatch ? (
                       <>
                         <img 
                           src={activeMatch.image} 
                           alt={activeMatch.name} 
-                          className="w-[40px] h-[40px] rounded-md cursor-pointer mr-4" 
+                          className="md:w-auto h-[100px] md:w-[40px] md:h-[40px] rounded-md cursor-pointer mr-4" 
                           onClick={(e) => {
                             e.stopPropagation();
                             handleImageClick(item, activeMatch);
                           }}
                         />
                         <div className="flex flex-col w-full">
-                          <span className="font-medium truncate max-w-[200px]">{activeMatch.name}</span>
+                          <span className="font-medium truncate max-w-[300px] md:max-w-[200px]">{activeMatch.name}</span>
                           <span className="text-sm text-gray-500">{activeMatch.unit_size} {activeMatch.unit_of_measurement}</span>
                         </div>
                       </>
@@ -424,21 +473,21 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                 />
             </div>
 
-            <div className="max-h-[250px] overflow-y-auto">
+            <div className="md:max-h-[250px] max-h-[350px] overflow-y-auto">
               {searchResults?.map((match: any) => {
                 const activeMatch = activeMatchedItems[selectedItem.product_id]?._id === match._id;
                 return (
                     <div 
                       key={match._id}
-                      className={`flex justify-between items-center p-2 cursor-pointer border rounded-lg ${
+                      className={`flex flex-col md:flex-row justify-between items-center p-2 cursor-pointer border rounded-lg ${
                         activeMatch ? 'bg-[#09C274]/10 border-[#09C274]' : 'border-[transparent]'
                       }`}
                     >
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col md:flex-row items-center gap-4 w-full">
                         <img 
                           src={match.image} 
                           alt={match.name} 
-                          className="w-[60px] h-[60px] rounded-md"
+                          className="w-auto md:w-full md:w-[60px] h-[120px] md:h-[60px] object-cover rounded-md"
                           onClick={() => setImagePopup({ visible: true, item: match })}
                         />
                         <div className="flex flex-col">
@@ -446,7 +495,7 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                         </div>
                       </div>
 
-                      <div className="flex items-center gap-4">
+                      <div className="flex flex-col md:flex-row items-center gap-4 w-full mt-4 md:mt-0">
                         <span className="text-xs text-gray-500">{match.unit_size} {match.unit_of_measurement}</span>
                         <div className="flex items-center gap-2">
                           <button 
@@ -469,9 +518,9 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
                             +
                           </button>
                         </div>
-                        <span className="text-sm font-medium w-20 text-right">${(match.price * (quantities[match._id] || 1)).toFixed(2)}</span>
+                        <span className="text-sm font-medium md:w-20 text-right">${(match.price * (quantities[match._id] || 1)).toFixed(2)}</span>
                         <button 
-                          className={`px-3 py-1 rounded-full text-sm min-w-[100px] ${
+                          className={`px-3 py-1 rounded-full text-sm text-center w-full md:min-w-[100px] ${
                             activeMatch
                               ? 'bg-[#09C274] text-white'
                               : 'bg-gray-100 text-gray-800 hover:bg-gray-200'
