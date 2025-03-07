@@ -632,6 +632,7 @@ const MealPlanDetailPage = () => {
 
             setShoppingList(shoppingListItems);
             setIsShoppingListReady(true);
+            console.log(isShoppingListReady, 'isShoppingListReady')
             console.log("Shopping list updated with matches:", shoppingListItems);
             break;
           }
