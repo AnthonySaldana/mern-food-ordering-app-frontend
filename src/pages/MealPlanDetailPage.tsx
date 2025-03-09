@@ -351,6 +351,12 @@ const MealPlanDetailPage = () => {
         await new Promise(resolve => setTimeout(resolve, 1000));
         await refetchStoreMatches();
         setIsLoading(false);
+  
+        // Add scroll behavior after stores are loaded
+        const storesSection = document.getElementById('stores-section');
+        if (storesSection) {
+          storesSection.scrollIntoView({ behavior: 'smooth' });
+        }
       }
     }
   };
