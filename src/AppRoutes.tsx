@@ -7,7 +7,7 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import ManageRestaurantPage from "./pages/ManageRestaurantPage";
 import SearchPage from "./pages/SearchPage";
 // import DetailPage from "./pages/DetailPage";
-import OrderStatusPage from "./pages/OrderStatusPage";
+// import OrderStatusPage from "./pages/OrderStatusPage";
 import InfluencerDetailPage from "./pages/InfluencerDetailPage";
 import MealPlanDetailPage from "./pages/MealPlanDetailPage";
 import MealPlansPage from "./pages/MealPlansPage";
@@ -94,14 +94,14 @@ const AppRoutes = () => {
         }
       />
       <Route element={<ProtectedRoute />}>
-        <Route
+        {/* <Route
           path="/order-status"
           element={
             <Layout>
               <OrderStatusPage />
             </Layout>
           }
-        />
+        /> */}
         <Route
           path="/user-profile"
           element={
@@ -118,16 +118,15 @@ const AppRoutes = () => {
             </Layout>
           }
         />
+        <Route 
+          path="/admin/orders" 
+          element={
+              <Layout>
+                <AdminOrdersPage />
+              </Layout>
+          } 
+        />
       </Route>
-
-      <Route 
-        path="/admin/orders" 
-        element={
-            <Layout>
-              <AdminOrdersPage />
-            </Layout>
-        } 
-      />
 
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
