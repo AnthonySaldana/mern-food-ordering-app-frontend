@@ -62,11 +62,16 @@ const MealPlanDetailPage = () => {
 
   // Add meal type order mapping
   const mealTypeOrder: { [key: string]: number } = {
-    'Pre Workout': 1,
-    'Post Workout': 2,
+    'Pre-Workout': 1,
+    'Post-Workout': 2,
     'Lunch': 3,
-    'Dinner': 4,
-    'Snack': 5
+    'Dinner option 1': 4,
+    'Dinner option 2': 5,
+    'Dinner option 3': 6,
+    'Dinner option 4': 7,
+    'Dinner option 5': 8,
+    'Dinner option 6': 9,
+    'Snack': 10
   };
 
   // Sort recipes based on meal type if influencerId matches
