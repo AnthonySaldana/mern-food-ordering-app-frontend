@@ -48,23 +48,54 @@ export type OrderStatus =
 
 export type Order = {
   _id: string;
-  restaurant: Restaurant;
-  user: User;
+  user_id: string;
+  meal_plan_name?: string;
+  influencer_id?: string;
+  restaurant?: Restaurant;
   cartItems: {
     menuItemId: string;
     name: string;
     quantity: string;
   }[];
   deliveryDetails: {
-    name: string;
-    addressLine1: string;
-    city: string;
-    email: string;
+    name?: string;
+    email?: string;
+    addressLine1?: string;
+    city?: string;
+    street_num?: string;
+    street_name?: string;
+    state?: string;
+    zipcode?: string;
+    country: string;
+    latitude?: number;
+    longitude?: number;
+    instructions?: string;
+    tip_amount: number;
+    user_email?: string;
   };
-  totalAmount: number;
+  quote?: {
+    subtotal: number;
+    delivery_fee_cents: number;
+    service_fee_cents: number;
+    small_order_fee_cents: number;
+    sales_tax_cents: number;
+    delivery_time_min: number;
+    delivery_time_max: number;
+    total_without_tips: number;
+    expected_time_of_arrival: string;
+  };
+  added_fees?: {
+    flat_fee_cents: number;
+    percent_fee: number;
+    is_fee_taxable: boolean;
+    total_fee_cents: number;
+    sales_tax_cents: number;
+  };
+  plan_start_day?: string;
+  totalAmount?: number;
   status: OrderStatus;
   createdAt: string;
-  restaurantId: string;
+  restaurantId?: string;
 };
 
 export type RestaurantSearchResponse = {

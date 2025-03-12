@@ -7,13 +7,15 @@ import ProtectedRoute from "./auth/ProtectedRoute";
 import ManageRestaurantPage from "./pages/ManageRestaurantPage";
 import SearchPage from "./pages/SearchPage";
 // import DetailPage from "./pages/DetailPage";
-import OrderStatusPage from "./pages/OrderStatusPage";
+// import OrderStatusPage from "./pages/OrderStatusPage";
 import InfluencerDetailPage from "./pages/InfluencerDetailPage";
 import MealPlanDetailPage from "./pages/MealPlanDetailPage";
 import MealPlansPage from "./pages/MealPlansPage";
 import OrderReviewPage from "./pages/OrderReviewPage";
 // import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import MealPlanBreakdownPage from "./pages/MealPlanBreakdownPage";
+import AdminOrdersPage from "./pages/AdminOrdersPage";
+
 
 const AppRoutes = () => {
   return (
@@ -92,14 +94,14 @@ const AppRoutes = () => {
         }
       />
       <Route element={<ProtectedRoute />}>
-        <Route
+        {/* <Route
           path="/order-status"
           element={
             <Layout>
               <OrderStatusPage />
             </Layout>
           }
-        />
+        /> */}
         <Route
           path="/user-profile"
           element={
@@ -115,6 +117,14 @@ const AppRoutes = () => {
               <ManageRestaurantPage />
             </Layout>
           }
+        />
+        <Route 
+          path="/admin/orders" 
+          element={
+              <Layout>
+                <AdminOrdersPage />
+              </Layout>
+          } 
         />
       </Route>
 
