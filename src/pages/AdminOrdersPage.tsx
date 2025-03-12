@@ -148,7 +148,7 @@ const AdminOrdersPage = () => {
                 <td className="px-6 py-4 whitespace-nowrap">
                   <div>
                     <div>{order.deliveryDetails.user_email || "N/A"}</div>
-                    <div className="text-sm text-gray-500">{order.deliveryDetails.user_name || ""}</div>
+                    {/* <div className="text-sm text-gray-500">{order.deliveryDetails.user_name || ""}</div> */}
                   </div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
