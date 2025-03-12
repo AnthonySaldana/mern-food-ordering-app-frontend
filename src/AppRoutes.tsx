@@ -14,6 +14,8 @@ import MealPlansPage from "./pages/MealPlansPage";
 import OrderReviewPage from "./pages/OrderReviewPage";
 // import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import MealPlanBreakdownPage from "./pages/MealPlanBreakdownPage";
+import AdminOrdersPage from "./pages/AdminOrdersPage";
+
 
 const AppRoutes = () => {
   return (
@@ -117,6 +119,15 @@ const AppRoutes = () => {
           }
         />
       </Route>
+
+      <Route 
+        path="/admin/orders" 
+        element={
+            <Layout>
+              <AdminOrdersPage />
+            </Layout>
+        } 
+      />
 
       <Route path="*" element={<Navigate to="/" />} />
     </Routes>
