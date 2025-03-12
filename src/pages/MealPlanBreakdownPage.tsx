@@ -61,7 +61,7 @@ const MealPlanDetailPage = () => {
   }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
 
   // Add meal type order mapping
-  const mealTypeOrder = {
+  const mealTypeOrder: { [key: string]: number } = {
     'Pre Workout': 1,
     'Post Workout': 2,
     'Lunch': 3,
