@@ -60,6 +60,30 @@ const MealPlanDetailPage = () => {
     };
   }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
 
+  // Add meal type order mapping
+  const mealTypeOrder: { [key: string]: number } = {
+    'Pre-Workout': 1,
+    'Post-Workout': 2,
+    'Lunch': 3,
+    'Dinner option 1': 4,
+    'Dinner option 2': 5,
+    'Dinner option 3': 6,
+    'Dinner option 4': 7,
+    'Dinner option 5': 8,
+    'Dinner option 6': 9,
+    'Snack': 10
+  };
+
+  // Sort recipes based on meal type if influencerId matches
+  const sortedRecipes = recipes?.slice().sort((a, b) => {
+    if (influencerId === '674b901be214325c55e161fc') {
+      const typeA = a.name.split(':')[0].trim();
+      const typeB = b.name.split(':')[0].trim();
+      return (mealTypeOrder[typeA] || 999) - (mealTypeOrder[typeB] || 999);
+    }
+    return 0;
+  });
+
   return (
     <div className="flex flex-col gap-4 bg-white p-3 rounded-md lg:p-6 lg:max-w-10xl lg:mx-auto lg:mt-8 max-w-[900px] mx-auto">
       {/* Add Macros Summary */}
@@ -93,7 +117,7 @@ const MealPlanDetailPage = () => {
         <div key={planIndex} className="mb-12">
           <p className="text-md font-bold">Here are the recipes!</p>
           <div className="grid grid-cols-1 gap-4 mb-6">
-            {recipes?.map((recipe) => (
+            {sortedRecipes?.map((recipe) => (
               <MenuItemDetail
                 key={recipe._id}
                 menuItem={recipe}

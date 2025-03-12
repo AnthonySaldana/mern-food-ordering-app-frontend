@@ -68,7 +68,7 @@ const OrderItemCard = ({ order }: Props) => {
           <div>
             Total Cost:
             <span className="ml-2 font-normal">
-              £{(order.totalAmount / 100).toFixed(2)}
+              {order.quote?.total_without_tips ? (order.quote.total_without_tips / 100).toFixed(2) : "N/A"}
             </span>
           </div>
         </CardTitle>
