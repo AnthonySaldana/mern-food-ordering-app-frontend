@@ -92,23 +92,23 @@ const MealPlanDetailPage = () => {
         <p className="text-sm text-gray-500">{influencer?.mealPlans[Number(planIndex) || 0]?.name}</p>
       </div>
       <div className="bg-gray-50 p-4 rounded-lg shadow-sm">
-        <h2 className="text-lg font-bold mb-2">Daily Nutrition Summary</h2>
+        <h2 className="text-lg font-bold mb-2">Average Daily Nutrition</h2>
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
           <div className="text-center">
             <p className="text-gray-600">Calories</p>
-            <p className="font-semibold">{totals?.calories.toFixed(0)} kcal</p>
+            <p className="font-semibold">{influencer?.mealPlans[Number(planIndex) || 0]?.totalCalories.toFixed(0)} kcal</p>
           </div>
           <div className="text-center">
             <p className="text-gray-600">Protein</p>
-            <p className="font-semibold">{totals?.protein.toFixed(1)}g</p>
+            <p className="font-semibold">{influencer?.mealPlans[Number(planIndex) || 0]?.totalProtein.toFixed(1)}g</p>
           </div>
           <div className="text-center">
             <p className="text-gray-600">Carbs</p>
-            <p className="font-semibold">{totals?.carbs.toFixed(1)}g</p>
+            <p className="font-semibold">{influencer?.mealPlans[Number(planIndex) || 0]?.totalCarbs.toFixed(1)}g</p>
           </div>
           <div className="text-center">
             <p className="text-gray-600">Fat</p>
-            <p className="font-semibold">{totals?.fat.toFixed(1)}g</p>
+            <p className="font-semibold">{influencer?.mealPlans[Number(planIndex) || 0]?.totalFat.toFixed(1)}g</p>
           </div>
         </div>
       </div>
