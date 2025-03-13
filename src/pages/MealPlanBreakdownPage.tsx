@@ -51,14 +51,14 @@ const MealPlanDetailPage = () => {
   }
 
   // Calculate totals
-  const totals = recipes?.reduce((acc, recipe) => {
-    return {
-      calories: (acc.calories || 0) + (recipe.calories || 0),
-      protein: (acc.protein || 0) + (recipe.protein || 0),
-      carbs: (acc.carbs || 0) + (recipe.carbs || 0),
-      fat: (acc.fat || 0) + (recipe.fat || 0),
-    };
-  }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
+  // const totals = recipes?.reduce((acc, recipe) => {
+  //   return {
+  //     calories: (acc.calories || 0) + (recipe.calories || 0),
+  //     protein: (acc.protein || 0) + (recipe.protein || 0),
+  //     carbs: (acc.carbs || 0) + (recipe.carbs || 0),
+  //     fat: (acc.fat || 0) + (recipe.fat || 0),
+  //   };
+  // }, { calories: 0, protein: 0, carbs: 0, fat: 0 });
 
   // Add meal type order mapping
   const mealTypeOrder: { [key: string]: number } = {
