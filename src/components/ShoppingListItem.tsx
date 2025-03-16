@@ -205,8 +205,8 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     if (currentIndex > 0) {
       setSelectedItem(shoppingList[currentIndex - 1]);
       setSearchResults([]);
-      setSearchQuery(shoppingList[currentIndex - 1].name);
-      handleSearchChange({ target: { value: shoppingList[currentIndex - 1].name } });
+      setSearchQuery(shoppingList[currentIndex - 1].searchTerm);
+      handleSearchChange({ target: { value: shoppingList[currentIndex - 1].searchTerm } });
     }
   };
 
@@ -216,8 +216,8 @@ const ShoppingListComponent = ({ shoppingList, tipAmount, handleCreateOrder,
     if (currentIndex < shoppingList.length - 1) {
       setSearchResults([]);
       setSelectedItem(shoppingList[currentIndex + 1]);
-      setSearchQuery(shoppingList[currentIndex + 1].name);
-      handleSearchChange({ target: { value: shoppingList[currentIndex + 1].name } });
+      setSearchQuery(shoppingList[currentIndex + 1].searchTerm);
+      handleSearchChange({ target: { value: shoppingList[currentIndex + 1].searchTerm } });
     }
   };
 
