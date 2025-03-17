@@ -31,7 +31,7 @@ export const useSearchGroceryStores = (params: {
   user_zipcode?: string;
   user_country?: string;
 }) => {
-  const { latitude, longitude, query = "", maximumMiles = 3, open, pickup, sort, search_focus, user_street_num, user_street_name, user_city, user_state, user_zipcode, user_country } = params;
+  const { latitude, longitude, query = "", maximumMiles = 7, open, pickup, sort, search_focus, user_street_num, user_street_name, user_city, user_state, user_zipcode, user_country } = params;
 
   return useQuery(
     ["groceryStores", { latitude, longitude, query, maximumMiles, open, pickup, sort, search_focus, user_street_num, user_street_name, user_city, user_state, user_zipcode, user_country }],
