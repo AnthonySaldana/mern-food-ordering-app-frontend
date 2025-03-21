@@ -15,7 +15,7 @@ import OrderReviewPage from "./pages/OrderReviewPage";
 // import OrderConfirmationPage from "./pages/OrderConfirmationPage";
 import MealPlanBreakdownPage from "./pages/MealPlanBreakdownPage";
 import AdminOrdersPage from "./pages/AdminOrdersPage";
-
+import CreatorOnboardingPage from "./pages/CreatorOnboardingPage";
 
 const AppRoutes = () => {
   return (
@@ -118,6 +118,7 @@ const AppRoutes = () => {
             </Layout>
           }
         />
+        <Route path="creator-onboarding" element={<CreatorOnboardingPage />} />
         <Route 
           path="/admin/orders" 
           element={

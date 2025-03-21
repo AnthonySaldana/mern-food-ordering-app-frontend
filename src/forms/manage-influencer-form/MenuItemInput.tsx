@@ -41,7 +41,7 @@ const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
           </FormItem>
         )}
       />
-      <FormField
+      {/* <FormField
         control={control}
         name={`mealPlans.${mealPlanIndex}.menuItems.${index}.price`}
         render={({ field }) => (
@@ -58,7 +58,7 @@ const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
             </FormControl>
           </FormItem>
         )}
-      />
+      /> */}
       <FormField
         control={control}
         name={`mealPlans.${mealPlanIndex}.menuItems.${index}.ingredients`}
