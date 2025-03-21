@@ -84,6 +84,47 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
           </FormItem>
         )}
       />
+      <FormField
+        control={control}
+        name={`mealPlans.${index}.totalProtein`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Total Protein (g)</FormLabel>
+            <FormControl>
+              <Input {...field} type="number" className="bg-white" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={`mealPlans.${index}.totalCarbs`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Total Carbs (g)</FormLabel>
+            <FormControl>
+              <Input {...field} type="number" className="bg-white" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
+
+      <FormField
+        control={control}
+        name={`mealPlans.${index}.totalFat`}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Total Fat (g)</FormLabel>
+            <FormControl>
+              <Input {...field} type="number" className="bg-white" />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
 
       <div className="space-y-2 mt-4">
         <FormLabel>Meal Plan Image</FormLabel>

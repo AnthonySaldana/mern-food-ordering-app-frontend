@@ -14,6 +14,18 @@ import MobileNavLinks from "./MobileNavLinks";
 const MobileNav = () => {
   const { isAuthenticated, loginWithRedirect, user } = useAuth0();
 
+  const handleCreatorSignup = async () => {
+    await loginWithRedirect({
+      appState: {
+        returnTo: "/creator-onboarding",
+        isCreator: true,
+      },
+      authorizationParams: {
+        screen_hint: "signup",
+      },
+    });
+  };
+
   return (
     <Sheet>
       <SheetTrigger>
@@ -35,16 +47,25 @@ const MobileNav = () => {
           {isAuthenticated ? (
             <MobileNavLinks />
           ) : (
-            <Button
-              onClick={() => loginWithRedirect({
-                appState: {
-                  returnTo: window.location.pathname,
-                },
-              })}
-              className="flex-1 font-bold bg-[#50ad40]"
-            >
-              Log In
-            </Button>
+            <>
+              <Button
+                onClick={() => loginWithRedirect({
+                  appState: {
+                    returnTo: window.location.pathname,
+                  },
+                })}
+                className="flex-1 font-bold bg-[#50ad40]"
+              >
+                Log In
+              </Button>
+              <Button
+                onClick={handleCreatorSignup}
+                className="flex-1 font-bold border-[#50ad40] text-[#50ad40] hover:bg-[#50ad40] hover:text-white"
+                variant="outline"
+              >
+                Become a Creator
+              </Button>
+            </>
           )}
         </SheetDescription>
       </SheetContent>
