@@ -41,7 +41,7 @@ const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
           </FormItem>
         )}
       />
-      <FormField
+      {/* <FormField
         control={control}
         name={`mealPlans.${mealPlanIndex}.menuItems.${index}.price`}
         render={({ field }) => (
@@ -58,8 +58,8 @@ const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
             </FormControl>
           </FormItem>
         )}
-      />
-      <FormField
+      /> */}
+      {/* <FormField
         control={control}
         name={`mealPlans.${mealPlanIndex}.menuItems.${index}.ingredients`}
         render={({ field }) => (
@@ -76,20 +76,20 @@ const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
             </FormControl>
           </FormItem>
         )}
-      />
+      /> */}
       <FormField
         control={control}
-        name={`mealPlans.${mealPlanIndex}.menuItems.${index}.instructions`}
+        name={`mealPlans.${mealPlanIndex}.menuItems.${index}.searchTerm`}
         render={({ field }) => (
           <FormItem>
             <FormLabel className="flex items-center gap-1">
-              Instructions <FormMessage />
+              Search Term <FormMessage />
             </FormLabel>
             <FormControl>
               <Input
                 type="textarea"
                 {...field}
-                placeholder="1. Grill chicken breast. 2. Chop vegetables. 3. Mix ingredients in a bowl."
+                placeholder="Enter a search term for this grocery item"
                 className="bg-white"
               />
             </FormControl>
@@ -188,7 +188,7 @@ const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
           />
         </div>
       </div>
-      <FormField
+      {/* <FormField
         control={control}
         name={`mealPlans.${mealPlanIndex}.menuItems.${index}.positiveDescriptors`}
         render={({ field }) => (
@@ -223,7 +223,7 @@ const MenuItemInput = ({ index, removeMenuItem, mealPlanIndex }: Props) => {
             </FormControl>
           </FormItem>
         )}
-      />
+      /> */}
       <Button
         type="button"
         onClick={removeMenuItem}

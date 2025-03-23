@@ -14,6 +14,9 @@ const AuthCallbackPage = () => {
   // Parse the returnTo parameter from the URL
   const searchParams = new URLSearchParams(location.search);
   const returnTo = searchParams.get("returnTo") || "/";
+  const isCreator = searchParams.get("isCreator") || false;
+  console.log("isCreator", isCreator);
+  console.log("returnTo", returnTo);
 
   useEffect(() => {
     if (isLoading) {
@@ -35,15 +38,31 @@ const AuthCallbackPage = () => {
 
     const createNewUser = async () => {
       if (user.sub && user.email && !hasCreatedUser.current) {
-        await createUser({ auth0Id: user.sub, email: user.email });
+        // Check if this is a creator signup
+        // const state = JSON.parse(localStorage.getItem("auth0_state") || "{}");
+        // const appState = state.appState || {};
+        // const isCreator = appState.isCreator || false;
+        
+        await createUser({
+          auth0Id: user.sub,
+          email: user.email,
+          role: returnTo === "/creator-onboarding" ? "creator" : "user"
+        });
+        
         hasCreatedUser.current = true;
         console.log("creating new user await done");
-        navigate(returnTo); // Use the returnTo parameter for navigation
+        
+        // If it's a creator, navigate to creator onboarding
+        if (isCreator) {
+          navigate("/creator-onboarding");
+        } else {
+          navigate(returnTo);
+        }
       }
     };
 
     createNewUser();
-  }, [createUser, navigate, user, isLoading, error, returnTo]);
+  }, [createUser, navigate, user, isLoading, error, returnTo, isCreator]);
 
   return <>Loading...</>;
 };

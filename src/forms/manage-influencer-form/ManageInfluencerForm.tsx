@@ -26,10 +26,6 @@ const formSchema = z
     country: z.string({
       required_error: "Country is required",
     }),
-    deliveryPrice: z.coerce.number({
-      required_error: "delivery price is required",
-      invalid_type_error: "must be a valid number",
-    }),
     estimatedDeliveryTime: z.coerce.number({
       required_error: "estimated delivery time is required",
       invalid_type_error: "must be a valid number",
@@ -48,12 +44,15 @@ const formSchema = z
         name: z.string().min(1, "name is required"),
         description: z.string().min(1, "description is required"),
         totalCalories: z.coerce.number().optional(),
+        totalProtein: z.coerce.number().default(0),
+        totalCarbs: z.coerce.number().default(0),
+        totalFat: z.coerce.number().default(0),
         imageUrl: z.string().optional(),
         imageFile: z.instanceof(File, { message: "Image is required" }).optional(),
         menuItems: z.array(
           z.object({
             name: z.string().min(1, "name is required"),
-            price: z.coerce.number().min(1, "price is required"),
+            price: z.coerce.number().min(0, "price is required"),
             ingredients: z.string().optional(),
             calories: z.coerce.number().optional(),
             macros: z.object({
@@ -93,11 +92,31 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
       bio: "",
       city: "",
       country: "",
-      deliveryPrice: 0,
+      // deliveryPrice: 0,
       estimatedDeliveryTime: 0,
       socialMediaHandles: [{ platform: "", handle: "" }],
       cuisines: [],
-      mealPlans: [{ name: "", description: "", totalCalories: 0, imageUrl: "", imageFile: undefined, menuItems: [{ name: "", price: 0, ingredients: "", calories: 0, macros: { protein: 0, carbs: 0, fat: 0 }, imageUrl: "", imageFile: undefined, positiveDescriptors: "", negativeDescriptors: "" }] }],
+      mealPlans: [{ 
+        name: "", 
+        description: "", 
+        totalCalories: 0, 
+        totalProtein: 0, 
+        totalCarbs: 0,   
+        totalFat: 0,     
+        imageUrl: "", 
+        imageFile: undefined, 
+        menuItems: [{ 
+          name: "", 
+          price: 0, 
+          ingredients: "", 
+          calories: 0, 
+          macros: { protein: 0, carbs: 0, fat: 0 }, 
+          imageUrl: "", 
+          imageFile: undefined, 
+          positiveDescriptors: "", 
+          negativeDescriptors: "" 
+        }] 
+      }],
       imageUrl: "",
       imageFile: undefined,
     },
@@ -111,12 +130,15 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
     console.log(influencer, 'Influencer data in effect');
 
     try {
-      const deliveryPriceFormatted = parseInt(
-        (influencer.deliveryPrice / 100).toFixed(2)
-      );
+      // const deliveryPriceFormatted = parseInt(
+      //   (influencer.deliveryPrice / 100).toFixed(2)
+      // );
 
       const mealPlansFormatted = influencer.mealPlans ? influencer.mealPlans.map((plan) => ({
         ...plan,
+        totalProtein: plan.totalProtein || 0,
+        totalCarbs: plan.totalCarbs || 0,
+        totalFat: plan.totalFat || 0,
         menuItems: plan.menuItems.map((item) => ({
           ...item,
           price: parseInt((item.price / 100).toFixed(2)),
@@ -125,7 +147,7 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
 
       const updatedInfluencer = {
         ...influencer,
-        deliveryPrice: deliveryPriceFormatted,
+        // deliveryPrice: deliveryPriceFormatted,
         mealPlans: mealPlansFormatted,
       };
 
@@ -146,7 +168,7 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
       formData.append("bio", formDataJson.bio);
       formData.append("city", formDataJson.city);
       formData.append("country", formDataJson.country);
-      formData.append("deliveryPrice", (formDataJson.deliveryPrice * 100).toString());
+      // formData.append("deliveryPrice", (formDataJson.deliveryPrice * 100).toString());
       formData.append("estimatedDeliveryTime", formDataJson.estimatedDeliveryTime.toString());
 
       if (formDataJson.socialMediaHandles) {
@@ -170,56 +192,36 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
         if (plan.totalCalories) {
           formData.append(`mealPlans[${planIndex}][totalCalories]`, plan.totalCalories.toString());
         }
-        plan.menuItems.forEach((item, itemIndex) => {
-          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][name]`, item.name);
-          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][price]`, (item.price * 100).toString());
-          if (item.ingredients) {
-            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][ingredients]`, item.ingredients);
-          }
-          if (item.calories) {
-            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][calories]`, item.calories.toString());
-          }
-          if (item.macros?.protein) {
-            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][protein]`, item.macros.protein.toString());
-          }
-          if (item.macros?.carbs) {
-            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][carbs]`, item.macros.carbs.toString());
-          }
-          if (item.macros?.fat) {
-            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][fat]`, item.macros.fat.toString());
-          }
-          if (item.positiveDescriptors) {
-            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][positiveDescriptors]`, item.positiveDescriptors);
-          }
-          if (item.negativeDescriptors) {
-            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][negativeDescriptors]`, item.negativeDescriptors);
-          }
-        });
-      });
-
-      if (formDataJson.imageFile) {
-        formData.append(`imageFile`, formDataJson.imageFile);
-      }
-
-      formDataJson.mealPlans.forEach((plan, planIndex) => {
-        if (plan.imageFile) {
-          formData.append(`mealPlans[${planIndex}][imageFile]`, plan.imageFile);
+        if (plan.totalProtein) {
+          formData.append(`mealPlans[${planIndex}][totalProtein]`, plan.totalProtein.toString());
+        }
+        if (plan.totalCarbs) {
+          formData.append(`mealPlans[${planIndex}][totalCarbs]`, plan.totalCarbs.toString());
+        }
+        if (plan.totalFat) {
+          formData.append(`mealPlans[${planIndex}][totalFat]`, plan.totalFat.toString());
         }
         plan.menuItems.forEach((item, itemIndex) => {
-          if (item.imageFile) {
-            formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][imageFile]`, item.imageFile);
-          }
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][name]`, item.name);
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][price]`, item.price.toString());
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][ingredients]`, item.ingredients || "");
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][calories]`, item.calories?.toString() || "");
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][protein]`, item.macros?.protein?.toString() || "");
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][carbs]`, item.macros?.carbs?.toString() || "");
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][macros][fat]`, item.macros?.fat?.toString() || "");
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][imageUrl]`, item.imageUrl || "");
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][imageFile]`, item.imageFile || "");
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][positiveDescriptors]`, item.positiveDescriptors || "");
+          formData.append(`mealPlans[${planIndex}][menuItems][${itemIndex}][negativeDescriptors]`, item.negativeDescriptors || "");
         });
       });
 
-      console.log(formDataJson);
-      console.log("Running submit on save");
+      formData.append("imageUrl", formDataJson.imageUrl || "");
+      formData.append("imageFile", formDataJson.imageFile || "");
+
       onSave(formData);
     } catch (error) {
       console.error("Error submitting form:", error);
-      // You might want to show an error message to the user here
-      // For example:
-      // form.setError("root", { type: "manual", message: "An error occurred while submitting the form. Please try again." });
     }
   };
 
@@ -231,15 +233,18 @@ const ManageInfluencerForm = ({ onSave, isLoading, influencer }: Props) => {
         })}
         className="space-y-8 bg-gray-50 p-10 rounded-lg"
       >
-        <a href={`/influencer/${influencer?._id}`} target="_blank" rel="noopener noreferrer">View Influencer Page</a>
+        {influencer?._id && (
+          <a href={`/influencer/${influencer._id}`} target="_blank" rel="noopener noreferrer">View Influencer Page</a>
+        )}
+        <ImageSection />
         <DetailsSection />
         <Separator />
         <CuisinesSection />
         <Separator />
         <MealPlansSection />
         <Separator />
-        <ImageSection />
         {isLoading ? <LoadingButton /> : <Button type="submit">Submit</Button>}
+        {window.location.pathname === '/creator-onboarding' && (isLoading ? <LoadingButton /> : <Button type="submit">Save for later</Button>)}
       </form>
     </Form>
   );

@@ -17,6 +17,7 @@ const UsernameMenu = () => {
   console.log(isGetLoading, 'Is user loading');
 
   const isAdmin = currentUser?.role === 'admin';
+  const isCreator = currentUser?.role === 'creator';
 
   return (
     <DropdownMenu>
@@ -34,6 +35,26 @@ const UsernameMenu = () => {
               Manage Influencer
             </Link>
           </DropdownMenuItem>
+        )}
+        {isCreator && (
+          <>
+            <DropdownMenuItem>
+              <Link
+                to="/creator-onboarding"
+                className="font-bold hover:text-[#50ad40]"
+              >
+                Creator Setup
+              </Link>
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <Link
+                to="/manage-restaurant"
+                className="font-bold hover:text-[#50ad40]"
+              >
+                Manage Profile
+              </Link>
+            </DropdownMenuItem>
+          </>
         )}
         <DropdownMenuItem>
           <Link to="/user-profile" className="font-bold hover:text-[#50ad40]">
