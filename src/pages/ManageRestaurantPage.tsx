@@ -38,7 +38,7 @@ const ManageRestaurantPage = () => {
       <TabsList>
         <TabsTrigger value="orders">Orders</TabsTrigger>
         <TabsTrigger value="manage-influencer">Manage Influencer</TabsTrigger>
-        <TabsTrigger value="manage-recipes">Manage Recipes</TabsTrigger>
+        <TabsTrigger value="manage-recipes">Recipe Library</TabsTrigger>
       </TabsList>
       <TabsContent
         value="orders"
