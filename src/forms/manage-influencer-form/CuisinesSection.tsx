@@ -16,7 +16,7 @@ const CuisinesSection = () => {
       <div>
         <h2 className="text-2xl font-bold">Categories</h2>
         <FormDescription>
-          Select the categories that your restaurant serves
+          Select your meal plan categories
         </FormDescription>
       </div>
       <FormField

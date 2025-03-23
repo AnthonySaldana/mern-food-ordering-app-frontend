@@ -76,9 +76,9 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
         name={`mealPlans.${index}.totalCalories`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Total Calories</FormLabel>
+            <FormLabel>Average Weekly Calories</FormLabel>
             <FormControl>
-              <Input {...field} placeholder="Total Calories" type="number" />
+              <Input {...field} placeholder="Average Weekly Calories" type="number" />
             </FormControl>
             <FormMessage />
           </FormItem>
@@ -89,7 +89,7 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
         name={`mealPlans.${index}.totalProtein`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Total Protein (g)</FormLabel>
+            <FormLabel>Average Weekly Protein (g)</FormLabel>
             <FormControl>
               <Input {...field} type="number" className="bg-white" />
             </FormControl>
@@ -103,7 +103,7 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
         name={`mealPlans.${index}.totalCarbs`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Total Carbs (g)</FormLabel>
+            <FormLabel>Average Weekly Carbs (g)</FormLabel>
             <FormControl>
               <Input {...field} type="number" className="bg-white" />
             </FormControl>
@@ -117,7 +117,7 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
         name={`mealPlans.${index}.totalFat`}
         render={({ field }) => (
           <FormItem>
-            <FormLabel>Total Fat (g)</FormLabel>
+            <FormLabel>Average Weekly Fat (g)</FormLabel>
             <FormControl>
               <Input {...field} type="number" className="bg-white" />
             </FormControl>
@@ -162,7 +162,7 @@ const MealPlanItem = ({ control, index, removeMealPlan }: { control: Control<any
       </div>
 
       <div className="mt-4">
-        <h3 className="text-md font-medium">Menu Items</h3>
+        <h3 className="text-md font-medium">Grocery List</h3>
         {menuItems.map((menuItem, menuItemIndex) => (
           <MenuItemInput
             key={menuItem.id}

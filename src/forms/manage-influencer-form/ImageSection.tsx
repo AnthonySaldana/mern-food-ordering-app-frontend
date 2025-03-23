@@ -5,6 +5,7 @@ import {
   FormField,
   FormItem,
   FormMessage,
+  FormLabel,
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useFormContext } from "react-hook-form";
@@ -17,10 +18,9 @@ const ImageSection = () => {
   return (
     <div className="space-y-2">
       <div>
-        <h2 className="text-2xl font-bold">Image</h2>
+        <h2 className="text-2xl font-bold">Details</h2>
         <FormDescription>
-          Add an image that will be displayed on your restaurant listing in the
-          search results. Adding a new image will overwrite the existing one.
+          Enter the details about your influencer profile
         </FormDescription>
       </div>
 
@@ -33,6 +33,7 @@ const ImageSection = () => {
             />
           </AspectRatio>
         )}
+        <FormLabel>Influencer Image</FormLabel>
         <FormField
           control={control}
           name="imageFile"
